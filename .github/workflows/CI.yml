@@ -24,8 +24,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
       - name: Run a build
-        run: ./gradlew build
+        run: mvn -B package --file pom.xml
+
+      - name: Run tests
+        run: mvn test
