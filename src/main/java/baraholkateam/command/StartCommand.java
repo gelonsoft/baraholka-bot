@@ -11,6 +11,7 @@ public class StartCommand extends Command {
             Вы можете начать создавать новое объявление при помощи команды /%s.
             Также Вы можете перейти в главное меню /%s и следовать дальнейшим инструкциям.
             Справочная информация по функциям бота представлена по команде /%s.""";
+
     public StartCommand(String commandIdentifier, String description) {
         super(commandIdentifier, description);
     }

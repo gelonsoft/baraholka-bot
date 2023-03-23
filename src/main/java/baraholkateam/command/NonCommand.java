@@ -14,6 +14,7 @@ public class NonCommand {
     private static final String UNKNOWN_COMMAND = """
             Введеная команда не понятна боту.
             Пожалуйста, вернитесь в /%s и следуйте инструкциям.""";
+
     public AnswerPair nonCommandExecute(String text, Long chatId, IState currentState) {
         if (currentState == null) {
             return new AnswerPair(String.format(NO_CURRENT_STATE, State.MainMenu.getIdentifier()), true);
@@ -24,7 +25,8 @@ public class NonCommand {
             return new AnswerPair(String.format(COMMAND_ERROR_MESSAGE, currentState.getIdentifier(),
                     State.MainMenu.getIdentifier()), true);
         } else if (currentState.equals(Substate.AddPhotos)) {
-            // TODO сделать обработку добавленных фотографий согласно ТЗ. Может быть также нарушения правил добавления фотографий, тогда нужна соответствующая обработка
+            // TODO сделать обработку добавленных фотографий согласно ТЗ. Может быть также нарушения правил добавления
+            //  фотографий, тогда нужна соответствующая обработка
             return new AnswerPair("Фотографии успешно отправлены.", false);
         } else if (currentState.equals(Substate.AddCity)) {
             // TODO аналогично предыдущему
@@ -38,7 +40,7 @@ public class NonCommand {
     }
 
     /**
-     * Хранит ответ бота с индикатором ранее присланного ошибочного сообщения от пользователя
+     * Хранит ответ бота с индикатором ранее присланного ошибочного сообщения от пользователя.
      */
     public static class AnswerPair {
         private final String answer;

@@ -12,10 +12,11 @@ public enum Substate implements IState {
     private final String description;
     // TODO указать переходы между состояниями согласно схеме создания и удаления объявления
     private static final Map<IState, IState> NEXT_SUBSTATE = Map.of(
-            State.NewAdvertisement, AddPhotos, // обязательно переходим со команды (стейта) в первый сабстейт
+            State.NewAdvertisement, AddPhotos, // обязательно переходим с команды (стейта) в первый сабстейт
             AddPhotos, AddCity,
             AddCity, AddDescription,
-            AddDescription, State.MainMenu // обязательно после завершения последнего сабстейта команды переходим в главное меню
+            AddDescription, State.MainMenu // обязательно после завершения последнего сабстейта команды переходим
+    // в главное меню
     );
 
     Substate(String identifier, String description) {

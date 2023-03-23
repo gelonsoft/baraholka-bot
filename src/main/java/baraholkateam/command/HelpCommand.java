@@ -12,6 +12,7 @@ public class HelpCommand extends Command {
             Полный список команд:
             %s""";
     private final Collection<IBotCommand> commands;
+
     public HelpCommand(String commandIdentifier, String description, Collection<IBotCommand> commands) {
         super(commandIdentifier, description);
         this.commands = commands;

@@ -1,6 +1,10 @@
 package baraholkateam.bot;
 
-import baraholkateam.command.*;
+import baraholkateam.command.HelpCommand;
+import baraholkateam.command.MainMenuCommand;
+import baraholkateam.command.NewAdvertisementCommand;
+import baraholkateam.command.NonCommand;
+import baraholkateam.command.StartCommand;
 import baraholkateam.util.IState;
 import baraholkateam.util.State;
 import baraholkateam.util.Substate;
