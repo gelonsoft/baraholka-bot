@@ -12,6 +12,9 @@ public final class BaraholkaBotProperties {
     public static final String USERNAME;
     public static final String ID;
     public static final String TOKEN;
+    public static final String DB_URL;
+    public static final String DB_USER;
+    public static final String DB_PASS;
     private static final Properties properties = new Properties();
     private static final Logger logger = LoggerFactory.getLogger(BaraholkaBotProperties.class);
 
@@ -27,5 +30,8 @@ public final class BaraholkaBotProperties {
         USERNAME = properties.getProperty("bot.username");
         ID = properties.getProperty("bot.id");
         TOKEN = properties.getProperty("bot.token");
+        DB_URL = properties.getProperty("db.url");
+        DB_USER = properties.getProperty("db.user");
+        DB_PASS = properties.getProperty("db.password");
     }
 }

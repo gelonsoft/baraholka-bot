@@ -6,7 +6,10 @@ public enum Substate implements IState {
     // TODO добавить подсостояния для процесса создания объявления и удаления объявления
     AddPhotos(State.NewAdvertisement.getIdentifier(), "Добавление фотографий"),
     AddCity(State.NewAdvertisement.getIdentifier(), "Добавление города"),
-    AddDescription(State.NewAdvertisement.getIdentifier(), "Добавление описания");
+    AddDescription(State.NewAdvertisement.getIdentifier(), "Добавление описания"),
+    ChooseTags(State.SearchAdvertisement.getIdentifier(), "Выбор хэштегов для поиска объявлений"),
+    ChooseAdvertisement(State.SearchAdvertisement.getIdentifier(),
+            "Выбор интересующего объявления из результатов поиска");
 
     private final String identifier;
     private final String description;
@@ -15,7 +18,10 @@ public enum Substate implements IState {
             State.NewAdvertisement, AddPhotos, // обязательно переходим с команды (стейта) в первый сабстейт
             AddPhotos, AddCity,
             AddCity, AddDescription,
-            AddDescription, State.MainMenu // обязательно после завершения последнего сабстейта команды переходим
+            AddDescription, State.MainMenu, // обязательно после завершения последнего сабстейта команды переходим
+            State.SearchAdvertisement, ChooseTags,
+            ChooseTags, ChooseAdvertisement,
+            ChooseAdvertisement, State.MainMenu
     // в главное меню
     );
 

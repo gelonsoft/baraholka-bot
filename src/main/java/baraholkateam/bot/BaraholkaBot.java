@@ -4,7 +4,9 @@ import baraholkateam.command.HelpCommand;
 import baraholkateam.command.MainMenuCommand;
 import baraholkateam.command.NewAdvertisementCommand;
 import baraholkateam.command.NonCommand;
+import baraholkateam.command.SearchAdvertisements;
 import baraholkateam.command.StartCommand;
+import baraholkateam.database.SQLExecutor;
 import baraholkateam.util.IState;
 import baraholkateam.util.State;
 import baraholkateam.util.Substate;
@@ -28,6 +30,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
     private final String botName;
     private final String botToken;
     private final NonCommand nonCommand;
+    private final SQLExecutor sqlExecutor;
     private final Map<Long, IState> currentState = new ConcurrentHashMap<>();
     private final Logger logger = LoggerFactory.getLogger(BaraholkaBot.class);
 
@@ -36,13 +39,22 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         this.botName = botName;
         this.botToken = botToken;
 
-        nonCommand = new NonCommand();
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            logger.error(String.format("Cannot find JDBC driver: %s", e.getMessage()));
+            throw new RuntimeException("Failed to load JDBC driver", e);
+        }
+        sqlExecutor = new SQLExecutor();
+        nonCommand = new NonCommand(sqlExecutor);
 
         register(new StartCommand(State.Start.getIdentifier(), State.Start.getDescription()));
         register(new HelpCommand(State.Help.getIdentifier(), State.Help.getDescription(), getRegisteredCommands()));
         register(new MainMenuCommand(State.MainMenu.getIdentifier(), State.MainMenu.getDescription()));
         register(new NewAdvertisementCommand(State.NewAdvertisement.getIdentifier(),
                 State.NewAdvertisement.getDescription()));
+        register(new SearchAdvertisements(State.SearchAdvertisement.getIdentifier(),
+                State.SearchAdvertisement.getDescription()));
     }
 
     @Override

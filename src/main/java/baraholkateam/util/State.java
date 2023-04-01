@@ -7,7 +7,8 @@ public enum State implements IState {
     Start("start", "Старт"),
     Help("help", "Справочная информация по боту"),
     MainMenu("menu", "Главное меню"),
-    NewAdvertisement("new_advertisement", "Создание нового объявления");
+    NewAdvertisement("new_advertisement", "Создание нового объявления"),
+    SearchAdvertisement("search_advertisement", "Поиск объявлений по хэштегам");
 
     private final String identifier;
     private final String description;

@@ -1,11 +1,13 @@
 package baraholkateam.command;
 
+import baraholkateam.util.State;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.IBotCommand;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.Collection;
+import java.util.Objects;
 
 public class HelpCommand extends Command {
     private static final String HELP_INFO = """
@@ -27,12 +29,15 @@ public class HelpCommand extends Command {
     private String allCommands() {
         StringBuilder result = new StringBuilder();
         for (IBotCommand command : commands) {
-            result
-                    .append("/")
-                    .append(command.getCommandIdentifier())
-                    .append(" - ")
-                    .append(command.getDescription())
-                    .append("\n");
+            if (!Objects.equals(command.getCommandIdentifier(), State.Start.getIdentifier())
+            && !Objects.equals(command.getCommandIdentifier(), State.Help.getIdentifier())) {
+                result
+                        .append("/")
+                        .append(command.getCommandIdentifier())
+                        .append(" - ")
+                        .append(command.getDescription())
+                        .append("\n");
+            }
         }
         return result.toString();
     }
