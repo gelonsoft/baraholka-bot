@@ -8,7 +8,7 @@ public enum State implements IState {
     Help("help", "Справочная информация по боту"),
     MainMenu("menu", "Главное меню"),
     NewAdvertisement("new_advertisement", "Создание нового объявления"),
-    SearchAdvertisement("search_advertisement", "Поиск объявлений по хэштегам");
+    SearchAdvertisements("search_advertisement", "Поиск объявлений по хэштегам");
 
     private final String identifier;
     private final String description;
@@ -31,6 +31,15 @@ public enum State implements IState {
     public static State findState(String text) {
         for (State state : State.values()) {
             if (Objects.equals(state.getIdentifier(), text)) {
+                return state;
+            }
+        }
+        return null;
+    }
+
+    public static State findStateByDescription(String text) {
+        for (State state : State.values()) {
+            if (Objects.equals(state.getDescription(), text)) {
                 return state;
             }
         }

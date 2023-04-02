@@ -1,5 +1,7 @@
 package baraholkateam.util;
 
+import java.util.Objects;
+
 public enum Tag {
     Moscow(TagType.City, "#Москва"),
     SPB(TagType.City, "#СПб"),
@@ -44,5 +46,14 @@ public enum Tag {
 
     public String getName() {
         return name;
+    }
+
+    public static Tag getTagByName(String name) {
+        for (Tag tag : Tag.values()) {
+            if (Objects.equals(tag.name, name)) {
+                return tag;
+            }
+        }
+        return null;
     }
 }

@@ -16,7 +16,7 @@ public class BaraholkaBotMain {
         SpringApplication.run(BaraholkaBotMain.class, args);
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(new BaraholkaBot(BaraholkaBotProperties.NAME, BaraholkaBotProperties.TOKEN));
+            botsApi.registerBot(new BaraholkaBot(BaraholkaBotProperties.BOT_NAME, BaraholkaBotProperties.BOT_TOKEN));
         } catch (TelegramApiException e) {
             LOGGER.error(String.format("Cannot register new bot: %s", e.getMessage()));
             throw new RuntimeException("Failed to start application.", e);

@@ -12,13 +12,13 @@ public class Advertisement {
     private final List<PhotoSize> photos;
     private final String description;
     private final List<Tag> tags;
-    private final Integer price;
+    private final Long price;
     private final List<String> contacts;
     private Long creationTime;
     private Long nextUpdateTime;
     private final Logger logger = LoggerFactory.getLogger(Advertisement.class);
 
-    public Advertisement(List<PhotoSize> photos, String description, List<Tag> tags, Integer price,
+    public Advertisement(List<PhotoSize> photos, String description, List<Tag> tags, Long price,
                          List<String> contacts) {
         this.photos = photos;
         this.description = description;
@@ -53,7 +53,7 @@ public class Advertisement {
         return tags;
     }
 
-    public Integer getPrice() {
+    public Long getPrice() {
         return price;
     }
 
