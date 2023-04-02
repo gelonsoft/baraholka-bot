@@ -5,11 +5,12 @@ import baraholkateam.command.MainMenuCommand;
 import baraholkateam.command.NewAdvertisementCommand;
 import baraholkateam.command.NonCommand;
 import baraholkateam.command.SearchAdvertisements;
+import baraholkateam.command.SearchAdvertisements_AddAdvertisementType;
+import baraholkateam.command.SearchAdvertisements_AddProductCategories;
+import baraholkateam.command.SearchAdvertisements_ShowFoundAdvertisements;
 import baraholkateam.command.StartCommand;
 import baraholkateam.database.SQLExecutor;
-import baraholkateam.util.IState;
 import baraholkateam.util.State;
-import baraholkateam.util.Substate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,23 +34,23 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static baraholkateam.command.NonCommand.NEXT_BUTTON_TEXT;
-import static baraholkateam.command.NonCommand.NOT_CHOSEN_TAG;
-import static baraholkateam.command.NonCommand.TAGS_CALLBACK_DATA;
-import static baraholkateam.command.NonCommand.TAG_CALLBACK_DATA;
+import static baraholkateam.command.Command.NEXT_BUTTON_TEXT;
+import static baraholkateam.command.Command.NOT_CHOSEN_TAG;
+import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
+import static baraholkateam.command.Command.TAGS_CALLBACK_DATA;
 
 @Component
 public class BaraholkaBot extends TelegramLongPollingCommandBot {
+    public static final Integer SEARCH_ADVERTISEMENTS_LIMIT = 10;
+    public static final String CHOSEN_TAG = "✅ %s";
     private final String botName;
     private final String botToken;
     private final NonCommand nonCommand;
     private final SQLExecutor sqlExecutor;
-    private final Map<Long, IState> currentState = new ConcurrentHashMap<>();
+    private final Map<Long, State> currentState = new ConcurrentHashMap<>();
     private final Map<Long, Message> lastSentMessage = new ConcurrentHashMap<>();
     private final Map<Long, String> chosenTags = new ConcurrentHashMap<>();
     private final Logger logger = LoggerFactory.getLogger(BaraholkaBot.class);
-    public static final String CHOSEN_TAG = "✅ %s";
-    public static final Integer SEARCH_ADVERTISEMENTS_LIMIT = 10;
 
     public BaraholkaBot(@Value("${bot.name}") String botName, @Value("${bot.token}") String botToken) {
         super();
@@ -63,7 +64,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
             throw new RuntimeException("Failed to load JDBC driver", e);
         }
         sqlExecutor = new SQLExecutor();
-        nonCommand = new NonCommand(sqlExecutor, chosenTags);
+        nonCommand = new NonCommand();
 
         register(new StartCommand(State.Start.getIdentifier(), State.Start.getDescription(), lastSentMessage));
         register(new HelpCommand(State.Help.getIdentifier(), State.Help.getDescription(), lastSentMessage,
@@ -74,6 +75,17 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 State.NewAdvertisement.getDescription(), lastSentMessage));
         register(new SearchAdvertisements(State.SearchAdvertisements.getIdentifier(),
                 State.SearchAdvertisements.getDescription(), lastSentMessage, chosenTags));
+        register(new SearchAdvertisements_AddAdvertisementType(
+                State.SearchAdvertisements_AddAdvertisementType.getIdentifier(),
+                State.SearchAdvertisements_AddAdvertisementType.getDescription(), lastSentMessage, chosenTags,
+                sqlExecutor));
+        register(new SearchAdvertisements_AddProductCategories(
+                State.SearchAdvertisements_AddProductCategories.getIdentifier(),
+                State.SearchAdvertisements_AddProductCategories.getDescription(), lastSentMessage, chosenTags));
+        register(new SearchAdvertisements_ShowFoundAdvertisements(
+                State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
+                State.SearchAdvertisements_ShowFoundAdvertisements.getDescription(), lastSentMessage, chosenTags,
+                sqlExecutor));
     }
 
     @Override
@@ -93,7 +105,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
      */
     @Override
     public boolean filter(Message message) {
-        //  Случай ввода команды по идентификаторуtext = "/menu"
+        //  Случай ввода команды по идентификатору
         State currentStateByIdentifier = State.findState(message.getText().replace("/", ""));
         if (currentStateByIdentifier != null) {
             this.currentState.put(message.getChatId(), currentStateByIdentifier);
@@ -124,6 +136,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         // Случай нажатия на кнопку с описанием команды
         State stateByDescription = State.findStateByDescription(msg.getText());
         if (stateByDescription != null) {
+            currentState.put(chatId, stateByDescription);
             getRegisteredCommand(stateByDescription.getIdentifier()).processMessage(this, msg, null);
             return;
         }
@@ -132,13 +145,17 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         if (Objects.equals(msg.getText(), NEXT_BUTTON_TEXT)) {
             addSearchTags(lastSentMessage.get(chatId));
             deleteLastMessage(msg.getChatId());
+            State nextState = State.nextState(currentState.get(msg.getChatId()));
+            currentState.put(chatId, nextState);
+            getRegisteredCommand(nextState.getIdentifier()).processMessage(this, msg, null);
+            return;
         }
 
         executeNonCommand(msg, chatId, currentState.get(chatId));
     }
 
-    private void executeNonCommand(Message msg, Long chatId, IState currState) {
-        List<NonCommand.AnswerPair> answers = nonCommand.nonCommandExecute(msg, chatId, currState);
+    private void executeNonCommand(Message msg, Long chatId, State currState) {
+        List<NonCommand.AnswerPair> answers = nonCommand.nonCommandExecute(msg, currState);
         if (answers.get(0).getError()) {
             for (NonCommand.AnswerPair answer : answers) {
                 SendMessage sendMessage = new SendMessage();
@@ -153,19 +170,16 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 }
             }
             // ошибка в обработке сообщения пользователя, необходимо повторить данный шаг
-            if (currState instanceof State) {
-                getRegisteredCommand(currState.getIdentifier()).processMessage(this, msg, null);
-            } else if (Substate.prevSubstate(currState) instanceof State) {
-                getRegisteredCommand(Substate.prevSubstate(currState).getIdentifier()).processMessage(this, msg, null);
-            } else {
-                executeNonCommand(msg, chatId, Substate.prevSubstate(currState));
-            }
+            deleteLastMessage(msg.getChatId());
+            getRegisteredCommand(currState.getIdentifier()).processMessage(this, msg, null);
             return;
         } else {
-            currentState.put(chatId, Substate.nextSubstate(currState));
+            State nextState = State.nextState(currentState.get(msg.getChatId()));
+            currentState.put(chatId, nextState);
         }
+        // ошибки в обработке сообщения пользователя нет, отправляем ответ и переходим на следующий шаг
         for (NonCommand.AnswerPair answer : answers) {
-            if (!answer.getError()) { // ошибки в обработке сообщения пользователя нет, отправляем ответ и переходим на следующий шаг
+            if (!answer.getError()) {
                 sendAnswer(chatId, getUserName(msg), answer.getAnswer(),
                         answer.getReplyKeyboard() == null ? null : answer.getReplyKeyboard());
             }
@@ -201,9 +215,10 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         for (List<InlineKeyboardButton> tag : buttons) {
             String[] dataCallbackParts = tag.get(0).getCallbackData().split(" ");
             if (Objects.equals(dataCallbackParts[dataCallbackParts.length - 1], "1")) {
+                String chosenTagsString = chosenTags.get(message.getChatId());
+                String newTags = tag.get(0).getText().split(" ")[1];
                 chosenTags.put(message.getChatId(),
-                        String.format("%s %s", chosenTags.get(message.getChatId()),
-                                tag.get(0).getText().split(" ")[1]));
+                        chosenTagsString == null ? newTags : String.format("%s %s", chosenTagsString, newTags));
             }
         }
     }
@@ -216,8 +231,9 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 chosenTags.put(msg.getChatId(), currentChosenTags == null
                         ? dataParts[1] : String.format("%s %s", currentChosenTags, dataParts[1]));
                 deleteLastMessage(msg.getChatId());
-                currentState.put(msg.getChatId(), Substate.nextSubstate(currentState.get(msg.getChatId())));
-                executeNonCommand(msg, msg.getChatId(), currentState.get(msg.getChatId()));
+                State nextState = State.nextState(currentState.get(msg.getChatId()));
+                currentState.put(msg.getChatId(), nextState);
+                getRegisteredCommand(nextState.getIdentifier()).processMessage(this, msg, null);
             }
             case TAGS_CALLBACK_DATA -> {
                 List<List<InlineKeyboardButton>> buttons =
