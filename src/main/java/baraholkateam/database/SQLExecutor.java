@@ -26,6 +26,13 @@ public class SQLExecutor {
 
     public SQLExecutor() {
         try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            logger.error(String.format("Cannot find JDBC driver: %s", e.getMessage()));
+            throw new RuntimeException("Failed to load JDBC driver", e);
+        }
+
+        try {
             connection = DriverManager.getConnection(
                     BaraholkaBotProperties.DB_URL,
                     BaraholkaBotProperties.DB_USER,

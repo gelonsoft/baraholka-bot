@@ -35,16 +35,19 @@ public class SearchAdvertisements_ShowFoundAdvertisements extends Command {
     private final Map<Long, String> chosenTags;
     private final SQLExecutor sqlExecutor;
     private final TelegramAPIRequests telegramAPIRequests;
+    private final Map<Long, State> previousState;
     private final Logger logger = LoggerFactory.getLogger(SearchAdvertisements_ShowFoundAdvertisements.class);
 
     public SearchAdvertisements_ShowFoundAdvertisements(String commandIdentifier, String description,
                                                         Map<Long, Message> lastSentMessage,
                                                         Map<Long, String> chosenTags,
-                                                        SQLExecutor sqlExecutor) {
+                                                        SQLExecutor sqlExecutor,
+                                                        Map<Long, State> previousState) {
         super(commandIdentifier, description, lastSentMessage);
         this.chosenTags = chosenTags;
         this.sqlExecutor = sqlExecutor;
         telegramAPIRequests = new TelegramAPIRequests();
+        this.previousState = previousState;
     }
 
     @Override
@@ -53,24 +56,29 @@ public class SearchAdvertisements_ShowFoundAdvertisements extends Command {
 
         String chosenTagsString = chosenTags.get(chat.getId());
 
-        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                String.format(CHOSEN_HASHTAGS, chosenTagsString == null ? NO_HASHTAGS : chosenTagsString), null);
-        if (count == 0) {
+        if (previousState.get(chat.getId()) == State.SearchAdvertisements_AddProductCategories) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                    String.format(CANNOT_FIND_ADVERTISEMENTS,
-                            State.MainMenu.getIdentifier(),
-                            State.SearchAdvertisements.getIdentifier()),
-                    showCommandButtons(List.of(State.MainMenu.getDescription(),
-                            State.SearchAdvertisements.getDescription())));
+                    String.format(CHOSEN_HASHTAGS, chosenTagsString == null ? NO_HASHTAGS : chosenTagsString), null);
+            if (count == 0) {
+                sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                        String.format(CANNOT_FIND_ADVERTISEMENTS,
+                                State.MainMenu.getIdentifier(),
+                                State.SearchAdvertisements.getIdentifier()),
+                        showCommandButtons(List.of(State.MainMenu.getDescription(),
+                                State.SearchAdvertisements.getDescription())));
+            } else {
+                sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                        String.format(FOUND_ADVERTISEMENTS,
+                                count,
+                                SEARCH_ADVERTISEMENTS_LIMIT,
+                                State.MainMenu.getIdentifier(),
+                                State.SearchAdvertisements.getIdentifier()),
+                        showCommandButtons(List.of(State.MainMenu.getDescription(),
+                                State.SearchAdvertisements.getDescription())));
+            }
         } else {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                    String.format(FOUND_ADVERTISEMENTS,
-                            count,
-                            SEARCH_ADVERTISEMENTS_LIMIT,
-                            State.MainMenu.getIdentifier(),
-                            State.SearchAdvertisements.getIdentifier()),
-                    showCommandButtons(List.of(State.MainMenu.getDescription(),
-                            State.SearchAdvertisements.getDescription())));
+                    String.format(INCORRECT_PREVIOUS_STATE, State.MainMenu.getIdentifier()), null);
         }
     }
 

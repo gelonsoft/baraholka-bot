@@ -14,7 +14,7 @@ public enum State {
             "Выбор типов объявления для поиска"),
     SearchAdvertisements_AddProductCategories("add_product_categories",
             "Выбор категорий товаров для поиска"),
-    SearchAdvertisements_ShowFoundAdvertisements("show_found_advertisement",
+    SearchAdvertisements_ShowFoundAdvertisements("show_found_advertisements",
             "Вывод найденных объявлений");
 
     private final String identifier;

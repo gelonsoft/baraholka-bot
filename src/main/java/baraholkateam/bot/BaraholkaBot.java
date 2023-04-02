@@ -50,6 +50,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
     private final Map<Long, State> currentState = new ConcurrentHashMap<>();
     private final Map<Long, Message> lastSentMessage = new ConcurrentHashMap<>();
     private final Map<Long, String> chosenTags = new ConcurrentHashMap<>();
+    private final Map<Long, State> previousState = new ConcurrentHashMap<>();
     private final Logger logger = LoggerFactory.getLogger(BaraholkaBot.class);
 
     public BaraholkaBot(@Value("${bot.name}") String botName, @Value("${bot.token}") String botToken) {
@@ -57,12 +58,6 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         this.botName = botName;
         this.botToken = botToken;
 
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            logger.error(String.format("Cannot find JDBC driver: %s", e.getMessage()));
-            throw new RuntimeException("Failed to load JDBC driver", e);
-        }
         sqlExecutor = new SQLExecutor();
         nonCommand = new NonCommand();
 
@@ -78,14 +73,15 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         register(new SearchAdvertisements_AddAdvertisementType(
                 State.SearchAdvertisements_AddAdvertisementType.getIdentifier(),
                 State.SearchAdvertisements_AddAdvertisementType.getDescription(), lastSentMessage, chosenTags,
-                sqlExecutor));
+                sqlExecutor, previousState));
         register(new SearchAdvertisements_AddProductCategories(
                 State.SearchAdvertisements_AddProductCategories.getIdentifier(),
-                State.SearchAdvertisements_AddProductCategories.getDescription(), lastSentMessage, chosenTags));
+                State.SearchAdvertisements_AddProductCategories.getDescription(), lastSentMessage, chosenTags,
+                previousState));
         register(new SearchAdvertisements_ShowFoundAdvertisements(
                 State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
                 State.SearchAdvertisements_ShowFoundAdvertisements.getDescription(), lastSentMessage, chosenTags,
-                sqlExecutor));
+                sqlExecutor, previousState));
     }
 
     @Override
@@ -146,6 +142,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
             addSearchTags(lastSentMessage.get(chatId));
             deleteLastMessage(msg.getChatId());
             State nextState = State.nextState(currentState.get(msg.getChatId()));
+            previousState.put(chatId, currentState.get(msg.getChatId()));
             currentState.put(chatId, nextState);
             getRegisteredCommand(nextState.getIdentifier()).processMessage(this, msg, null);
             return;
@@ -175,6 +172,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
             return;
         } else {
             State nextState = State.nextState(currentState.get(msg.getChatId()));
+            previousState.put(chatId, currentState.get(msg.getChatId()));
             currentState.put(chatId, nextState);
         }
         // ошибки в обработке сообщения пользователя нет, отправляем ответ и переходим на следующий шаг
@@ -232,6 +230,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                         ? dataParts[1] : String.format("%s %s", currentChosenTags, dataParts[1]));
                 deleteLastMessage(msg.getChatId());
                 State nextState = State.nextState(currentState.get(msg.getChatId()));
+                previousState.put(msg.getChatId(), currentState.get(msg.getChatId()));
                 currentState.put(msg.getChatId(), nextState);
                 getRegisteredCommand(nextState.getIdentifier()).processMessage(this, msg, null);
             }

@@ -2,6 +2,7 @@ package baraholkateam.command;
 
 import baraholkateam.database.SQLExecutor;
 import baraholkateam.util.Advertisement;
+import baraholkateam.util.State;
 import baraholkateam.util.Tag;
 import baraholkateam.util.TagType;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -20,13 +21,17 @@ public class SearchAdvertisements_AddAdvertisementType extends Command {
             Для подтверждения выбора, нажмите на кнопку '%s'.""";
     private final Map<Long, String> chosenTags;
     private final SQLExecutor sqlExecutor;
+    private final Map<Long, State> previousState;
 
     public SearchAdvertisements_AddAdvertisementType(String commandIdentifier, String description,
-                                                     Map<Long, Message> lastSentMessage, Map<Long, String> chosenTags,
-                                                     SQLExecutor sqlExecutor) {
+                                                     Map<Long, Message> lastSentMessage,
+                                                     Map<Long, String> chosenTags,
+                                                     SQLExecutor sqlExecutor,
+                                                     Map<Long, State> previousState) {
         super(commandIdentifier, description, lastSentMessage);
         this.chosenTags = chosenTags;
         this.sqlExecutor = sqlExecutor;
+        this.previousState = previousState;
     }
 
     @Override
@@ -38,12 +43,17 @@ public class SearchAdvertisements_AddAdvertisementType extends Command {
 
         String chosenTagsString = chosenTags.get(chat.getId());
 
-        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                String.format(CHOSEN_HASHTAGS, chosenTagsString == null ? NO_HASHTAGS : chosenTagsString),
-                showNextButton());
-        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                String.format(CHOOSE_ADVERTISEMENT_TYPE, NEXT_BUTTON_TEXT),
-                getTags(TagType.AdvertisementType, true));
+        if (previousState.get(chat.getId()) == State.SearchAdvertisements) {
+            sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                    String.format(CHOSEN_HASHTAGS, chosenTagsString == null ? NO_HASHTAGS : chosenTagsString),
+                    showNextButton());
+            sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                    String.format(CHOOSE_ADVERTISEMENT_TYPE, NEXT_BUTTON_TEXT),
+                    getTags(TagType.AdvertisementType, true));
+        } else {
+            sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                    String.format(INCORRECT_PREVIOUS_STATE, State.MainMenu.getIdentifier()), null);
+        }
     }
 
     // TODO убрать метод-заглушку
