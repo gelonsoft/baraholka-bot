@@ -16,8 +16,9 @@ import java.util.List;
 public class NewAdvertisementCommand extends Command {
     // TODO дописать первое действие при создании объявления
     private static final String NEW_AD = """
-            Давайте приступим к созданию нового объявления.
-            Для начала Вам необходимо...""";
+            Команда /new_advertisement позволяет перейти к процессу создания нового объявления. Вам необходимо ответить на вопросы и заполнить макет объявления. Чтобы прервать создание, нужно вернуться в Главное меню.
+                                        
+            Добавьте фотографии к вашему объявлению.""";
 
     public NewAdvertisementCommand(String commandIdentifier, String description) {
         super(commandIdentifier, description);
@@ -31,7 +32,6 @@ public class NewAdvertisementCommand extends Command {
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
-//        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(), NEW_AD);
     }
 
     public SendMessage suggestAddingPhotos(Long chatId) {
@@ -55,7 +55,7 @@ public class NewAdvertisementCommand extends Command {
 
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
-        message.setText("Добавьте фотографии");
+        message.setText(NEW_AD);
         message.setReplyMarkup(replyKeyboardMarkup);
         return message;
     }
