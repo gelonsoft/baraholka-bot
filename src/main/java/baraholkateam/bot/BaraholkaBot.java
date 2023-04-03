@@ -4,10 +4,13 @@ import baraholkateam.command.HelpCommand;
 import baraholkateam.command.MainMenuCommand;
 import baraholkateam.command.NewAdvertisementCommand;
 import baraholkateam.command.NonCommand;
+import baraholkateam.command.SearchAdvertisements;
+import baraholkateam.command.SearchAdvertisements_AddAdvertisementType;
+import baraholkateam.command.SearchAdvertisements_AddProductCategories;
+import baraholkateam.command.SearchAdvertisements_ShowFoundAdvertisements;
 import baraholkateam.command.StartCommand;
-import baraholkateam.util.IState;
+import baraholkateam.database.SQLExecutor;
 import baraholkateam.util.State;
-import baraholkateam.util.Substate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,20 +18,39 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static baraholkateam.command.Command.NEXT_BUTTON_TEXT;
+import static baraholkateam.command.Command.NOT_CHOSEN_TAG;
+import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
+import static baraholkateam.command.Command.TAGS_CALLBACK_DATA;
 
 @Component
 public class BaraholkaBot extends TelegramLongPollingCommandBot {
+    public static final Integer SEARCH_ADVERTISEMENTS_LIMIT = 10;
+    public static final String CHOSEN_TAG = "✅ %s";
     private final String botName;
     private final String botToken;
     private final NonCommand nonCommand;
-    private final Map<Long, IState> currentState = new ConcurrentHashMap<>();
+    private final SQLExecutor sqlExecutor;
+    private final Map<Long, State> currentState = new ConcurrentHashMap<>();
+    private final Map<Long, Message> lastSentMessage = new ConcurrentHashMap<>();
+    private final Map<Long, String> chosenTags = new ConcurrentHashMap<>();
+    private final Map<Long, State> previousState = new ConcurrentHashMap<>();
     private final Logger logger = LoggerFactory.getLogger(BaraholkaBot.class);
 
     public BaraholkaBot(@Value("${bot.name}") String botName, @Value("${bot.token}") String botToken) {
@@ -36,13 +58,30 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         this.botName = botName;
         this.botToken = botToken;
 
+        sqlExecutor = new SQLExecutor();
         nonCommand = new NonCommand();
 
-        register(new StartCommand(State.Start.getIdentifier(), State.Start.getDescription()));
-        register(new HelpCommand(State.Help.getIdentifier(), State.Help.getDescription(), getRegisteredCommands()));
-        register(new MainMenuCommand(State.MainMenu.getIdentifier(), State.MainMenu.getDescription()));
+        register(new StartCommand(State.Start.getIdentifier(), State.Start.getDescription(), lastSentMessage));
+        register(new HelpCommand(State.Help.getIdentifier(), State.Help.getDescription(), lastSentMessage,
+                getRegisteredCommands()));
+        register(new MainMenuCommand(State.MainMenu.getIdentifier(), State.MainMenu.getDescription(),
+                lastSentMessage));
         register(new NewAdvertisementCommand(State.NewAdvertisement.getIdentifier(),
-                State.NewAdvertisement.getDescription()));
+                State.NewAdvertisement.getDescription(), lastSentMessage));
+        register(new SearchAdvertisements(State.SearchAdvertisements.getIdentifier(),
+                State.SearchAdvertisements.getDescription(), lastSentMessage, chosenTags));
+        register(new SearchAdvertisements_AddAdvertisementType(
+                State.SearchAdvertisements_AddAdvertisementType.getIdentifier(),
+                State.SearchAdvertisements_AddAdvertisementType.getDescription(), lastSentMessage, chosenTags,
+                sqlExecutor, previousState));
+        register(new SearchAdvertisements_AddProductCategories(
+                State.SearchAdvertisements_AddProductCategories.getIdentifier(),
+                State.SearchAdvertisements_AddProductCategories.getDescription(), lastSentMessage, chosenTags,
+                previousState));
+        register(new SearchAdvertisements_ShowFoundAdvertisements(
+                State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
+                State.SearchAdvertisements_ShowFoundAdvertisements.getDescription(), lastSentMessage, chosenTags,
+                sqlExecutor, previousState));
     }
 
     @Override
@@ -62,31 +101,86 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
      */
     @Override
     public boolean filter(Message message) {
-        State currentState = State.findState(message.getText().replace("/", ""));
-        if (currentState != null) {
-            this.currentState.put(message.getChatId(), currentState);
+        //  Случай ввода команды по идентификатору
+        State currentStateByIdentifier = State.findState(message.getText().replace("/", ""));
+        if (currentStateByIdentifier != null) {
+            this.currentState.put(message.getChatId(), currentStateByIdentifier);
+            return false;
+        }
+        // Случай нажатия на кнопку с описанием команды
+        State currentStateByDescription = State.findStateByDescription(message.getText());
+        if (currentStateByDescription != null) {
+            this.currentState.put(message.getChatId(), currentStateByDescription);
         }
         return false;
     }
 
     @Override
     public void processNonCommandUpdate(Update update) {
-        Message msg = update.getMessage();
-        Long chatId = msg.getChatId();
-        String messageText = msg.getText();
-
-        IState currState = currentState.get(chatId);
-        if (currState instanceof State) { // если у команды есть подкоманды, то переходим сразу в первую из них
-            currState = Substate.nextSubstate(currState);
-            currentState.put(chatId, currState);
+        Message msg;
+        if (update.hasCallbackQuery()) {
+            CallbackQuery callbackQuery = update.getCallbackQuery();
+            msg = callbackQuery.getMessage();
+            String callbackQueryData = callbackQuery.getData();
+            parseKeyboardData(callbackQueryData, msg);
+            return;
         }
-        NonCommand.AnswerPair answer = nonCommand.nonCommandExecute(messageText, chatId, currState);
-        if (answer.getError()) { // ошибка в обработке сообщения пользователя, необходимо повторить данный шаг
-            msg.setText(answer.getAnswer());
+
+        msg = update.getMessage();
+        Long chatId = msg.getChatId();
+
+        // Случай нажатия на кнопку с описанием команды
+        State stateByDescription = State.findStateByDescription(msg.getText());
+        if (stateByDescription != null) {
+            currentState.put(chatId, stateByDescription);
+            getRegisteredCommand(stateByDescription.getIdentifier()).processMessage(this, msg, null);
+            return;
+        }
+
+        // Случай нажатия на кнопку с продолжением во множественном выборе хэштегов
+        if (Objects.equals(msg.getText(), NEXT_BUTTON_TEXT)) {
+            addSearchTags(lastSentMessage.get(chatId));
+            deleteLastMessage(msg.getChatId());
+            State nextState = State.nextState(currentState.get(msg.getChatId()));
+            previousState.put(chatId, currentState.get(msg.getChatId()));
+            currentState.put(chatId, nextState);
+            getRegisteredCommand(nextState.getIdentifier()).processMessage(this, msg, null);
+            return;
+        }
+
+        executeNonCommand(msg, chatId, currentState.get(chatId));
+    }
+
+    private void executeNonCommand(Message msg, Long chatId, State currState) {
+        List<NonCommand.AnswerPair> answers = nonCommand.nonCommandExecute(msg, currState);
+        if (answers.get(0).getError()) {
+            for (NonCommand.AnswerPair answer : answers) {
+                SendMessage sendMessage = new SendMessage();
+                sendMessage.setText(answer.getAnswer());
+                sendMessage.setParseMode(ParseMode.HTML);
+                sendMessage.setChatId(chatId.toString());
+                sendMessage.disableWebPagePreview();
+                try {
+                    execute(sendMessage);
+                } catch (TelegramApiException e) {
+                    logger.error(String.format("Cannot send message: %s", e.getMessage()));
+                }
+            }
+            // ошибка в обработке сообщения пользователя, необходимо повторить данный шаг
+            deleteLastMessage(msg.getChatId());
             getRegisteredCommand(currState.getIdentifier()).processMessage(this, msg, null);
-        } else { // ошибки в обработке сообщения пользователя нет, отправляем ответ и переходим на следующий шаг
-            setAnswer(chatId, getUserName(msg), answer.getAnswer());
-            currentState.put(chatId, Substate.nextSubstate(currState));
+            return;
+        } else {
+            State nextState = State.nextState(currentState.get(msg.getChatId()));
+            previousState.put(chatId, currentState.get(msg.getChatId()));
+            currentState.put(chatId, nextState);
+        }
+        // ошибки в обработке сообщения пользователя нет, отправляем ответ и переходим на следующий шаг
+        for (NonCommand.AnswerPair answer : answers) {
+            if (!answer.getError()) {
+                sendAnswer(chatId, getUserName(msg), answer.getAnswer(),
+                        answer.getReplyKeyboard() == null ? null : answer.getReplyKeyboard());
+            }
         }
     }
 
@@ -96,17 +190,96 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         return (userName != null) ? userName : String.format("%s %s", user.getLastName(), user.getFirstName());
     }
 
-    private void setAnswer(Long chatId, String userName, String text) {
+    private void sendAnswer(Long chatId, String userName, String text, ReplyKeyboard replyKeyboard) {
         SendMessage answer = new SendMessage();
         answer.setText(text);
         answer.setParseMode(ParseMode.HTML);
         answer.setChatId(chatId.toString());
+        if (replyKeyboard != null) {
+            answer.setReplyMarkup(replyKeyboard);
+        }
         answer.disableWebPagePreview();
 
         try {
-            execute(answer);
+            Message sentMessage = execute(answer);
+            lastSentMessage.put(chatId, sentMessage);
         } catch (TelegramApiException e) {
             logger.error(String.format("Cannot execute command of user %s: %s", userName, e.getMessage()));
+        }
+    }
+
+    private void addSearchTags(Message message) {
+        List<List<InlineKeyboardButton>> buttons = message.getReplyMarkup().getKeyboard();
+        for (List<InlineKeyboardButton> tag : buttons) {
+            String[] dataCallbackParts = tag.get(0).getCallbackData().split(" ");
+            if (Objects.equals(dataCallbackParts[dataCallbackParts.length - 1], "1")) {
+                String chosenTagsString = chosenTags.get(message.getChatId());
+                String newTags = tag.get(0).getText().split(" ")[1];
+                chosenTags.put(message.getChatId(),
+                        chosenTagsString == null ? newTags : String.format("%s %s", chosenTagsString, newTags));
+            }
+        }
+    }
+
+    private void parseKeyboardData(String callbackQuery, Message msg) {
+        String[] dataParts = callbackQuery.split(" ");
+        switch (dataParts[0]) {
+            case TAG_CALLBACK_DATA -> {
+                String currentChosenTags = chosenTags.get(msg.getChatId());
+                chosenTags.put(msg.getChatId(), currentChosenTags == null
+                        ? dataParts[1] : String.format("%s %s", currentChosenTags, dataParts[1]));
+                deleteLastMessage(msg.getChatId());
+                State nextState = State.nextState(currentState.get(msg.getChatId()));
+                previousState.put(msg.getChatId(), currentState.get(msg.getChatId()));
+                currentState.put(msg.getChatId(), nextState);
+                getRegisteredCommand(nextState.getIdentifier()).processMessage(this, msg, null);
+            }
+            case TAGS_CALLBACK_DATA -> {
+                List<List<InlineKeyboardButton>> buttons =
+                        lastSentMessage.get(msg.getChatId()).getReplyMarkup().getKeyboard();
+                InlineKeyboardButton changeTag = buttons.get(Integer.parseInt(dataParts[2])).get(0);
+                if (Objects.equals(dataParts[3], "0")) {
+                    changeTag.setText(String.format(CHOSEN_TAG, changeTag.getText().split(" ")[1]));
+                    changeTag.setCallbackData(changeTag
+                            .getCallbackData()
+                            .substring(0, changeTag.getCallbackData().length() - 2)
+                            .concat(" 1"));
+                    editMessageReplyMarkup(msg.getChatId(), buttons);
+                } else {
+                    changeTag.setText(String.format(NOT_CHOSEN_TAG, changeTag.getText().split(" ")[1]));
+                    changeTag.setCallbackData(changeTag
+                            .getCallbackData()
+                            .substring(0, changeTag.getCallbackData().length() - 2)
+                            .concat(" 0"));
+                    editMessageReplyMarkup(msg.getChatId(), buttons);
+                }
+            }
+            default -> logger.error(String.format("Unknown command in callback data: %s", callbackQuery));
+        }
+    }
+
+    private void deleteLastMessage(Long chatId) {
+        DeleteMessage deleteLastMessage = new DeleteMessage();
+        deleteLastMessage.setMessageId(lastSentMessage.get(chatId).getMessageId());
+        deleteLastMessage.setChatId(chatId);
+        try {
+            execute(deleteLastMessage);
+        } catch (TelegramApiException e) {
+            logger.error(String.format("Cannot delete last message due to: %s", e.getMessage()));
+        }
+    }
+
+    private void editMessageReplyMarkup(Long chatId, List<List<InlineKeyboardButton>> buttons) {
+        InlineKeyboardMarkup ikm = new InlineKeyboardMarkup();
+        ikm.setKeyboard(buttons);
+        EditMessageReplyMarkup editMessageReplyMarkup = new EditMessageReplyMarkup();
+        editMessageReplyMarkup.setChatId(chatId);
+        editMessageReplyMarkup.setMessageId(lastSentMessage.get(chatId).getMessageId());
+        editMessageReplyMarkup.setReplyMarkup(ikm);
+        try {
+            execute(editMessageReplyMarkup);
+        } catch (TelegramApiException e) {
+            logger.error(String.format("Cannot edit message reply markup due to: %s", e.getMessage()));
         }
     }
 }

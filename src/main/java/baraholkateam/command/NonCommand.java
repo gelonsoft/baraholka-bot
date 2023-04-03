@@ -1,8 +1,10 @@
 package baraholkateam.command;
 
-import baraholkateam.util.IState;
 import baraholkateam.util.State;
-import baraholkateam.util.Substate;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
+
+import java.util.List;
 
 public class NonCommand {
     private static final String NO_CURRENT_STATE = """
@@ -14,29 +16,33 @@ public class NonCommand {
     private static final String UNKNOWN_COMMAND = """
             Введеная команда не понятна боту.
             Пожалуйста, вернитесь в /%s и следуйте инструкциям.""";
+    private static final String CHOOSE_CITY = "Пожалуйста, выберите город для поиска.";
+    private static final String CHOOSE_ADVERTISEMENT_TYPES = "Пожалуйста, выберите типы объявления.";
+    private static final String CHOOSE_PRODUCT_CATEGORIES = "Пожалуйста, выберите категории объявлений.";
 
-    public AnswerPair nonCommandExecute(String text, Long chatId, IState currentState) {
+    public NonCommand() {
+    }
+
+    public List<AnswerPair> nonCommandExecute(Message msg, State currentState) {
         if (currentState == null) {
-            return new AnswerPair(String.format(NO_CURRENT_STATE, State.MainMenu.getIdentifier()), true);
+            return List.of(new AnswerPair(String.format(NO_CURRENT_STATE, State.MainMenu.getIdentifier()), true, null));
         }
 
         if (currentState.equals(State.Start) || currentState.equals(State.Help) || currentState.equals(State.MainMenu)
                 || currentState.equals(State.NewAdvertisement)) {
-            return new AnswerPair(String.format(COMMAND_ERROR_MESSAGE, currentState.getIdentifier(),
-                    State.MainMenu.getIdentifier()), true);
-        } else if (currentState.equals(Substate.AddPhotos)) {
-            // TODO сделать обработку добавленных фотографий согласно ТЗ. Может быть также нарушения правил добавления
-            //  фотографий, тогда нужна соответствующая обработка
-            return new AnswerPair("Фотографии успешно отправлены.", false);
-        } else if (currentState.equals(Substate.AddCity)) {
-            // TODO аналогично предыдущему
-            return new AnswerPair("Город успешно добавлен.", false);
-        } else if (currentState.equals(Substate.AddDescription)) {
-            // TODO аналогично предыдущему
-            return new AnswerPair("Описание успешно добавлено.", false);
+            return List.of(new AnswerPair(String.format(COMMAND_ERROR_MESSAGE, currentState.getIdentifier(),
+                    State.MainMenu.getIdentifier()), true, null));
+        } else if (currentState.equals(State.SearchAdvertisements)) {
+            return List.of(new AnswerPair(CHOOSE_CITY, true, null));
+        } else if (currentState.equals(State.SearchAdvertisements_AddAdvertisementType)) {
+            return List.of(new AnswerPair(CHOOSE_ADVERTISEMENT_TYPES, true, null));
+        } else if (currentState.equals(State.SearchAdvertisements_AddProductCategories)) {
+            return List.of(new AnswerPair(CHOOSE_PRODUCT_CATEGORIES, true, null));
+        } else if (currentState.equals(State.SearchAdvertisements_ShowFoundAdvertisements)) {
+            return List.of(new AnswerPair(String.format(UNKNOWN_COMMAND, State.MainMenu.getIdentifier()), true, null));
         }
         // TODO добавить обработку всех возможных состояний и подсостояний
-        return new AnswerPair(String.format(UNKNOWN_COMMAND, State.MainMenu.getIdentifier()), true);
+        return List.of(new AnswerPair(String.format(UNKNOWN_COMMAND, State.MainMenu.getIdentifier()), true, null));
     }
 
     /**
@@ -45,10 +51,12 @@ public class NonCommand {
     public static class AnswerPair {
         private final String answer;
         private final Boolean isError;
+        private final ReplyKeyboard inlineKeyboardMarkup;
 
-        public AnswerPair(String answer, boolean isError) {
+        public AnswerPair(String answer, boolean isError, ReplyKeyboard inlineKeyboardMarkup) {
             this.answer = answer;
             this.isError = isError;
+            this.inlineKeyboardMarkup = inlineKeyboardMarkup;
         }
 
         public String getAnswer() {
@@ -57,6 +65,10 @@ public class NonCommand {
 
         public Boolean getError() {
             return isError;
+        }
+
+        public ReplyKeyboard getReplyKeyboard() {
+            return inlineKeyboardMarkup;
         }
     }
 }

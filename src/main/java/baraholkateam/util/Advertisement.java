@@ -1,63 +1,97 @@
 package baraholkateam.util;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.telegram.telegrambots.meta.api.objects.PhotoSize;
+
 import java.util.List;
 
 public class Advertisement {
-    private Long authorId;
-    private List<InputFile> photos;
-    private List<String> tags;
-    private String description;
-    private int price;
-    private List<String> contacts;
-    private boolean isActual;
+    private Long chatId;
+    private Long messageId;
+    private final List<PhotoSize> photos;
+    private final String description;
+    private final List<Tag> tags;
+    private final Long price;
+    private final List<String> contacts;
+    private Long creationTime;
+    private Long nextUpdateTime;
+    private final Logger logger = LoggerFactory.getLogger(Advertisement.class);
 
-    public Advertisement() {
+    public Advertisement(List<PhotoSize> photos, String description, List<Tag> tags, Long price,
+                         List<String> contacts) {
+        this.photos = photos;
+        this.description = description;
+        this.tags = tags;
+        this.price = price;
+        this.contacts = contacts;
     }
 
-    public static class AdvertisementBuilder {
-        private final Advertisement ad;
-
-        public AdvertisementBuilder() {
-            this.ad = new Advertisement();
+    public Long getChatId() {
+        if (chatId == null) {
+            logger.warn("Field 'chatId' of the advertisement is null!");
         }
+        return chatId;
+    }
 
-        public Advertisement build() {
-            return ad;
+    public Long getMessageId() {
+        if (messageId == null) {
+            logger.warn("Field 'messageId' of the advertisement is null!");
         }
+        return messageId;
+    }
 
-        public AdvertisementBuilder setAuthorId(Long authorId) {
-            ad.authorId = authorId;
-            return this;
-        }
+    public List<PhotoSize> getPhotos() {
+        return photos;
+    }
 
-        public AdvertisementBuilder setPhotos(List<InputFile> photos) {
-            ad.photos = photos;
-            return this;
-        }
+    public String getDescription() {
+        return description;
+    }
 
-        public AdvertisementBuilder setTags(List<String> tags) {
-            ad.tags = tags;
-            return this;
-        }
+    public List<Tag> getTags() {
+        return tags;
+    }
 
-        public AdvertisementBuilder setDescription(String description) {
-            ad.description = description;
-            return this;
-        }
+    public Long getPrice() {
+        return price;
+    }
 
-        public AdvertisementBuilder setPrice(int price) {
-            ad.price = price;
-            return this;
-        }
+    public List<String> getContacts() {
+        return contacts;
+    }
 
-        public AdvertisementBuilder setContacts(List<String> contacts) {
-            ad.contacts = contacts;
-            return this;
+    public Long getCreationTime() {
+        if (creationTime == null) {
+            logger.warn("Field 'creationTime' of the advertisement is null!");
         }
+        return creationTime;
+    }
 
-        public AdvertisementBuilder setActual(boolean isActual) {
-            ad.isActual = isActual;
-            return this;
+    public Long getNextUpdateTime() {
+        if (nextUpdateTime == null) {
+            logger.warn("Field 'nextUpdateTime' of the advertisement is null!");
         }
+        return nextUpdateTime;
+    }
+
+    public Advertisement setChatId(Long chatId) {
+        this.chatId = chatId;
+        return this;
+    }
+
+    public Advertisement setMessageId(Long messageId) {
+        this.messageId = messageId;
+        return this;
+    }
+
+    public Advertisement setCreationTime(Long creationTime) {
+        this.creationTime = creationTime;
+        return this;
+    }
+
+    public Advertisement setNextUpdateTime(Long nextUpdateTime) {
+        this.nextUpdateTime = nextUpdateTime;
+        return this;
     }
 }
