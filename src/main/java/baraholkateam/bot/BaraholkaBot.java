@@ -1,14 +1,6 @@
 package baraholkateam.bot;
 
-import baraholkateam.command.HelpCommand;
-import baraholkateam.command.MainMenuCommand;
-import baraholkateam.command.NewAdvertisementCommand;
-import baraholkateam.command.NonCommand;
-import baraholkateam.command.SearchAdvertisements;
-import baraholkateam.command.SearchAdvertisements_AddAdvertisementType;
-import baraholkateam.command.SearchAdvertisements_AddProductCategories;
-import baraholkateam.command.SearchAdvertisements_ShowFoundAdvertisements;
-import baraholkateam.command.StartCommand;
+import baraholkateam.command.*;
 import baraholkateam.database.SQLExecutor;
 import baraholkateam.util.State;
 import org.slf4j.Logger;
@@ -68,6 +60,16 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 lastSentMessage));
         register(new NewAdvertisementCommand(State.NewAdvertisement.getIdentifier(),
                 State.NewAdvertisement.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_AddPhotos(State.NewAdvertisement_AddPhotos.getIdentifier(),
+                State.NewAdvertisement_AddPhotos.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_ConfirmPhoto(State.NewAdvertisement_ConfirmPhoto.getIdentifier(),
+                State.NewAdvertisement_ConfirmPhoto.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_AddDescription(State.NewAdvertisement_AddDescription.getIdentifier(),
+                State.NewAdvertisement_AddDescription.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_ConfirmDescription(State.NewAdvertisement_ConfirmDescription.getIdentifier(),
+                State.NewAdvertisement_ConfirmDescription.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_AddCityTags(State.NewAdvertisement_AddTags.getIdentifier(),
+                State.NewAdvertisement_AddTags.getDescription(), lastSentMessage));
         register(new SearchAdvertisements(State.SearchAdvertisements.getIdentifier(),
                 State.SearchAdvertisements.getDescription(), lastSentMessage, chosenTags));
         register(new SearchAdvertisements_AddAdvertisementType(
@@ -128,6 +130,18 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
 
         msg = update.getMessage();
         Long chatId = msg.getChatId();
+
+        if (msg.hasPhoto() && currentState.get(chatId) == State.NewAdvertisement_AddPhotos) {
+            currentState.put(chatId, State.NewAdvertisement_ConfirmPhoto);
+            getRegisteredCommand(State.NewAdvertisement_ConfirmPhoto.getIdentifier()).processMessage(this, msg, null);
+            return;
+        }
+
+        if (msg.hasText() && currentState.get(chatId) == State.NewAdvertisement_AddDescription) {
+            currentState.put(chatId, State.NewAdvertisement_ConfirmDescription);
+            getRegisteredCommand(State.NewAdvertisement_ConfirmDescription.getIdentifier()).processMessage(this, msg, null);
+            return;
+        }
 
         // Случай нажатия на кнопку с описанием команды
         State stateByDescription = State.findStateByDescription(msg.getText());

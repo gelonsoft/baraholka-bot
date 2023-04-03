@@ -15,20 +15,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+public class NewAdvertisement_ConfirmPhoto extends Command {
+    private static final String CONFIRM_PHOTOS_TEXT = """
+            Фотографии успешно добавлены. Вы можете добавить еще или перейти к добавлению описания.""";
 
-public class NewAdvertisementCommand extends Command {
-    private static final String NEW_AD = """
-            Команда /new_advertisement позволяет перейти к процессу создания нового объявления. Вам необходимо ответить на вопросы и заполнить макет объявления. Чтобы прервать создание, нужно вернуться в Главное меню.
-                                        
-            Добавьте фотографии к вашему объявлению.""";
-
-    public NewAdvertisementCommand(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
+    public NewAdvertisement_ConfirmPhoto(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
         super(commandIdentifier, description, lastSentMessage);
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        SendMessage message = suggestAddingPhotos(chat.getId());
+        SendMessage message = suggestAddingMorePhotos(chat.getId());
         try {
             absSender.execute(message);
         } catch (TelegramApiException e) {
@@ -36,16 +33,20 @@ public class NewAdvertisementCommand extends Command {
         }
     }
 
-    public SendMessage suggestAddingPhotos(Long chatId) {
+    public SendMessage suggestAddingMorePhotos(Long chatId) {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
 
         KeyboardButton addPhotosButton = new KeyboardButton();
         addPhotosButton.setText(State.NewAdvertisement_AddPhotos.getDescription());
 
+        KeyboardButton addDescriptionButton = new KeyboardButton();
+        addDescriptionButton.setText(State.NewAdvertisement_AddDescription.getDescription());
+
         KeyboardButton mainMenuButton = new KeyboardButton();
         mainMenuButton.setText(State.MainMenu.getDescription());
 
         KeyboardRow keyboardFirstRow = new KeyboardRow();
+        keyboardFirstRow.add(addDescriptionButton);
         keyboardFirstRow.add(addPhotosButton);
         keyboardFirstRow.add(mainMenuButton);
 
@@ -57,7 +58,7 @@ public class NewAdvertisementCommand extends Command {
 
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
-        message.setText(NEW_AD);
+        message.setText(CONFIRM_PHOTOS_TEXT);
         message.setReplyMarkup(replyKeyboardMarkup);
         return message;
     }
