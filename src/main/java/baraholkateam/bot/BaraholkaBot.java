@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
@@ -34,10 +35,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static baraholkateam.command.Command.NEXT_BUTTON_TEXT;
-import static baraholkateam.command.Command.NOT_CHOSEN_TAG;
-import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
-import static baraholkateam.command.Command.TAGS_CALLBACK_DATA;
+import static baraholkateam.command.Command.*;
 
 @Component
 public class BaraholkaBot extends TelegramLongPollingCommandBot {
@@ -254,8 +252,26 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                     editMessageReplyMarkup(msg.getChatId(), buttons);
                 }
             }
+            case DELETE_AD -> {
+                sqlExecutor.deleteAd(Long.parseLong(dataParts[1]));
+                EditMessageText editMessage = new EditMessageText();
+                // TODO установить id чата бота,
+                //  id message - int type?
+                editMessage.setChatId(BaraholkaBotProperties.BOT_ID);
+                editMessage.setMessageId(Integer.parseInt(dataParts[1]));
+                editMessage.setText(editAdText(editMessage.getText()));
+                try {
+                    execute(editMessage);
+                } catch (TelegramApiException e){
+                    logger.error(String.format("Cannot edit deleted message: %s", e.getMessage()));
+                }
+            }
             default -> logger.error(String.format("Unknown command in callback data: %s", callbackQuery));
         }
+    }
+    public String editAdText(String message) {
+        message = new StringBuffer(message).insert(message.indexOf("Цена"), "<b style=\"color:#ff0000\"> НЕ АКТУАЛЬНО </b> \n").toString();
+        return message;
     }
 
     private void deleteLastMessage(Long chatId) {

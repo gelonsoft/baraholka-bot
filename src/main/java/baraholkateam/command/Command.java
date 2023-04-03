@@ -26,6 +26,7 @@ public abstract class Command extends BotCommand {
     public static final String NOT_CHOSEN_TAG = "➖ %s";
     public static final String TAG_CALLBACK_DATA = "tag";
     public static final String TAGS_CALLBACK_DATA = "tags";
+    public static final String DELETE_AD = "delete";
     static final String INCORRECT_PREVIOUS_STATE = """
             Невозможно выполнить текущую команду.
             Пожалуйста, вернитесь в главное меню /%s и попробуйте снова.""";

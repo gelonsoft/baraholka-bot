@@ -11,14 +11,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static baraholkateam.bot.BaraholkaBot.SEARCH_ADVERTISEMENTS_LIMIT;
-import static baraholkateam.secure_constants.SecureConstants.CREATE_TABLES;
-import static baraholkateam.secure_constants.SecureConstants.INSERT_NEW_ADVERTISEMENT;
-import static baraholkateam.secure_constants.SecureConstants.REMOVE_ALL_DATA;
-import static baraholkateam.secure_constants.SecureConstants.TAGS_SEARCH;
+import static baraholkateam.secure_constants.SecureConstants.*;
+import static baraholkateam.secure_constants.SecureConstants.DELETE_AD;
 
 public class SQLExecutor {
     private final Connection connection;
@@ -100,6 +99,31 @@ public class SQLExecutor {
             return removeAllData.executeUpdate();
         } catch (SQLException e) {
             logger.error(String.format("Error while searching advertisements by tags in database: %s", e.getMessage()));
+            return -1;
+        }
+    }
+    public List<Long> userAds(Long chatId) {
+        try {
+            PreparedStatement userAds = connection.prepareStatement(USER_ADS);
+            userAds.setLong(1, chatId);
+            ResultSet result = userAds.executeQuery();
+            List<Long> ads = new ArrayList<>();
+            while (result.next()) {
+                ads.add(result.getLong("message_id"));
+            }
+            return ads;
+        } catch (SQLException e) {
+            logger.error(String.format("Error while selecting user's ads in database: %s", e.getMessage()));
+            return null;
+        }
+    }
+    public int deleteAd(Long messageId) {
+        try {
+            PreparedStatement deleteAd = connection.prepareStatement(DELETE_AD);
+            deleteAd.setLong(1, messageId);
+            return deleteAd.executeUpdate();
+        } catch (SQLException e) {
+            logger.error(String.format("Error while deleting ad in database: %s", e.getMessage()));
             return -1;
         }
     }
