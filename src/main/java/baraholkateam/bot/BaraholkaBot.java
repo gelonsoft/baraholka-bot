@@ -30,6 +30,7 @@ import static baraholkateam.command.Command.NEXT_BUTTON_TEXT;
 import static baraholkateam.command.Command.NOT_CHOSEN_TAG;
 import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
 import static baraholkateam.command.Command.TAGS_CALLBACK_DATA;
+import static baraholkateam.command.NewAdvertisement_AddCityTags.ADD_CITY_CALLBACK_DATA;
 
 @Component
 public class BaraholkaBot extends TelegramLongPollingCommandBot {
@@ -267,6 +268,9 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                             .concat(" 0"));
                     editMessageReplyMarkup(msg.getChatId(), buttons);
                 }
+            }
+            case ADD_CITY_CALLBACK_DATA -> {
+                // TODO добавить обработку добавления хэштега города в объявлении
             }
             default -> logger.error(String.format("Unknown command in callback data: %s", callbackQuery));
         }
