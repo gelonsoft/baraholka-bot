@@ -14,6 +14,7 @@ public final class BaraholkaBotProperties {
     public static final String BOT_TOKEN;
     public static final String CHANNEL_USERNAME;
     public static final String CHANNEL_CHAT_ID;
+    public static final String BOT_CHANNEL_ID;
     public static final String DB_URL;
     public static final String DB_USER;
     public static final String DB_PASS;
@@ -34,6 +35,7 @@ public final class BaraholkaBotProperties {
         BOT_TOKEN = properties.getProperty("bot.token");
         CHANNEL_USERNAME = properties.getProperty("channel.username");
         CHANNEL_CHAT_ID = properties.getProperty("channel.chat_id");
+        BOT_CHANNEL_ID = properties.getProperty("bot.channelId");
         DB_URL = properties.getProperty("db.url");
         DB_USER = properties.getProperty("db.user");
         DB_PASS = properties.getProperty("db.password");

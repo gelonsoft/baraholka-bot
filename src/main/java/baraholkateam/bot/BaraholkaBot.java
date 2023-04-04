@@ -255,9 +255,8 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
             case DELETE_AD -> {
                 sqlExecutor.deleteAd(Long.parseLong(dataParts[1]));
                 EditMessageText editMessage = new EditMessageText();
-                // TODO установить id чата бота,
-                //  id message - int type?
-                editMessage.setChatId(BaraholkaBotProperties.BOT_ID);
+                // TODO id message - int type?
+                editMessage.setChatId(BaraholkaBotProperties.BOT_CHANNEL_ID);
                 editMessage.setMessageId(Integer.parseInt(dataParts[1]));
                 editMessage.setText(editAdText(editMessage.getText()));
                 try {
