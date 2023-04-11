@@ -1,5 +1,7 @@
 package baraholkateam.command;
 
+import baraholkateam.util.Tag;
+import baraholkateam.util.TagType;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -16,6 +18,7 @@ import java.util.Map;
 public class NewAdvertisement_AddCityTags extends Command {
     private static final String ADD_CITY_TAGS_TEXT = """
             Выберите город для публикации объявления.""";
+    public static final String ADD_CITY_CALLBACK_DATA = "addCity";
 
     public NewAdvertisement_AddCityTags(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
         super(commandIdentifier, description, lastSentMessage);
@@ -34,27 +37,19 @@ public class NewAdvertisement_AddCityTags extends Command {
     public SendMessage suggestChoosingCity(Long chatId) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
-        // TODO parse data from Tag class
-        List<String> cities = new ArrayList<>();
-        cities.add("Москва");
-        cities.add("СПб");
-        cities.add("Екатеринбург");
-        cities.add("Челябинск");
-        cities.add("Ульяновск");
-        cities.add("Омск");
-        cities.add("Белгород");
-        cities.add("Пермь");
-        cities.add("Волгоград");
-        cities.add("Киров");
-        cities.add("Хабаровск");
-        cities.add("Петропавловск");
+        List<Tag> cities = new ArrayList<>();
+        for (Tag tag : Tag.values()) {
+            if (tag.getTagType() == TagType.City) {
+                cities.add(tag);
+            }
+        }
 
         InlineKeyboardButton[] buttons = new InlineKeyboardButton[cities.size()];
 
         for (int i = 0; i < cities.size(); i++) {
             buttons[i] = new InlineKeyboardButton();
-            buttons[i].setText(cities.get(i));
-            buttons[i].setCallbackData("Button " + cities.get(i) + " has been pressed");
+            buttons[i].setText(cities.get(i).getName());
+            buttons[i].setCallbackData(String.format("%s %s", ADD_CITY_CALLBACK_DATA, cities.get(i).getName()));
         }
 
         List<InlineKeyboardButton> keyboardRow1 = new ArrayList<>();

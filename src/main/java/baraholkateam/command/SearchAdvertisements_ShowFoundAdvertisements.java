@@ -52,13 +52,14 @@ public class SearchAdvertisements_ShowFoundAdvertisements extends Command {
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
-        int count = forwardMessages(chat.getId());
-
         String chosenTagsString = chosenTags.get(chat.getId());
 
         if (previousState.get(chat.getId()) == State.SearchAdvertisements_AddProductCategories) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                     String.format(CHOSEN_HASHTAGS, chosenTagsString == null ? NO_HASHTAGS : chosenTagsString), null);
+
+            int count = forwardMessages(chat.getId());
+
             if (count == 0) {
                 sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                         String.format(CANNOT_FIND_ADVERTISEMENTS,

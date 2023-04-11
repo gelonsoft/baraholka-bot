@@ -60,7 +60,7 @@ public class SearchAdvertisements_AddAdvertisementType extends Command {
     private void createAds() {
         Advertisement ad1 = new Advertisement(new ArrayList<>(1), "описание1", List.of(Tag.Exchange, Tag.Sale, Tag.Belgorod, Tag.Hobby), 1000L, List.of("контакт 1", "контакт 2"))
                 .setChatId(1L)
-                .setMessageId(2L)
+                .setMessageId(3L)
                 .setCreationTime(123L)
                 .setNextUpdateTime(456L);
         Advertisement ad2 = new Advertisement(new ArrayList<>(1), "описание2", List.of(Tag.Exchange, Tag.Sale, Tag.Belgorod), 2000L, List.of("контакт 3"))
@@ -70,17 +70,17 @@ public class SearchAdvertisements_AddAdvertisementType extends Command {
                 .setNextUpdateTime(101112L);
         Advertisement ad3 = new Advertisement(new ArrayList<>(1), "описание3", List.of(Tag.Sale, Tag.Belgorod, Tag.Hobby), 3000L, List.of("контакт 4", "контакт 5", "контакт 6"))
                 .setChatId(5L)
-                .setMessageId(6L)
+                .setMessageId(5L)
                 .setCreationTime(131415L)
                 .setNextUpdateTime(161718L);
         Advertisement ad4 = new Advertisement(new ArrayList<>(1), "описание4", List.of(Tag.Exchange, Tag.Sale, Tag.Belgorod, Tag.Hobby, Tag.Books), 4000L, new ArrayList<>(1))
                 .setChatId(7L)
-                .setMessageId(8L)
+                .setMessageId(6L)
                 .setCreationTime(192021L)
                 .setNextUpdateTime(222324L);
         Advertisement ad5 = new Advertisement(new ArrayList<>(1), "описание5", List.of(Tag.Exchange, Tag.Sale, Tag.Belgorod, Tag.Hobby, Tag.Ekaterinburg), 5000L, List.of("контакт 7"))
                 .setChatId(9L)
-                .setMessageId(10L)
+                .setMessageId(7L)
                 .setCreationTime(252627L)
                 .setNextUpdateTime(282930L);
 
