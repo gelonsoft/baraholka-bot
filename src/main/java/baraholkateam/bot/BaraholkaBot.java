@@ -70,6 +70,10 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 State.NewAdvertisement_ConfirmDescription.getDescription(), lastSentMessage));
         register(new NewAdvertisement_AddCityTags(State.NewAdvertisement_AddTags.getIdentifier(),
                 State.NewAdvertisement_AddTags.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_ConfirmCity(State.NewAdvertisement_ConfirmCity.getIdentifier(),
+                State.NewAdvertisement_ConfirmCity.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_AddType(State.NewAdvertisement_AddType.getIdentifier(),
+                State.NewAdvertisement_AddType.getDescription(), lastSentMessage));
         register(new SearchAdvertisements(State.SearchAdvertisements.getIdentifier(),
                 State.SearchAdvertisements.getDescription(), lastSentMessage, chosenTags));
         register(new SearchAdvertisements_AddAdvertisementType(

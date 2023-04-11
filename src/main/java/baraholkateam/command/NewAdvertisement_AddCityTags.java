@@ -54,7 +54,7 @@ public class NewAdvertisement_AddCityTags extends Command {
         for (int i = 0; i < cities.size(); i++) {
             buttons[i] = new InlineKeyboardButton();
             buttons[i].setText(cities.get(i));
-            buttons[i].setCallbackData("Button" + cities.get(i) + "has been pressed");
+            buttons[i].setCallbackData("Button " + cities.get(i) + " has been pressed");
         }
 
         List<InlineKeyboardButton> keyboardRow1 = new ArrayList<>();
