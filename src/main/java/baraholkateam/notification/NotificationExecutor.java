@@ -39,10 +39,10 @@ public class NotificationExecutor {
     private static final int CORE_POOL_SIZE = MAXIMUM_POOL_SIZE > 2 ? MAXIMUM_POOL_SIZE - 2 : MAXIMUM_POOL_SIZE;
     private static final Long FIRST_REPEAT_NOTIFICATION_PERIOD = 14L;
     private static final TimeUnit FIRST_REPEAT_NOTIFICATION_TIME_UNIT = TimeUnit.DAYS;
-    private static final Long SCHEDULE_NOTIFICATION_EXECUTOR_PERIOD = 12L;
-    private static final TimeUnit SCHEDULE_NOTIFICATION_EXECUTOR_TIME_UNIT = TimeUnit.HOURS;
-    private static final Long REPEAT_NOTIFICATION_PERIOD = 1L;
+    private static final Long REPEAT_NOTIFICATION_PERIOD = 12L;
     private static final TimeUnit REPEAT_NOTIFICATION_TIME_UNIT = TimeUnit.HOURS;
+    private static final Long SCHEDULE_NOTIFICATION_EXECUTOR_PERIOD = 1L;
+    private static final TimeUnit SCHEDULE_NOTIFICATION_EXECUTOR_TIME_UNIT = TimeUnit.HOURS;
     private static final ScheduledExecutorService notificationExecutor =
             Executors.newScheduledThreadPool(CORE_POOL_SIZE,
                     new ThreadFactoryBuilder().setNameFormat("Notification-Executor-%d").build());
