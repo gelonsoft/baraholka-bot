@@ -18,7 +18,7 @@ public class TelegramAPIRequests {
     private final HttpClient client = HttpClient.newHttpClient();
     private final Logger logger = LoggerFactory.getLogger(TelegramAPIRequests.class);
 
-    public void forwardMessage(String from, String to, Long messageId) {
+    public Long forwardMessage(String from, String to, Long messageId) {
         try {
             URI uri = new URIBuilder(String.format(FORWARD_MESSAGE, BaraholkaBotProperties.BOT_TOKEN))
                     .addParameter("chat_id", String.format("%s", to))
@@ -42,7 +42,7 @@ public class TelegramAPIRequests {
                                 Request headers: %s
                                 Response: %s""";
                 logError(request, response, errorMessage);
-                return;
+                return 0L;
             }
 
             JSONObject object = new JSONObject(response.body());
@@ -54,7 +54,7 @@ public class TelegramAPIRequests {
                                 Request headers: %s
                                 Response: %s""";
                 logError(request, response, errorMessage);
-                return;
+                return 0L;
             }
 
             JSONObject result = object.getJSONObject("result");
@@ -66,9 +66,12 @@ public class TelegramAPIRequests {
                                 Request headers: %s
                                 Response: %s""";
                 logError(request, response, errorMessage);
+                return 0L;
             }
+            return result.getLong("message_id");
         } catch (URISyntaxException | IOException | InterruptedException e) {
             logger.error(String.format("Cannot create request: %s", e.getMessage()));
+            return 0L;
         }
     }
 

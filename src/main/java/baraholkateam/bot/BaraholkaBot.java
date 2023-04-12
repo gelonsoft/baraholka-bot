@@ -10,6 +10,8 @@ import baraholkateam.command.SearchAdvertisements_AddProductCategories;
 import baraholkateam.command.SearchAdvertisements_ShowFoundAdvertisements;
 import baraholkateam.command.StartCommand;
 import baraholkateam.database.SQLExecutor;
+import baraholkateam.notification.NotificationExecutor;
+import baraholkateam.telegram_api_requests.TelegramAPIRequests;
 import baraholkateam.util.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,6 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageRe
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -34,23 +35,28 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static baraholkateam.command.Command.ADVERTISEMENT_SUCCESSFUL_DELETE;
+import static baraholkateam.command.Command.ADVERTISEMENT_SUCCESSFUL_UPDATE;
+import static baraholkateam.command.Command.CHOSEN_TAG;
 import static baraholkateam.command.Command.NEXT_BUTTON_TEXT;
 import static baraholkateam.command.Command.NOT_CHOSEN_TAG;
-import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
 import static baraholkateam.command.Command.TAGS_CALLBACK_DATA;
+import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
+import static baraholkateam.command.Command.YES_NO_ANSWER;
 
 @Component
 public class BaraholkaBot extends TelegramLongPollingCommandBot {
     public static final Integer SEARCH_ADVERTISEMENTS_LIMIT = 10;
-    public static final String CHOSEN_TAG = "✅ %s";
     private final String botName;
     private final String botToken;
     private final NonCommand nonCommand;
     private final SQLExecutor sqlExecutor;
+    private final TelegramAPIRequests telegramAPIRequests;
     private final Map<Long, State> currentState = new ConcurrentHashMap<>();
     private final Map<Long, Message> lastSentMessage = new ConcurrentHashMap<>();
     private final Map<Long, String> chosenTags = new ConcurrentHashMap<>();
     private final Map<Long, State> previousState = new ConcurrentHashMap<>();
+    private final Map<Long, Map<Long, List<Message>>> notificationMessages = new ConcurrentHashMap<>();
     private final Logger logger = LoggerFactory.getLogger(BaraholkaBot.class);
 
     public BaraholkaBot(@Value("${bot.name}") String botName, @Value("${bot.token}") String botToken) {
@@ -60,12 +66,19 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
 
         sqlExecutor = new SQLExecutor();
         nonCommand = new NonCommand();
+        telegramAPIRequests = new TelegramAPIRequests();
+
+        // TODO убрать метод
+        sqlExecutor.removeAllData();
+
+        NotificationExecutor.startNotificationExecutor(sqlExecutor, this, telegramAPIRequests,
+                notificationMessages);
 
         register(new StartCommand(State.Start.getIdentifier(), State.Start.getDescription(), lastSentMessage));
         register(new HelpCommand(State.Help.getIdentifier(), State.Help.getDescription(), lastSentMessage,
                 getRegisteredCommands()));
         register(new MainMenuCommand(State.MainMenu.getIdentifier(), State.MainMenu.getDescription(),
-                lastSentMessage));
+                lastSentMessage, sqlExecutor));
         register(new NewAdvertisementCommand(State.NewAdvertisement.getIdentifier(),
                 State.NewAdvertisement.getDescription(), lastSentMessage));
         register(new SearchAdvertisements(State.SearchAdvertisements.getIdentifier(),
@@ -73,7 +86,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         register(new SearchAdvertisements_AddAdvertisementType(
                 State.SearchAdvertisements_AddAdvertisementType.getIdentifier(),
                 State.SearchAdvertisements_AddAdvertisementType.getDescription(), lastSentMessage, chosenTags,
-                sqlExecutor, previousState));
+                previousState));
         register(new SearchAdvertisements_AddProductCategories(
                 State.SearchAdvertisements_AddProductCategories.getIdentifier(),
                 State.SearchAdvertisements_AddProductCategories.getDescription(), lastSentMessage, chosenTags,
@@ -81,7 +94,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         register(new SearchAdvertisements_ShowFoundAdvertisements(
                 State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
                 State.SearchAdvertisements_ShowFoundAdvertisements.getDescription(), lastSentMessage, chosenTags,
-                sqlExecutor, previousState));
+                sqlExecutor, telegramAPIRequests, previousState));
     }
 
     @Override
@@ -178,19 +191,13 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         // ошибки в обработке сообщения пользователя нет, отправляем ответ и переходим на следующий шаг
         for (NonCommand.AnswerPair answer : answers) {
             if (!answer.getError()) {
-                sendAnswer(chatId, getUserName(msg), answer.getAnswer(),
+                sendAnswer(chatId, answer.getAnswer(),
                         answer.getReplyKeyboard() == null ? null : answer.getReplyKeyboard());
             }
         }
     }
 
-    private String getUserName(Message msg) {
-        User user = msg.getFrom();
-        String userName = user.getUserName();
-        return (userName != null) ? userName : String.format("%s %s", user.getLastName(), user.getFirstName());
-    }
-
-    private void sendAnswer(Long chatId, String userName, String text, ReplyKeyboard replyKeyboard) {
+    private void sendAnswer(Long chatId, String text, ReplyKeyboard replyKeyboard) {
         SendMessage answer = new SendMessage();
         answer.setText(text);
         answer.setParseMode(ParseMode.HTML);
@@ -204,7 +211,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
             Message sentMessage = execute(answer);
             lastSentMessage.put(chatId, sentMessage);
         } catch (TelegramApiException e) {
-            logger.error(String.format("Cannot execute command of user %s: %s", userName, e.getMessage()));
+            logger.error(String.format("Cannot execute command of chat id %d: %s", chatId, e.getMessage()));
         }
     }
 
@@ -253,6 +260,20 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                             .concat(" 0"));
                     editMessageReplyMarkup(msg.getChatId(), buttons);
                 }
+            }
+            case YES_NO_ANSWER -> {
+                if (Objects.equals(dataParts[4], "0")) {
+                    sqlExecutor.removeAdvertisement(Long.parseLong(dataParts[1]), Long.parseLong(dataParts[2]));
+                    // TODO добавить удаление объявления из канала
+                    sendAnswer(Long.parseLong(dataParts[1]), ADVERTISEMENT_SUCCESSFUL_DELETE, null);
+                } else {
+                    sqlExecutor.updateNextUpdateTime(Long.parseLong(dataParts[1]), Long.parseLong(dataParts[2]),
+                            System.currentTimeMillis() + Long.parseLong(dataParts[3]));
+                    sqlExecutor.updateAttemptNumber(Long.parseLong(dataParts[1]), Long.parseLong(dataParts[2]), 0);
+                    sendAnswer(Long.parseLong(dataParts[1]), ADVERTISEMENT_SUCCESSFUL_UPDATE, null);
+                }
+                NotificationExecutor.deleteMessages(this, notificationMessages, Long.parseLong(dataParts[1]),
+                        Long.parseLong(dataParts[2]));
             }
             default -> logger.error(String.format("Unknown command in callback data: %s", callbackQuery));
         }

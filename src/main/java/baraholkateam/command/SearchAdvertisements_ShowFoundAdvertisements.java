@@ -42,11 +42,12 @@ public class SearchAdvertisements_ShowFoundAdvertisements extends Command {
                                                         Map<Long, Message> lastSentMessage,
                                                         Map<Long, String> chosenTags,
                                                         SQLExecutor sqlExecutor,
+                                                        TelegramAPIRequests telegramAPIRequests,
                                                         Map<Long, State> previousState) {
         super(commandIdentifier, description, lastSentMessage);
         this.chosenTags = chosenTags;
         this.sqlExecutor = sqlExecutor;
-        telegramAPIRequests = new TelegramAPIRequests();
+        this.telegramAPIRequests = telegramAPIRequests;
         this.previousState = previousState;
     }
 
@@ -86,21 +87,20 @@ public class SearchAdvertisements_ShowFoundAdvertisements extends Command {
         if (chosenTags.get(chatId) == null) {
             return 0;
         }
-        ResultSet messageIds = sqlExecutor.tagsSearch(Arrays.stream(chosenTags.get(chatId).split(" "))
-                .map(Tag::getTagByName)
-                .toList());
+
         int count = 0;
-        while (true) {
-            try {
-                if (!messageIds.next()) break;
+        try (ResultSet messageIds = sqlExecutor.tagsSearch(Arrays.stream(chosenTags.get(chatId).split(" "))
+                .map(Tag::getTagByName)
+                .toList())) {
+            while (messageIds.next()) {
                 telegramAPIRequests.forwardMessage(BaraholkaBotProperties.CHANNEL_USERNAME, String.valueOf(chatId),
                         messageIds.getLong("message_id"));
                 count++;
-            } catch (SQLException e) {
-                logger.error(String.format("Cannot handle sql: %s", e.getMessage()));
-                throw new RuntimeException("Failed to handle sql", e);
             }
+        } catch (SQLException e) {
+            logger.error(String.format("Cannot handle sql: %s", e.getMessage()));
         }
+
         return count;
     }
 

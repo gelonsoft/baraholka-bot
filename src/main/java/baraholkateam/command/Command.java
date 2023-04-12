@@ -23,12 +23,18 @@ import java.util.Map;
 
 public abstract class Command extends BotCommand {
     public static final String NEXT_BUTTON_TEXT = "Продолжить";
+    public static final String CHOSEN_TAG = "✅ %s";
     public static final String NOT_CHOSEN_TAG = "➖ %s";
+    public static final String YES_NO_ANSWER = "yesNo";
     public static final String TAG_CALLBACK_DATA = "tag";
     public static final String TAGS_CALLBACK_DATA = "tags";
     static final String INCORRECT_PREVIOUS_STATE = """
             Невозможно выполнить текущую команду.
             Пожалуйста, вернитесь в главное меню /%s и попробуйте снова.""";
+    public static final String ADVERTISEMENT_SUCCESSFUL_UPDATE = "Актуальность объявления была продлена.";
+    public static final String ADVERTISEMENT_SUCCESSFUL_DELETE = "Объявление было удалено.";
+    public static final String ADVERTISEMENT_DELETE =
+            "Объявление было автоматически удалено после 3 попыток уточнения его актуальности.";
     static final String NO_HASHTAGS = "➖";
     static final String CHOSEN_HASHTAGS = "Текущие выбранные хэштеги: %s";
     private final Map<Long, Message> lastSentMessage;
@@ -72,7 +78,7 @@ public abstract class Command extends BotCommand {
         return rkm;
     }
 
-    public static InlineKeyboardMarkup getTags(TagType tagType, Boolean isMultipleChoice) {
+    static InlineKeyboardMarkup getTags(TagType tagType, Boolean isMultipleChoice) {
         InlineKeyboardMarkup ikm = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> tags = new ArrayList<>(1);
         int count = 0;
