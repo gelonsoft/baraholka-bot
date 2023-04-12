@@ -26,15 +26,6 @@ public class NewAdvertisement_AddCityTags extends Command {
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        SendMessage message = suggestChoosingCity(chat.getId());
-        try {
-            absSender.execute(message);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public SendMessage suggestChoosingCity(Long chatId) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
 
         List<Tag> cities = new ArrayList<>();
@@ -83,10 +74,7 @@ public class NewAdvertisement_AddCityTags extends Command {
 
         inlineKeyboardMarkup.setKeyboard(rowList);
 
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId);
-        message.setText(ADD_CITY_TAGS_TEXT);
-        message.setReplyMarkup(inlineKeyboardMarkup);
-        return message;
+        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                ADD_CITY_TAGS_TEXT, inlineKeyboardMarkup);
     }
 }

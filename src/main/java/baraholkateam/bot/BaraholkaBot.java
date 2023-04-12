@@ -43,6 +43,8 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
     private final Map<Long, State> currentState = new ConcurrentHashMap<>();
     private final Map<Long, Message> lastSentMessage = new ConcurrentHashMap<>();
     private final Map<Long, String> chosenTags = new ConcurrentHashMap<>();
+
+    private final Map<Long, String> chosenCity = new ConcurrentHashMap<>();
     private final Map<Long, State> previousState = new ConcurrentHashMap<>();
     private final Logger logger = LoggerFactory.getLogger(BaraholkaBot.class);
 
@@ -72,7 +74,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         register(new NewAdvertisement_AddCityTags(State.NewAdvertisement_AddTags.getIdentifier(),
                 State.NewAdvertisement_AddTags.getDescription(), lastSentMessage));
         register(new NewAdvertisement_ConfirmCity(State.NewAdvertisement_ConfirmCity.getIdentifier(),
-                State.NewAdvertisement_ConfirmCity.getDescription(), lastSentMessage));
+                State.NewAdvertisement_ConfirmCity.getDescription(), lastSentMessage, chosenCity));
         register(new NewAdvertisement_AddType(State.NewAdvertisement_AddType.getIdentifier(),
                 State.NewAdvertisement_AddType.getDescription(), lastSentMessage));
         register(new SearchAdvertisements(State.SearchAdvertisements.getIdentifier(),
@@ -274,7 +276,13 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 }
             }
             case ADD_CITY_CALLBACK_DATA -> {
-                // TODO добавить обработку добавления хэштега города в объявлении
+                // TODO заменить на общую мапу для объявлений
+                chosenCity.put(msg.getChatId(), dataParts[1]);
+                deleteLastMessage(msg.getChatId());
+                State nextState = State.nextState(currentState.get(msg.getChatId()));
+                previousState.put(msg.getChatId(), currentState.get(msg.getChatId()));
+                currentState.put(msg.getChatId(), nextState);
+                getRegisteredCommand(nextState.getIdentifier()).processMessage(this, msg, null);
             }
             default -> logger.error(String.format("Unknown command in callback data: %s", callbackQuery));
         }

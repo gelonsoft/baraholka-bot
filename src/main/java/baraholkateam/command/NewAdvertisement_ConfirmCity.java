@@ -1,7 +1,6 @@
 package baraholkateam.command;
 
 import baraholkateam.util.State;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -9,34 +8,29 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.bots.AbsSender;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class NewAdvertisement_ConfirmCity extends Command {
-    // TODO выводить в сообщении выбранный город
     private static final String CONFIRM_CITY_TEXT = """
-            Вы выбрали город.
-            Теперь выберите тип объявления
-            """;
+                Вы выбрали город: %s
+                Теперь выберите тип объявления""";
 
-    public NewAdvertisement_ConfirmCity(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
+    private final Map<Long, String> chosenCity;
+
+    public NewAdvertisement_ConfirmCity(String commandIdentifier, String description,
+                                        Map<Long, Message> lastSentMessage,
+                                        Map<Long, String> chosenCity) {
         super(commandIdentifier, description, lastSentMessage);
+        this.chosenCity = chosenCity;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        SendMessage message = suggestAddingHashtags(chat.getId());
-        try {
-            absSender.execute(message);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
-    }
+        String chosenCityString = chosenCity.get(chat.getId());
 
-    public SendMessage suggestAddingHashtags(Long chatId) {
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
 
         KeyboardButton addTypeButton = new KeyboardButton();
@@ -55,10 +49,7 @@ public class NewAdvertisement_ConfirmCity extends Command {
         replyKeyboardMarkup.setKeyboard(keyboardRows);
         replyKeyboardMarkup.setResizeKeyboard(true);
 
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId);
-        message.setText(CONFIRM_CITY_TEXT);
-        message.setReplyMarkup(replyKeyboardMarkup);
-        return message;
+        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                String.format(CONFIRM_CITY_TEXT, chosenCityString), replyKeyboardMarkup);
     }
 }
