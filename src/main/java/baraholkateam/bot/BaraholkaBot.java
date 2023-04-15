@@ -76,7 +76,27 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         register(new NewAdvertisement_ConfirmCity(State.NewAdvertisement_ConfirmCity.getIdentifier(),
                 State.NewAdvertisement_ConfirmCity.getDescription(), lastSentMessage, chosenCity));
         register(new NewAdvertisement_AddType(State.NewAdvertisement_AddType.getIdentifier(),
-                State.NewAdvertisement_AddType.getDescription(), lastSentMessage));
+                State.NewAdvertisement_AddType.getDescription(), lastSentMessage, chosenTags,
+                previousState));
+        register(new NewAdvertisement_ConfirmType(State.NewAdvertisement_ConfirmType.getIdentifier(),
+                State.NewAdvertisement_ConfirmType.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_AddCategories(State.NewAdvertisement_AddCategories.getIdentifier(),
+                State.NewAdvertisement_AddCategories.getDescription(), lastSentMessage, chosenTags,
+                previousState));
+        register(new NewAdvertisement_ConfirmCategories(State.NewAdvertisement_ConfirmCategories.getIdentifier(),
+                State.NewAdvertisement_ConfirmCategories.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_AddPrice(State.NewAdvertisement_AddPrice.getIdentifier(),
+                State.NewAdvertisement_AddPrice.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_ConfirmPrice(State.NewAdvertisement_ConfirmPrice.getIdentifier(),
+                State.NewAdvertisement_ConfirmPrice.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_AddContacts(State.NewAdvertisement_AddContacts.getIdentifier(),
+                State.NewAdvertisement_AddContacts.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_AddPhone(State.NewAdvertisement_AddPhone.getIdentifier(),
+                State.NewAdvertisement_AddPhone.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_AddSocial(State.NewAdvertisement_AddSocial.getIdentifier(),
+                State.NewAdvertisement_AddSocial.getDescription(), lastSentMessage));
+        register(new NewAdvertisement_Confirm(State.NewAdvertisement_Confirm.getIdentifier(),
+                State.NewAdvertisement_Confirm.getDescription(), lastSentMessage));
         register(new SearchAdvertisements(State.SearchAdvertisements.getIdentifier(),
                 State.SearchAdvertisements.getDescription(), lastSentMessage, chosenTags));
         register(new SearchAdvertisements_AddAdvertisementType(
@@ -276,9 +296,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 }
             }
             case ADD_CITY_CALLBACK_DATA -> {
-                // TODO заменить на общую мапу для объявлений
                 chosenCity.put(msg.getChatId(), dataParts[1]);
-                deleteLastMessage(msg.getChatId());
                 State nextState = State.nextState(currentState.get(msg.getChatId()));
                 previousState.put(msg.getChatId(), currentState.get(msg.getChatId()));
                 currentState.put(msg.getChatId(), nextState);

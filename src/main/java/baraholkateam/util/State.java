@@ -1,5 +1,7 @@
 package baraholkateam.util;
 
+import baraholkateam.command.NewAdvertisement_AddContacts;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -22,6 +24,10 @@ public enum State {
     NewAdvertisement_ConfirmCategories("confirm_categories", "Подтвердить категории"),
     NewAdvertisement_AddPrice("add_price", "Добавить стоимость"),
     NewAdvertisement_ConfirmPrice("confirm_price", "Подтвердить стоимость"),
+    NewAdvertisement_AddContacts("add_contacts", "Добавить контакты"),
+    NewAdvertisement_AddPhone("add_phone", "Добавить номер телефона"),
+    NewAdvertisement_AddSocial("add_social", "Добавить ссылку"),
+    NewAdvertisement_Confirm("confirm_ad", "Подтвердить"),
     SearchAdvertisements("search_advertisement", "Поиск объявлений по хэштегам"),
     SearchAdvertisements_AddAdvertisementType("add_advertisement_type",
             "Выбор типов объявления для поиска"),
@@ -56,6 +62,10 @@ public enum State {
         nextStates.put(NewAdvertisement_AddCategories, NewAdvertisement_ConfirmCategories);
         nextStates.put(NewAdvertisement_ConfirmCategories, NewAdvertisement_AddPrice);
         nextStates.put(NewAdvertisement_AddPrice, NewAdvertisement_ConfirmPrice);
+        nextStates.put(NewAdvertisement_ConfirmPrice, NewAdvertisement_AddContacts);
+        nextStates.put(NewAdvertisement_AddContacts, NewAdvertisement_AddPhone);
+        nextStates.put(NewAdvertisement_AddPhone, NewAdvertisement_AddSocial);
+        nextStates.put(NewAdvertisement_AddSocial, NewAdvertisement_Confirm);
         return nextStates;
     }
 
