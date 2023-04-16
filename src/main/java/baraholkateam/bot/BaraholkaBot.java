@@ -6,6 +6,8 @@ import baraholkateam.util.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
+import org.springframework.boot.autoconfigure.integration.IntegrationProperties;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
@@ -13,15 +15,13 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageTe
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
-import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
-import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.nio.channels.Channel;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -246,12 +246,15 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 }
             }
             case DELETE_AD -> {
-                sqlExecutor.deleteAd(Long.parseLong(dataParts[1]));
+//                sqlExecutor.deleteAd(Long.parseLong(dataParts[1]));
                 EditMessageText editMessage = new EditMessageText();
+
                 // TODO id message - int type?
                 editMessage.setChatId(BaraholkaBotProperties.CHANNEL_CHAT_ID);
                 editMessage.setMessageId(Integer.parseInt(dataParts[1]));
-                editMessage.setText(editAdText(editMessage.getText()));
+                System.out.println("Текст объявления: ");
+//                editMessage.setText(editAdText(editMessage.getText()));
+                editMessage.setText("TEST1");
                 try {
                     execute(editMessage);
                 } catch (TelegramApiException e){
@@ -262,7 +265,11 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         }
     }
     public String editAdText(String message) {
-        message = new StringBuffer(message).insert(message.indexOf("Цена"), "<b style=\"color:#ff0000\"> НЕ АКТУАЛЬНО </b> \n").toString();
+//        TODO Раскомментировать основной функционал, удалить заглушку
+//        message = new StringBuffer(message).insert(0, "<b style=\"color:#ff0000\"> НЕ АКТУАЛЬНО </b> \n").toString();
+        StringBuffer sb = new StringBuffer(message);
+        sb = sb.insert(0, "НЕ АКТУАЛЬНО\n");
+        message = sb.toString();
         return message;
     }
 
