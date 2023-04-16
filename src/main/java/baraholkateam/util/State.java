@@ -9,6 +9,7 @@ public enum State {
     Help("help", "Справочная информация по боту"),
     MainMenu("menu", "Главное меню"),
     NewAdvertisement("new_advertisement", "Создание нового объявления"),
+    DeleteAd("delete_ad", "удалить объявление"),
     SearchAdvertisements("search_advertisement", "Поиск объявлений по хэштегам"),
     SearchAdvertisements_AddAdvertisementType("add_advertisement_type",
             "Выбор типов объявления для поиска"),

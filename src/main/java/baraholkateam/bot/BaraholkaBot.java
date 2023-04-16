@@ -1,14 +1,6 @@
 package baraholkateam.bot;
 
-import baraholkateam.command.HelpCommand;
-import baraholkateam.command.MainMenuCommand;
-import baraholkateam.command.NewAdvertisementCommand;
-import baraholkateam.command.NonCommand;
-import baraholkateam.command.SearchAdvertisements;
-import baraholkateam.command.SearchAdvertisements_AddAdvertisementType;
-import baraholkateam.command.SearchAdvertisements_AddProductCategories;
-import baraholkateam.command.SearchAdvertisements_ShowFoundAdvertisements;
-import baraholkateam.command.StartCommand;
+import baraholkateam.command.*;
 import baraholkateam.database.SQLExecutor;
 import baraholkateam.util.State;
 import org.slf4j.Logger;
@@ -66,6 +58,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 lastSentMessage));
         register(new NewAdvertisementCommand(State.NewAdvertisement.getIdentifier(),
                 State.NewAdvertisement.getDescription(), lastSentMessage));
+        register(new DeleteAd(State.DeleteAd.getIdentifier(), State.DeleteAd.getDescription(), sqlExecutor, lastSentMessage));
         register(new SearchAdvertisements(State.SearchAdvertisements.getIdentifier(),
                 State.SearchAdvertisements.getDescription(), lastSentMessage, chosenTags));
         register(new SearchAdvertisements_AddAdvertisementType(
