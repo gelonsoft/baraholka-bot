@@ -8,12 +8,16 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import java.util.Map;
 
 public class NewAdvertisement_AddPrice extends Command {
+    private static final String ADD_PRICE_TEXT = """
+            Укажите стоимость товара в рублях.""";
+
     public NewAdvertisement_AddPrice(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
         super(commandIdentifier, description, lastSentMessage);
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-
+        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                ADD_PRICE_TEXT, null);
     }
 }

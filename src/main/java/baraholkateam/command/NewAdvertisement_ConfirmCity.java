@@ -1,5 +1,6 @@
 package baraholkateam.command;
 
+import baraholkateam.bot.BaraholkaBot;
 import baraholkateam.util.State;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -18,19 +19,13 @@ public class NewAdvertisement_ConfirmCity extends Command {
                 Вы выбрали город: %s
                 Теперь выберите тип объявления""";
 
-    private final Map<Long, String> chosenCity;
-
     public NewAdvertisement_ConfirmCity(String commandIdentifier, String description,
-                                        Map<Long, Message> lastSentMessage,
-                                        Map<Long, String> chosenCity) {
+                                        Map<Long, Message> lastSentMessage) {
         super(commandIdentifier, description, lastSentMessage);
-        this.chosenCity = chosenCity;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        String chosenCityString = chosenCity.get(chat.getId());
-
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
 
         KeyboardButton addTypeButton = new KeyboardButton();
@@ -50,6 +45,7 @@ public class NewAdvertisement_ConfirmCity extends Command {
         replyKeyboardMarkup.setResizeKeyboard(true);
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                String.format(CONFIRM_CITY_TEXT, chosenCityString), replyKeyboardMarkup);
+                String.format(CONFIRM_CITY_TEXT, BaraholkaBot.getNewAdvertisement(chat.getId()).getCity()),
+                replyKeyboardMarkup);
     }
 }

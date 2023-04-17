@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class NewAdvertisement_AddContacts extends Command {
-    private static final String ADD_CONTACTS_TEXT = """
-            Желаете указать ваш номер телефона?""";
+public class NewAdvertisement_ConfirmPhone extends Command {
+    private static final String CONFIRM_PHONE_TEXT = """
+            Желаете добавить ссылку на вашу социальную сеть?""";
 
-    public NewAdvertisement_AddContacts(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
+    public NewAdvertisement_ConfirmPhone(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
         super(commandIdentifier, description, lastSentMessage);
     }
 
@@ -25,12 +25,11 @@ public class NewAdvertisement_AddContacts extends Command {
 
         InlineKeyboardButton yesButton = new InlineKeyboardButton();
         yesButton.setText("Да");
-        String yesCallbackData = String.format("%s %s", PHONE_CALLBACK_DATA, "yes");
+        String yesCallbackData = String.format("%s %s", SOCIAL_CALLBACK_DATA, "yes");
         yesButton.setCallbackData(yesCallbackData);
 
         InlineKeyboardButton noButton = new InlineKeyboardButton();
-        noButton.setText("Нет");
-        String noCallbackData = String.format("%s %s", PHONE_CALLBACK_DATA, "no");
+        String noCallbackData = String.format("%s %s", SOCIAL_CALLBACK_DATA, "no");
         noButton.setCallbackData(noCallbackData);
 
         List<InlineKeyboardButton> keyboardFirstRow = new ArrayList<>();
@@ -42,6 +41,6 @@ public class NewAdvertisement_AddContacts extends Command {
         inlineKeyboardMarkup.setKeyboard(keyboardRows);
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                ADD_CONTACTS_TEXT, inlineKeyboardMarkup);
+                CONFIRM_PHONE_TEXT, inlineKeyboardMarkup);
     }
 }

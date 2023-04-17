@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class NewAdvertisement_AddType extends Command {
     private static final String ADD_TYPE_TEXT = """
-            Теперь выберите категориии, наиболее подходящие для описания вашего товара.""";
+            Теперь выберите категории, наиболее подходящие для описания вашего товара.""";
 
     private final Map<Long, String> chosenTags;
     private final Map<Long, State> previousState;

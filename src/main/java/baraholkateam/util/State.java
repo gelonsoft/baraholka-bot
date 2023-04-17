@@ -1,6 +1,7 @@
 package baraholkateam.util;
 
 import baraholkateam.command.NewAdvertisement_AddContacts;
+import baraholkateam.command.NewAdvertisement_ConfirmPhone;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,7 @@ public enum State {
     NewAdvertisement_ConfirmPrice("confirm_price", "Подтвердить стоимость"),
     NewAdvertisement_AddContacts("add_contacts", "Добавить контакты"),
     NewAdvertisement_AddPhone("add_phone", "Добавить номер телефона"),
+    NewAdvertisement_ConfirmPhone("confirm_phone", "Подтвердить номер телефона"),
     NewAdvertisement_AddSocial("add_social", "Добавить ссылку"),
     NewAdvertisement_Confirm("confirm_ad", "Подтвердить"),
     SearchAdvertisements("search_advertisement", "Поиск объявлений по хэштегам"),
@@ -64,7 +66,8 @@ public enum State {
         nextStates.put(NewAdvertisement_AddPrice, NewAdvertisement_ConfirmPrice);
         nextStates.put(NewAdvertisement_ConfirmPrice, NewAdvertisement_AddContacts);
         nextStates.put(NewAdvertisement_AddContacts, NewAdvertisement_AddPhone);
-        nextStates.put(NewAdvertisement_AddPhone, NewAdvertisement_AddSocial);
+        nextStates.put(NewAdvertisement_AddPhone, NewAdvertisement_ConfirmPhone);
+        nextStates.put(NewAdvertisement_ConfirmPhone, NewAdvertisement_AddSocial);
         nextStates.put(NewAdvertisement_AddSocial, NewAdvertisement_Confirm);
         return nextStates;
     }
