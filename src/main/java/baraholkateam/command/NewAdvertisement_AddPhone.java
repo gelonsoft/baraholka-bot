@@ -4,19 +4,20 @@ import baraholkateam.util.State;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.Map;
 
 public class NewAdvertisement_AddPhone extends Command {
     private static final String ADD_PHONE_TEXT = """
-            Введите ваш номер в формате: 8-ххх-ххх-хх-хх.""";
+            Введите ваш номер в формате
+            8-ххх-ххх-хх-хх
+            или
+            +7-xxx-xxx-xx-xx""";
 
-    public NewAdvertisement_AddPhone(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
-        super(commandIdentifier, description, lastSentMessage);
+    public NewAdvertisement_AddPhone(Map<Long, Message> lastSentMessage) {
+        super(State.NewAdvertisement_AddPhone.getIdentifier(),
+                State.NewAdvertisement_AddPhone.getDescription(), lastSentMessage);
     }
 
     @Override

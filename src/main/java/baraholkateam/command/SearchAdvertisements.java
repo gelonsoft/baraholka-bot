@@ -1,5 +1,6 @@
 package baraholkateam.command;
 
+import baraholkateam.util.State;
 import baraholkateam.util.TagType;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -17,9 +18,9 @@ public class SearchAdvertisements extends Command {
             Если не хотите выбирать ни одного города, то нажмите на кнопку '%s'.""";
     private final Map<Long, String> chosenTags;
 
-    public SearchAdvertisements(String commandIdentifier, String description, Map<Long, Message> lastSentMessage,
-                                Map<Long, String> chosenTags) {
-        super(commandIdentifier, description, lastSentMessage);
+    public SearchAdvertisements(Map<Long, Message> lastSentMessage, Map<Long, String> chosenTags) {
+        super(State.SearchAdvertisements.getIdentifier(),
+                State.SearchAdvertisements.getDescription(), lastSentMessage);
         this.chosenTags = chosenTags;
     }
 

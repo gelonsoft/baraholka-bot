@@ -17,10 +17,10 @@ public class SearchAdvertisements_AddProductCategories extends Command {
     private final Map<Long, String> chosenTags;
     private final Map<Long, State> previousState;
 
-    public SearchAdvertisements_AddProductCategories(String commandIdentifier, String description,
-                                                     Map<Long, Message> lastSentMessage, Map<Long, String> chosenTags,
+    public SearchAdvertisements_AddProductCategories(Map<Long, Message> lastSentMessage, Map<Long, String> chosenTags,
                                                      Map<Long, State> previousState) {
-        super(commandIdentifier, description, lastSentMessage);
+        super(State.SearchAdvertisements_AddProductCategories.getIdentifier(),
+                State.SearchAdvertisements_AddProductCategories.getDescription(), lastSentMessage);
         this.chosenTags = chosenTags;
         this.previousState = previousState;
     }
@@ -29,7 +29,7 @@ public class SearchAdvertisements_AddProductCategories extends Command {
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         String chosenTagsString = chosenTags.get(chat.getId());
 
-        if (previousState.get(chat.getId()) == State.SearchAdvertisements_AddAdvertisementType) {
+        if (previousState.get(chat.getId()) == State.SearchAdvertisements_AddAdvertisementTypes) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                     String.format(CHOSEN_HASHTAGS, chosenTagsString == null ? NO_HASHTAGS : chosenTagsString),
                     showNextButton());

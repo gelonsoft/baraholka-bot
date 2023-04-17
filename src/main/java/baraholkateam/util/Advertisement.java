@@ -12,8 +12,7 @@ public class Advertisement {
     private Long messageId;
     private List<PhotoSize> photos = new ArrayList<>();
     private String description = null;
-    private String city = null;
-    private List<Tag> tags = new ArrayList<>();
+    private final List<Tag> tags = new ArrayList<>();
     private Long price = null;
     private String phone = null;
     private List<String> contacts = new ArrayList<>();
@@ -22,14 +21,16 @@ public class Advertisement {
     private final Logger logger = LoggerFactory.getLogger(Advertisement.class);
 
     public Advertisement(Long chatId) {
+        this.tags.add(Tag.Actual);
         this.chatId = chatId;
     }
 
     public Advertisement(List<PhotoSize> photos, String description, List<Tag> tags, Long price,
                          List<String> contacts) {
+        this.tags.add(Tag.Actual);
         this.photos = photos;
         this.description = description;
-        this.tags = tags;
+        this.tags.addAll(tags);
         this.price = price;
         this.contacts = contacts;
     }
@@ -60,6 +61,21 @@ public class Advertisement {
         return tags;
     }
 
+    public String getTagsOfType(TagType tagType) {
+        StringBuilder sb = new StringBuilder();
+        for (Tag tag : tags) {
+            if (tag.getTagType() == tagType) {
+                sb
+                        .append(tag.getName())
+                        .append(" ");
+            }
+        }
+        if (sb.length() > 1) {
+            sb.setLength(sb.length() - 1);
+        }
+        return sb.toString();
+    }
+
     public Long getPrice() {
         return price;
     }
@@ -84,10 +100,6 @@ public class Advertisement {
             logger.warn("Field 'nextUpdateTime' of the advertisement is null!");
         }
         return nextUpdateTime;
-    }
-
-    public String getCity() {
-        return city;
     }
 
     public Advertisement setChatId(Long chatId) {
@@ -120,16 +132,15 @@ public class Advertisement {
         return this;
     }
 
-    public Advertisement setCity(Tag city) {
-        this.tags.add(city);
-        this.city = city.getName();
-        return this;
-    }
-
     public Advertisement addTags(List<String> tags) {
         for (String tagName : tags) {
             this.tags.add(Tag.getTagByName(tagName));
         }
+        return this;
+    }
+
+    public Advertisement addTag(String tag) {
+        tags.add(Tag.getTagByName(tag));
         return this;
     }
 

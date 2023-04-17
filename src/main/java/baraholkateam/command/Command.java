@@ -30,6 +30,8 @@ public abstract class Command extends BotCommand {
     public static final String PHONE_CALLBACK_DATA = "phone";
     public static final String SOCIAL_CALLBACK_DATA = "social";
     public static final String CONFIRM_AD_CALLBACK_DATA = "confirm_ad";
+    public static final String CHOSEN_TAG = "✅ %s";
+    public static final String SUCCESS_TEXT = "Объявление успешно добавлено";
     static final String INCORRECT_PREVIOUS_STATE = """
             Невозможно выполнить текущую команду.
             Пожалуйста, вернитесь в главное меню /%s и попробуйте снова.""";
@@ -80,23 +82,32 @@ public abstract class Command extends BotCommand {
         InlineKeyboardMarkup ikm = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> tags = new ArrayList<>(1);
         int count = 0;
+        int i = 0;
+        List<InlineKeyboardButton> tagButton = new ArrayList<>(2);
         for (Tag tag : Tag.values()) {
             if (tag.getTagType() == tagType) {
-                List<InlineKeyboardButton> tagButton = new ArrayList<>(1);
-
                 String text = tag.getName();
                 String callbackData = String.format("%s %s", TAG_CALLBACK_DATA, tag.getName());
                 if (isMultipleChoice) {
                     text = String.format(NOT_CHOSEN_TAG, text);
-                    callbackData = String.format("%s %s %d 0", TAGS_CALLBACK_DATA, tag.getName(), count++);
+                    callbackData = String.format("%s %s %d %d 0", TAGS_CALLBACK_DATA, tag.getName(),
+                            Math.floorDiv(count, 2), i % 2 == 0 ? 0 : 1);
+                    count++;
                 }
 
                 tagButton.add(InlineKeyboardButton.builder()
                         .text(text)
                         .callbackData(callbackData)
                         .build());
-                tags.add(tagButton);
+
+                if (i++ % 2 == 1) {
+                    tags.add(tagButton);
+                    tagButton = new ArrayList<>(2);
+                }
             }
+        }
+        if (i % 2 == 1) {
+            tags.add(tagButton);
         }
         ikm.setKeyboard(tags);
         return ikm;

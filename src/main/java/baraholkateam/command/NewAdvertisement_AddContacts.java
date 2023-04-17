@@ -1,5 +1,6 @@
 package baraholkateam.command;
 
+import baraholkateam.util.State;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -15,14 +16,18 @@ public class NewAdvertisement_AddContacts extends Command {
     private static final String ADD_CONTACTS_TEXT = """
             Желаете указать ваш номер телефона?""";
 
-    public NewAdvertisement_AddContacts(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
-        super(commandIdentifier, description, lastSentMessage);
+    public NewAdvertisement_AddContacts(Map<Long, Message> lastSentMessage) {
+        super(State.NewAdvertisement_AddContacts.getIdentifier(),
+                State.NewAdvertisement_AddContacts.getDescription(), lastSentMessage);
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                ADD_CONTACTS_TEXT, getAddPhone());
+    }
 
+    private InlineKeyboardMarkup getAddPhone() {
         InlineKeyboardButton yesButton = new InlineKeyboardButton();
         yesButton.setText("Да");
         String yesCallbackData = String.format("%s %s", PHONE_CALLBACK_DATA, "yes");
@@ -39,9 +44,10 @@ public class NewAdvertisement_AddContacts extends Command {
 
         List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
         keyboardRows.add(keyboardFirstRow);
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         inlineKeyboardMarkup.setKeyboard(keyboardRows);
 
-        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                ADD_CONTACTS_TEXT, inlineKeyboardMarkup);
+        return inlineKeyboardMarkup;
     }
 }

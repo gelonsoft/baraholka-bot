@@ -1,12 +1,30 @@
 package baraholkateam.bot;
 
-import baraholkateam.command.*;
+import baraholkateam.command.HelpCommand;
+import baraholkateam.command.MainMenuCommand;
+import baraholkateam.command.NewAdvertisementCommand;
+import baraholkateam.command.NewAdvertisement_AddAdvertisementTypes;
+import baraholkateam.command.NewAdvertisement_AddCategories;
+import baraholkateam.command.NewAdvertisement_AddCity;
+import baraholkateam.command.NewAdvertisement_AddContacts;
+import baraholkateam.command.NewAdvertisement_AddDescription;
+import baraholkateam.command.NewAdvertisement_AddPhone;
+import baraholkateam.command.NewAdvertisement_AddPhotos;
+import baraholkateam.command.NewAdvertisement_AddPrice;
+import baraholkateam.command.NewAdvertisement_AddSocial;
+import baraholkateam.command.NewAdvertisement_Confirm;
+import baraholkateam.command.NewAdvertisement_ConfirmPhone;
+import baraholkateam.command.NewAdvertisement_ConfirmPhoto;
+import baraholkateam.command.NewAdvertisement_ConfirmPrice;
+import baraholkateam.command.NonCommand;
+import baraholkateam.command.SearchAdvertisements;
+import baraholkateam.command.SearchAdvertisements_AddAdvertisementTypes;
+import baraholkateam.command.SearchAdvertisements_AddProductCategories;
+import baraholkateam.command.SearchAdvertisements_ShowFoundAdvertisements;
+import baraholkateam.command.StartCommand;
 import baraholkateam.database.SQLExecutor;
 import baraholkateam.util.Advertisement;
 import baraholkateam.util.State;
-import baraholkateam.util.Tag;
-import baraholkateam.util.TagType;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,14 +46,19 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static baraholkateam.command.Command.*;
-import static baraholkateam.command.NewAdvertisement_AddCityTags.ADD_CITY_CALLBACK_DATA;
+import static baraholkateam.command.Command.CHOSEN_TAG;
+import static baraholkateam.command.Command.CONFIRM_AD_CALLBACK_DATA;
+import static baraholkateam.command.Command.NEXT_BUTTON_TEXT;
+import static baraholkateam.command.Command.NOT_CHOSEN_TAG;
+import static baraholkateam.command.Command.PHONE_CALLBACK_DATA;
+import static baraholkateam.command.Command.SOCIAL_CALLBACK_DATA;
+import static baraholkateam.command.Command.SUCCESS_TEXT;
+import static baraholkateam.command.Command.TAGS_CALLBACK_DATA;
+import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
 
 @Component
 public class BaraholkaBot extends TelegramLongPollingCommandBot {
     public static final Integer SEARCH_ADVERTISEMENTS_LIMIT = 10;
-    public static final String CHOSEN_TAG = "✅ %s";
-    public static final String SUCCESS_TEXT = "Объявление успешно добавлено";
     private final String botName;
     private final String botToken;
     private final NonCommand nonCommand;
@@ -44,8 +67,8 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
     private final Map<Long, Message> lastSentMessage = new ConcurrentHashMap<>();
     private final Map<Long, String> chosenTags = new ConcurrentHashMap<>();
     private final Map<Long, State> previousState = new ConcurrentHashMap<>();
+    private final Map<Long, Advertisement> advertisement = new ConcurrentHashMap<>();
     private final Logger logger = LoggerFactory.getLogger(BaraholkaBot.class);
-    private static final Map<Long, Advertisement> newAdvertisements = new ConcurrentHashMap<>();
 
     public BaraholkaBot(@Value("${bot.name}") String botName, @Value("${bot.token}") String botToken) {
         super();
@@ -54,68 +77,6 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
 
         sqlExecutor = new SQLExecutor();
         nonCommand = new NonCommand();
-
-        register(new StartCommand(State.Start.getIdentifier(), State.Start.getDescription(), lastSentMessage));
-        register(new HelpCommand(State.Help.getIdentifier(), State.Help.getDescription(), lastSentMessage,
-                getRegisteredCommands()));
-        register(new MainMenuCommand(State.MainMenu.getIdentifier(), State.MainMenu.getDescription(),
-                lastSentMessage));
-        register(new NewAdvertisementCommand(State.NewAdvertisement.getIdentifier(),
-                State.NewAdvertisement.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_AddPhotos(State.NewAdvertisement_AddPhotos.getIdentifier(),
-                State.NewAdvertisement_AddPhotos.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_ConfirmPhoto(State.NewAdvertisement_ConfirmPhoto.getIdentifier(),
-                State.NewAdvertisement_ConfirmPhoto.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_AddDescription(State.NewAdvertisement_AddDescription.getIdentifier(),
-                State.NewAdvertisement_AddDescription.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_ConfirmDescription(State.NewAdvertisement_ConfirmDescription.getIdentifier(),
-                State.NewAdvertisement_ConfirmDescription.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_AddCityTags(State.NewAdvertisement_AddTags.getIdentifier(),
-                State.NewAdvertisement_AddTags.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_ConfirmCity(State.NewAdvertisement_ConfirmCity.getIdentifier(),
-                State.NewAdvertisement_ConfirmCity.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_AddType(State.NewAdvertisement_AddType.getIdentifier(),
-                State.NewAdvertisement_AddType.getDescription(), lastSentMessage, chosenTags,
-                previousState));
-        register(new NewAdvertisement_ConfirmType(State.NewAdvertisement_ConfirmType.getIdentifier(),
-                State.NewAdvertisement_ConfirmType.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_AddCategories(State.NewAdvertisement_AddCategories.getIdentifier(),
-                State.NewAdvertisement_AddCategories.getDescription(), lastSentMessage, chosenTags,
-                previousState));
-        register(new NewAdvertisement_ConfirmCategories(State.NewAdvertisement_ConfirmCategories.getIdentifier(),
-                State.NewAdvertisement_ConfirmCategories.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_AddPrice(State.NewAdvertisement_AddPrice.getIdentifier(),
-                State.NewAdvertisement_AddPrice.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_ConfirmPrice(State.NewAdvertisement_ConfirmPrice.getIdentifier(),
-                State.NewAdvertisement_ConfirmPrice.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_AddContacts(State.NewAdvertisement_AddContacts.getIdentifier(),
-                State.NewAdvertisement_AddContacts.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_AddPhone(State.NewAdvertisement_AddPhone.getIdentifier(),
-                State.NewAdvertisement_AddPhone.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_ConfirmPhone(State.NewAdvertisement_ConfirmPhone.getIdentifier(),
-                State.NewAdvertisement_ConfirmPhone.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_AddSocial(State.NewAdvertisement_AddSocial.getIdentifier(),
-                State.NewAdvertisement_AddSocial.getDescription(), lastSentMessage));
-        register(new NewAdvertisement_Confirm(State.NewAdvertisement_Confirm.getIdentifier(),
-                State.NewAdvertisement_Confirm.getDescription(), lastSentMessage));
-        register(new SearchAdvertisements(State.SearchAdvertisements.getIdentifier(),
-                State.SearchAdvertisements.getDescription(), lastSentMessage, chosenTags));
-        register(new SearchAdvertisements_AddAdvertisementType(
-                State.SearchAdvertisements_AddAdvertisementType.getIdentifier(),
-                State.SearchAdvertisements_AddAdvertisementType.getDescription(), lastSentMessage, chosenTags,
-                sqlExecutor, previousState));
-        register(new SearchAdvertisements_AddProductCategories(
-                State.SearchAdvertisements_AddProductCategories.getIdentifier(),
-                State.SearchAdvertisements_AddProductCategories.getDescription(), lastSentMessage, chosenTags,
-                previousState));
-        register(new SearchAdvertisements_ShowFoundAdvertisements(
-                State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
-                State.SearchAdvertisements_ShowFoundAdvertisements.getDescription(), lastSentMessage, chosenTags,
-                sqlExecutor, previousState));
-    }
-
-    public static Advertisement getNewAdvertisement(Long chatId) {
-        return newAdvertisements.get(chatId);
     }
 
     @Override
@@ -141,6 +102,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
             this.currentState.put(message.getChatId(), currentStateByIdentifier);
             return false;
         }
+
         // Случай нажатия на кнопку с описанием команды
         State currentStateByDescription = State.findStateByDescription(message.getText());
         if (currentStateByDescription != null) {
@@ -149,16 +111,40 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         return false;
     }
 
-    private void updateStateOnTextData(Message msg, Long chatId) {
-        State nextState = State.nextState(currentState.get(msg.getChatId()));
-        previousState.put(chatId, currentState.get(msg.getChatId()));
-        currentState.put(chatId, nextState);
-        getRegisteredCommand(nextState.getIdentifier()).processMessage(this, msg, null);
+    @Override
+    public void onRegister() {
+        super.onRegister();
+
+        register(new StartCommand(lastSentMessage));
+        register(new HelpCommand(lastSentMessage));
+        register(new MainMenuCommand(lastSentMessage));
+        register(new NewAdvertisementCommand(lastSentMessage, advertisement));
+        register(new NewAdvertisement_AddPhotos(lastSentMessage));
+        register(new NewAdvertisement_ConfirmPhoto(lastSentMessage));
+        register(new NewAdvertisement_AddDescription(lastSentMessage));
+        register(new NewAdvertisement_AddCity(lastSentMessage));
+        register(new NewAdvertisement_AddAdvertisementTypes(lastSentMessage, advertisement));
+        register(new NewAdvertisement_AddCategories(lastSentMessage, advertisement));
+        register(new NewAdvertisement_AddPrice(lastSentMessage, advertisement));
+        register(new NewAdvertisement_ConfirmPrice(lastSentMessage, advertisement));
+        register(new NewAdvertisement_AddContacts(lastSentMessage));
+        register(new NewAdvertisement_AddPhone(lastSentMessage));
+        register(new NewAdvertisement_ConfirmPhone(lastSentMessage, advertisement));
+        register(new NewAdvertisement_AddSocial(lastSentMessage));
+        register(new NewAdvertisement_Confirm(lastSentMessage, advertisement));
+        register(new SearchAdvertisements(lastSentMessage, chosenTags));
+        register(new SearchAdvertisements_AddAdvertisementTypes(lastSentMessage, chosenTags, sqlExecutor,
+                previousState));
+        register(new SearchAdvertisements_AddProductCategories(lastSentMessage, chosenTags, previousState));
+        register(new SearchAdvertisements_ShowFoundAdvertisements(lastSentMessage, chosenTags, sqlExecutor,
+                previousState));
     }
 
     @Override
     public void processNonCommandUpdate(Update update) {
         Message msg;
+
+        // Случай получения информации с кнопок (инлайн-клавиатуры)
         if (update.hasCallbackQuery()) {
             CallbackQuery callbackQuery = update.getCallbackQuery();
             msg = callbackQuery.getMessage();
@@ -170,57 +156,19 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         msg = update.getMessage();
         Long chatId = msg.getChatId();
 
-        if (msg.hasPhoto() && currentState.get(chatId) == State.NewAdvertisement_AddPhotos) {
-            if (!newAdvertisements.containsKey(chatId)) {
-                newAdvertisements.put(chatId, new Advertisement(chatId));
-            }
-            Advertisement ad = newAdvertisements.get(chatId);
-            List<PhotoSize> photos = msg.getPhoto();
-            for (PhotoSize photo : photos) {
-                ad.addPhoto(photo);
-            }
-            // TODO убрать эти две строчки чтобы менять стейт только после закидывания всех фоток
-            getRegisteredCommand(State.NewAdvertisement_ConfirmPhoto.getIdentifier()).processMessage(this, msg, null);
-            currentState.put(chatId, State.NewAdvertisement_ConfirmPhoto);
+        // Случай обновления данных во время создания объявления
+        if (msg.hasText() && newAdvertisementUpdateData(msg)) {
             return;
         }
 
-        if (msg.hasText()) {
-            State state = currentState.get(msg.getChatId());
-            Advertisement ad = newAdvertisements.get(chatId);
-            if (state == State.NewAdvertisement_AddDescription) {
-                ad.setDescription(msg.getText());
-                updateStateOnTextData(msg, chatId);
-                return;
-            }
-            if (state == State.NewAdvertisement_AddPrice) {
-                try {
-                    ad.setPrice(Long.parseLong(msg.getText()));
-                } catch (Exception e) {
-                    logger.error("Invalid input from user");
-                }
-                updateStateOnTextData(msg, chatId);
-                return;
-            }
-            if (state == State.NewAdvertisement_AddPhone) {
-                ad.setPhone(msg.getText());
-                updateStateOnTextData(msg, chatId);
-                return;
-            }
-            if (state == State.NewAdvertisement_AddSocial) {
-                ad.addSocial(msg.getText());
-                updateStateOnTextData(msg, chatId);
-                return;
-            }
+        // Случай добавления новых фотографий во время создания объявления
+        if (msg.hasPhoto() && addAdvertisementPhotos(msg)) {
+            return;
         }
 
         // Случай нажатия на кнопку с описанием команды
         State stateByDescription = State.findStateByDescription(msg.getText());
         if (stateByDescription != null) {
-            // TODO убрать если хотим сохранять недоделанные объявления
-            if (stateByDescription == State.MainMenu) {
-                newAdvertisements.remove(chatId);
-            }
             currentState.put(chatId, stateByDescription);
             getRegisteredCommand(stateByDescription.getIdentifier()).processMessage(this, msg, null);
             return;
@@ -228,16 +176,18 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
 
         // Случай нажатия на кнопку с продолжением во множественном выборе хэштегов
         if (Objects.equals(msg.getText(), NEXT_BUTTON_TEXT)) {
-            if (currentState.get(msg.getChatId()) == State.NewAdvertisement_AddType
+            addChosenTags(lastSentMessage.get(chatId));
+
+            if (currentState.get(msg.getChatId()) == State.NewAdvertisement_AddAdvertisementTypes
                     || currentState.get(msg.getChatId()) == State.NewAdvertisement_AddCategories) {
-                Advertisement ad = newAdvertisements.get(chatId);
-                // TODO переписать под список тегов
+                Advertisement ad = advertisement.get(chatId);
                 if (chosenTags.get(chatId) != null) {
                     List<String> tags = Arrays.stream(chosenTags.get(chatId).split(" ")).toList();
                     ad.addTags(tags);
+                    chosenTags.clear();
                 }
             }
-            addSearchTags(lastSentMessage.get(chatId));
+
             deleteLastMessage(msg.getChatId());
             State nextState = State.nextState(currentState.get(msg.getChatId()));
             previousState.put(chatId, currentState.get(msg.getChatId()));
@@ -245,7 +195,80 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
             getRegisteredCommand(nextState.getIdentifier()).processMessage(this, msg, null);
             return;
         }
+
+        // Случай обработки текстовой информации от пользователя
         executeNonCommand(msg, chatId, currentState.get(chatId));
+    }
+
+    private boolean newAdvertisementUpdateData(Message msg) {
+        State state = currentState.get(msg.getChatId());
+        Advertisement ad = advertisement.get(msg.getChatId());
+
+        if (state == State.NewAdvertisement_AddDescription) {
+            ad.setDescription(msg.getText());
+            updateStateOnTextData(msg);
+            return true;
+        }
+
+        if (state == State.NewAdvertisement_AddPrice) {
+            if (!msg.getText().matches("\\d{1,18}")) {
+                return false;
+            }
+            try {
+                ad.setPrice(Long.parseLong(msg.getText()));
+            } catch (Exception e) {
+                logger.error("Invalid input from user");
+            }
+            updateStateOnTextData(msg);
+            return true;
+        }
+
+        if (state == State.NewAdvertisement_AddPhone) {
+            if (!msg.getText().matches("8-\\d{3}-\\d{3}-\\d{2}-\\d{2}")
+                    && !msg.getText().matches("\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}")) {
+                return false;
+            }
+            ad.setPhone(msg.getText());
+            updateStateOnTextData(msg);
+            return true;
+        }
+
+        if (state == State.NewAdvertisement_AddSocial) {
+            ad.addSocial(msg.getText());
+            updateStateOnTextData(msg);
+            return true;
+        }
+
+        // TODO убрать если хотим сохранять недоделанные объявления
+        if (state == State.MainMenu) {
+            advertisement.remove(msg.getChatId());
+        }
+
+        return false;
+    }
+
+    private boolean addAdvertisementPhotos(Message msg) {
+        if (currentState.get(msg.getChatId()) == State.NewAdvertisement_AddPhotos) {
+            Advertisement ad = advertisement.get(msg.getChatId());
+            List<PhotoSize> photos = msg.getPhoto();
+
+            for (PhotoSize photo : photos) {
+                ad.addPhoto(photo);
+            }
+
+            // TODO убрать эти две строчки чтобы менять стейт только после закидывания всех фоток
+            getRegisteredCommand(State.NewAdvertisement_ConfirmPhoto.getIdentifier()).processMessage(this, msg, null);
+            currentState.put(msg.getChatId(), State.NewAdvertisement_ConfirmPhoto);
+            return true;
+        }
+        return false;
+    }
+
+    private void updateStateOnTextData(Message msg) {
+        State nextState = State.nextState(currentState.get(msg.getChatId()));
+        previousState.put(msg.getChatId(), currentState.get(msg.getChatId()));
+        currentState.put(msg.getChatId(), nextState);
+        getRegisteredCommand(nextState.getIdentifier()).processMessage(this, msg, null);
     }
 
     private void executeNonCommand(Message msg, Long chatId, State currState) {
@@ -305,15 +328,17 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         }
     }
 
-    private void addSearchTags(Message message) {
+    private void addChosenTags(Message message) {
         List<List<InlineKeyboardButton>> buttons = message.getReplyMarkup().getKeyboard();
         for (List<InlineKeyboardButton> tag : buttons) {
-            String[] dataCallbackParts = tag.get(0).getCallbackData().split(" ");
-            if (Objects.equals(dataCallbackParts[dataCallbackParts.length - 1], "1")) {
-                String chosenTagsString = chosenTags.get(message.getChatId());
-                String newTags = tag.get(0).getText().split(" ")[1];
-                chosenTags.put(message.getChatId(),
-                        chosenTagsString == null ? newTags : String.format("%s %s", chosenTagsString, newTags));
+            for (InlineKeyboardButton inlineKeyboardButton : tag) {
+                String[] dataCallbackParts = inlineKeyboardButton.getCallbackData().split(" ");
+                if (Objects.equals(dataCallbackParts[dataCallbackParts.length - 1], "1")) {
+                    String chosenTagsString = chosenTags.get(message.getChatId());
+                    String newTags = inlineKeyboardButton.getText().split(" ")[1];
+                    chosenTags.put(message.getChatId(),
+                            chosenTagsString == null ? newTags : String.format("%s %s", chosenTagsString, newTags));
+                }
             }
         }
     }
@@ -322,9 +347,14 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         String[] dataParts = callbackQuery.split(" ");
         switch (dataParts[0]) {
             case TAG_CALLBACK_DATA -> {
-                String currentChosenTags = chosenTags.get(msg.getChatId());
-                chosenTags.put(msg.getChatId(), currentChosenTags == null
-                        ? dataParts[1] : String.format("%s %s", currentChosenTags, dataParts[1]));
+                if (currentState.get(msg.getChatId()) == State.NewAdvertisement_AddCity) {
+                    advertisement.get(msg.getChatId()).addTag(dataParts[1]);
+                } else {
+                    String currentChosenTags = chosenTags.get(msg.getChatId());
+                    chosenTags.put(msg.getChatId(), currentChosenTags == null
+                            ? dataParts[1] : String.format("%s %s", currentChosenTags, dataParts[1]));
+                }
+
                 deleteLastMessage(msg.getChatId());
                 State nextState = State.nextState(currentState.get(msg.getChatId()));
                 previousState.put(msg.getChatId(), currentState.get(msg.getChatId()));
@@ -334,8 +364,9 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
             case TAGS_CALLBACK_DATA -> {
                 List<List<InlineKeyboardButton>> buttons =
                         lastSentMessage.get(msg.getChatId()).getReplyMarkup().getKeyboard();
-                InlineKeyboardButton changeTag = buttons.get(Integer.parseInt(dataParts[2])).get(0);
-                if (Objects.equals(dataParts[3], "0")) {
+                InlineKeyboardButton changeTag = buttons.get(Integer.parseInt(dataParts[2]))
+                        .get(Integer.parseInt(dataParts[3]));
+                if (Objects.equals(dataParts[4], "0")) {
                     changeTag.setText(String.format(CHOSEN_TAG, changeTag.getText().split(" ")[1]));
                     changeTag.setCallbackData(changeTag
                             .getCallbackData()
@@ -351,36 +382,31 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                     editMessageReplyMarkup(msg.getChatId(), buttons);
                 }
             }
-            case ADD_CITY_CALLBACK_DATA -> {
-                if (currentState.get(msg.getChatId()) == State.NewAdvertisement_AddTags) {
-                    newAdvertisements.get(msg.getChatId()).setCity(Tag.getTagByName(dataParts[1]));
-                }
-                State nextState = State.nextState(currentState.get(msg.getChatId()));
-                previousState.put(msg.getChatId(), currentState.get(msg.getChatId()));
-                currentState.put(msg.getChatId(), nextState);
-                getRegisteredCommand(nextState.getIdentifier()).processMessage(this, msg, null);
-            }
             case PHONE_CALLBACK_DATA -> {
                 if (Objects.equals(dataParts[1], "yes")) {
                     currentState.put(msg.getChatId(), State.NewAdvertisement_AddPhone);
-                    getRegisteredCommand(State.NewAdvertisement_AddPhone.getIdentifier()).processMessage(this, msg, null);
+                    getRegisteredCommand(State.NewAdvertisement_AddPhone.getIdentifier())
+                            .processMessage(this, msg, null);
                 } else if (Objects.equals(dataParts[1], "no")) {
-                    currentState.put(msg.getChatId(), State.NewAdvertisement_AddSocial);
-                    getRegisteredCommand(State.NewAdvertisement_AddSocial.getIdentifier()).processMessage(this, msg, null);
+                    currentState.put(msg.getChatId(), State.NewAdvertisement_ConfirmPhone);
+                    getRegisteredCommand(State.NewAdvertisement_ConfirmPhone.getIdentifier())
+                            .processMessage(this, msg, null);
                 }
             }
             case SOCIAL_CALLBACK_DATA -> {
                 if (Objects.equals(dataParts[1], "yes")) {
                     currentState.put(msg.getChatId(), State.NewAdvertisement_AddSocial);
-                    getRegisteredCommand(State.NewAdvertisement_AddSocial.getIdentifier()).processMessage(this, msg, null);
+                    getRegisteredCommand(State.NewAdvertisement_AddSocial.getIdentifier())
+                            .processMessage(this, msg, null);
                 } else if (Objects.equals(dataParts[1], "no")) {
                     currentState.put(msg.getChatId(), State.NewAdvertisement_Confirm);
-                    getRegisteredCommand(State.NewAdvertisement_Confirm.getIdentifier()).processMessage(this, msg, null);
+                    getRegisteredCommand(State.NewAdvertisement_Confirm.getIdentifier())
+                            .processMessage(this, msg, null);
                 }
             }
             case CONFIRM_AD_CALLBACK_DATA -> {
                 if (Objects.equals(dataParts[1], "yes")) {
-                    sqlExecutor.insertNewAdvertisement(newAdvertisements.get(msg.getChatId()));
+                    sqlExecutor.insertNewAdvertisement(advertisement.get(msg.getChatId()));
                     sendAnswer(msg.getChatId(), getUserName(msg), SUCCESS_TEXT, null);
                 } else if (Objects.equals(dataParts[1], "no")) {
                     // TODO обработать сброс объявления

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class SearchAdvertisements_AddAdvertisementType extends Command {
+public class SearchAdvertisements_AddAdvertisementTypes extends Command {
     private static final String CHOOSE_ADVERTISEMENT_TYPE = """
             Выберите тип объявления.
             Вы можете выбрать несколько хэштегов, нажав на них, либо не выбрать ни один.
@@ -23,12 +23,12 @@ public class SearchAdvertisements_AddAdvertisementType extends Command {
     private final SQLExecutor sqlExecutor;
     private final Map<Long, State> previousState;
 
-    public SearchAdvertisements_AddAdvertisementType(String commandIdentifier, String description,
-                                                     Map<Long, Message> lastSentMessage,
-                                                     Map<Long, String> chosenTags,
-                                                     SQLExecutor sqlExecutor,
-                                                     Map<Long, State> previousState) {
-        super(commandIdentifier, description, lastSentMessage);
+    public SearchAdvertisements_AddAdvertisementTypes(Map<Long, Message> lastSentMessage,
+                                                      Map<Long, String> chosenTags,
+                                                      SQLExecutor sqlExecutor,
+                                                      Map<Long, State> previousState) {
+        super(State.SearchAdvertisements_AddAdvertisementTypes.getIdentifier(),
+                State.SearchAdvertisements_AddAdvertisementTypes.getDescription(), lastSentMessage);
         this.chosenTags = chosenTags;
         this.sqlExecutor = sqlExecutor;
         this.previousState = previousState;

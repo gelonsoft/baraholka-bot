@@ -17,8 +17,8 @@ public class MainMenuCommand extends Command {
             3. Найти нужные объявления по хэштегам: /%s.
             4. Получить справку по командам бота: /%s.""";
 
-    public MainMenuCommand(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
-        super(commandIdentifier, description, lastSentMessage);
+    public MainMenuCommand(Map<Long, Message> lastSentMessage) {
+        super(State.MainMenu.getIdentifier(), State.MainMenu.getDescription(), lastSentMessage);
     }
 
     @Override

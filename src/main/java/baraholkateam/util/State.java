@@ -1,8 +1,5 @@
 package baraholkateam.util;
 
-import baraholkateam.command.NewAdvertisement_AddContacts;
-import baraholkateam.command.NewAdvertisement_ConfirmPhone;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -16,13 +13,9 @@ public enum State {
     NewAdvertisement_AddPhotos("add_photos", "Добавить фотографии"),
     NewAdvertisement_ConfirmPhoto("confirm_photo", "Подтвердить фотографии"),
     NewAdvertisement_AddDescription("add_description", "Добавить описание"),
-    NewAdvertisement_ConfirmDescription("confirm_description", "Подтвердить описание"),
-    NewAdvertisement_AddTags("add_tags", "Добавить хэштеги"),
-    NewAdvertisement_ConfirmCity("confirm_city", "Подтвердить город"),
-    NewAdvertisement_AddType("add_type", "Выбрать тип объявления"),
-    NewAdvertisement_ConfirmType("confirm_type", "Подтвердить тип объявления"),
+    NewAdvertisement_AddCity("add_city", "Добавить город"),
+    NewAdvertisement_AddAdvertisementTypes("add_advertisement_types", "Выбрать типы объявления"),
     NewAdvertisement_AddCategories("add_categories", "Выбрать категории"),
-    NewAdvertisement_ConfirmCategories("confirm_categories", "Подтвердить категории"),
     NewAdvertisement_AddPrice("add_price", "Добавить стоимость"),
     NewAdvertisement_ConfirmPrice("confirm_price", "Подтвердить стоимость"),
     NewAdvertisement_AddContacts("add_contacts", "Добавить контакты"),
@@ -31,7 +24,7 @@ public enum State {
     NewAdvertisement_AddSocial("add_social", "Добавить ссылку"),
     NewAdvertisement_Confirm("confirm_ad", "Подтвердить"),
     SearchAdvertisements("search_advertisement", "Поиск объявлений по хэштегам"),
-    SearchAdvertisements_AddAdvertisementType("add_advertisement_type",
+    SearchAdvertisements_AddAdvertisementTypes("add_advertisement_types",
             "Выбор типов объявления для поиска"),
     SearchAdvertisements_AddProductCategories("add_product_categories",
             "Выбор категорий товаров для поиска"),
@@ -49,20 +42,16 @@ public enum State {
 
     public static Map<State, State> getNextStates() {
         Map<State, State> nextStates = new HashMap<>();
-        nextStates.put(SearchAdvertisements, SearchAdvertisements_AddAdvertisementType);
-        nextStates.put(SearchAdvertisements_AddAdvertisementType, SearchAdvertisements_AddProductCategories);
+        nextStates.put(SearchAdvertisements, SearchAdvertisements_AddAdvertisementTypes);
+        nextStates.put(SearchAdvertisements_AddAdvertisementTypes, SearchAdvertisements_AddProductCategories);
         nextStates.put(SearchAdvertisements_AddProductCategories, SearchAdvertisements_ShowFoundAdvertisements);
         nextStates.put(NewAdvertisement, NewAdvertisement_AddPhotos);
         nextStates.put(NewAdvertisement_AddPhotos, NewAdvertisement_ConfirmPhoto);
         nextStates.put(NewAdvertisement_ConfirmPhoto, NewAdvertisement_AddDescription);
-        nextStates.put(NewAdvertisement_AddDescription, NewAdvertisement_ConfirmDescription);
-        nextStates.put(NewAdvertisement_ConfirmDescription, NewAdvertisement_AddTags);
-        nextStates.put(NewAdvertisement_AddTags, NewAdvertisement_ConfirmCity);
-        nextStates.put(NewAdvertisement_ConfirmCity, NewAdvertisement_AddType);
-        nextStates.put(NewAdvertisement_AddType, NewAdvertisement_ConfirmType);
-        nextStates.put(NewAdvertisement_ConfirmType, NewAdvertisement_AddCategories);
-        nextStates.put(NewAdvertisement_AddCategories, NewAdvertisement_ConfirmCategories);
-        nextStates.put(NewAdvertisement_ConfirmCategories, NewAdvertisement_AddPrice);
+        nextStates.put(NewAdvertisement_AddDescription, NewAdvertisement_AddCity);
+        nextStates.put(NewAdvertisement_AddCity, NewAdvertisement_AddAdvertisementTypes);
+        nextStates.put(NewAdvertisement_AddAdvertisementTypes, NewAdvertisement_AddCategories);
+        nextStates.put(NewAdvertisement_AddCategories, NewAdvertisement_AddPrice);
         nextStates.put(NewAdvertisement_AddPrice, NewAdvertisement_ConfirmPrice);
         nextStates.put(NewAdvertisement_ConfirmPrice, NewAdvertisement_AddContacts);
         nextStates.put(NewAdvertisement_AddContacts, NewAdvertisement_AddPhone);

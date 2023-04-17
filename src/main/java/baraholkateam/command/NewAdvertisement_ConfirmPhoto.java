@@ -15,16 +15,21 @@ import java.util.Map;
 
 public class NewAdvertisement_ConfirmPhoto extends Command {
     private static final String CONFIRM_PHOTOS_TEXT = """
-            Фотографии успешно добавлены. Вы можете добавить еще или перейти к добавлению описания.""";
+            Фотографии успешно добавлены.
+            Вы можете добавить еще или перейти к добавлению описания.""";
 
-    public NewAdvertisement_ConfirmPhoto(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
-        super(commandIdentifier, description, lastSentMessage);
+    public NewAdvertisement_ConfirmPhoto(Map<Long, Message> lastSentMessage) {
+        super(State.NewAdvertisement_ConfirmPhoto.getIdentifier(),
+                State.NewAdvertisement_ConfirmPhoto.getDescription(), lastSentMessage);
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                CONFIRM_PHOTOS_TEXT, getAddReplyKeyboard());
+    }
 
+    private ReplyKeyboardMarkup getAddReplyKeyboard() {
         KeyboardButton addPhotosButton = new KeyboardButton();
         addPhotosButton.setText(State.NewAdvertisement_AddPhotos.getDescription());
 
@@ -42,10 +47,10 @@ public class NewAdvertisement_ConfirmPhoto extends Command {
         List<KeyboardRow> keyboardRows = new ArrayList<>();
         keyboardRows.add(keyboardFirstRow);
 
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setKeyboard(keyboardRows);
         replyKeyboardMarkup.setResizeKeyboard(true);
 
-        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                CONFIRM_PHOTOS_TEXT, replyKeyboardMarkup);
+        return replyKeyboardMarkup;
     }
 }

@@ -1,9 +1,11 @@
 package baraholkateam.command;
 
-import baraholkateam.bot.BaraholkaBot;
 import baraholkateam.util.Advertisement;
+import baraholkateam.util.State;
 import baraholkateam.util.Tag;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Chat;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -17,18 +19,20 @@ import java.util.Map;
 public class NewAdvertisement_Confirm extends Command {
     private static final String CONFIRM_AD_TEXT = """
             Желаете опубликовать ваше объявление в канале?""";
+    private final Map<Long, Advertisement> advertisement;
 
-    public NewAdvertisement_Confirm(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
-        super(commandIdentifier, description, lastSentMessage);
+    public NewAdvertisement_Confirm(Map<Long, Message> lastSentMessage, Map<Long, Advertisement> advertisement) {
+        super(State.NewAdvertisement_Confirm.getIdentifier(),
+                State.NewAdvertisement_Confirm.getDescription(), lastSentMessage);
+        this.advertisement = advertisement;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        Advertisement ad = BaraholkaBot.getNewAdvertisement(chat.getId());
+        Advertisement ad = advertisement.get(chat.getId());
 
-        List<Tag> tags = BaraholkaBot.getNewAdvertisement(chat.getId()).getTags();
+        List<Tag> tags = advertisement.get(chat.getId()).getTags();
         StringBuilder tagsString = new StringBuilder();
-        tagsString.append(ad.getCity()).append(", ");
         for (Tag tag : tags) {
             tagsString.append(tag.getName()).append(", ");
         }
@@ -69,8 +73,6 @@ public class NewAdvertisement_Confirm extends Command {
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                 sb.toString(), null);
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-
         InlineKeyboardButton yesButton = new InlineKeyboardButton();
         yesButton.setText("Да");
         String yesCallbackData = String.format("%s %s", CONFIRM_AD_CALLBACK_DATA, "yes");
@@ -87,6 +89,8 @@ public class NewAdvertisement_Confirm extends Command {
 
         List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
         keyboardRows.add(keyboardFirstRow);
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         inlineKeyboardMarkup.setKeyboard(keyboardRows);
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),

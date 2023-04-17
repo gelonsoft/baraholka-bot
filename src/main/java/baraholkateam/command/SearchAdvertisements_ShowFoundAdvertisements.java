@@ -38,12 +38,12 @@ public class SearchAdvertisements_ShowFoundAdvertisements extends Command {
     private final Map<Long, State> previousState;
     private final Logger logger = LoggerFactory.getLogger(SearchAdvertisements_ShowFoundAdvertisements.class);
 
-    public SearchAdvertisements_ShowFoundAdvertisements(String commandIdentifier, String description,
-                                                        Map<Long, Message> lastSentMessage,
+    public SearchAdvertisements_ShowFoundAdvertisements(Map<Long, Message> lastSentMessage,
                                                         Map<Long, String> chosenTags,
                                                         SQLExecutor sqlExecutor,
                                                         Map<Long, State> previousState) {
-        super(commandIdentifier, description, lastSentMessage);
+        super(State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
+                State.SearchAdvertisements_ShowFoundAdvertisements.getDescription(), lastSentMessage);
         this.chosenTags = chosenTags;
         this.sqlExecutor = sqlExecutor;
         telegramAPIRequests = new TelegramAPIRequests();

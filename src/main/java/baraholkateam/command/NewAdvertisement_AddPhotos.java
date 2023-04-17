@@ -1,5 +1,6 @@
 package baraholkateam.command;
 
+import baraholkateam.util.State;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -11,8 +12,9 @@ public class NewAdvertisement_AddPhotos extends Command {
     private static final String ADD_PHOTOS_TEXT = """
             Добавьте от 1 до 10 фотографий к вашему объявлению. Рекомендуемое число - 5.""";
 
-    public NewAdvertisement_AddPhotos(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
-        super(commandIdentifier, description, lastSentMessage);
+    public NewAdvertisement_AddPhotos(Map<Long, Message> lastSentMessage) {
+        super(State.NewAdvertisement_AddPhotos.getIdentifier(), State.NewAdvertisement_AddPhotos.getDescription(),
+                lastSentMessage);
     }
 
     @Override
