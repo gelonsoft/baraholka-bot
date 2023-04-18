@@ -15,10 +15,11 @@ import java.net.http.HttpResponse;
 
 public class TelegramAPIRequests {
     private static final String FORWARD_MESSAGE = "https://api.telegram.org/bot%s/forwardMessage";
+    private static final String GET_FILE = "https://api.telegram.org/bot%s/getFile";
     private final HttpClient client = HttpClient.newHttpClient();
     private final Logger logger = LoggerFactory.getLogger(TelegramAPIRequests.class);
 
-    public void forwardMessage(String from, String to, Long messageId) {
+    public Long forwardMessage(String from, String to, Long messageId) {
         try {
             URI uri = new URIBuilder(String.format(FORWARD_MESSAGE, BaraholkaBotProperties.BOT_TOKEN))
                     .addParameter("chat_id", String.format("%s", to))
@@ -42,7 +43,7 @@ public class TelegramAPIRequests {
                                 Request headers: %s
                                 Response: %s""";
                 logError(request, response, errorMessage);
-                return;
+                return 0L;
             }
 
             JSONObject object = new JSONObject(response.body());
@@ -54,7 +55,7 @@ public class TelegramAPIRequests {
                                 Request headers: %s
                                 Response: %s""";
                 logError(request, response, errorMessage);
-                return;
+                return 0L;
             }
 
             JSONObject result = object.getJSONObject("result");
@@ -67,8 +68,62 @@ public class TelegramAPIRequests {
                                 Response: %s""";
                 logError(request, response, errorMessage);
             }
+
+            return result.getLong("message_id");
         } catch (URISyntaxException | IOException | InterruptedException e) {
             logger.error(String.format("Cannot create request: %s", e.getMessage()));
+            return 0L;
+        }
+    }
+
+    public String getFilePath(String fileId) {
+        try {
+            URI uri = new URIBuilder(String.format(GET_FILE, BaraholkaBotProperties.BOT_TOKEN))
+                    .addParameter("file_id", fileId)
+                    .build();
+            HttpRequest request = HttpRequest.newBuilder(uri).GET().build();
+            HttpResponse<String> response;
+
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            String errorMessage;
+            if (response.statusCode() != 200) {
+                errorMessage = """
+                                Not 200 code of the response.
+                                Request URI: %s
+                                Request headers: %s
+                                Response: %s""";
+                logError(request, response, errorMessage);
+                return null;
+            }
+
+            JSONObject object = new JSONObject(response.body());
+
+            if (!object.has("result")) {
+                errorMessage = """
+                                Response doesn't contain 'result' field.
+                                Request URI: %s
+                                Request headers: %s
+                                Response: %s""";
+                logError(request, response, errorMessage);
+                return null;
+            }
+
+            JSONObject result = object.getJSONObject("result");
+
+            if (!result.has("file_path")) {
+                errorMessage = """
+                                Response doesn't contain 'file_path' field.
+                                Request URI: %s
+                                Request headers: %s
+                                Response: %s""";
+                logError(request, response, errorMessage);
+            }
+
+            return result.getString("file_path");
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            logger.error(String.format("Cannot create request: %s", e.getMessage()));
+            return null;
         }
     }
 

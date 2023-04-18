@@ -26,6 +26,19 @@ public abstract class Command extends BotCommand {
     public static final String NOT_CHOSEN_TAG = "➖ %s";
     public static final String TAG_CALLBACK_DATA = "tag";
     public static final String TAGS_CALLBACK_DATA = "tags";
+
+    public static final String PHONE_CALLBACK_DATA = "phone";
+    public static final String SOCIAL_CALLBACK_DATA = "social";
+    public static final String CONFIRM_AD_CALLBACK_DATA = "confirm_ad";
+    public static final String NOTIFICATION_CALLBACK_DATA = "notification";
+    public static final String CHOSEN_TAG = "✅ %s";
+    public static final String SUCCESS_TEXT = "Объявление успешно добавлено.";
+    public static final String UNSUCCESS_TEXT = "Объявление не было успешно добавлено.";
+    public static final String ADVERTISEMENT_CANCELLED_TEXT = "Формирование объявления было отменено.";
+    public static final String ADVERTISEMENT_SUCCESSFUL_UPDATE = "Актуальность объявления была продлена.";
+    public static final String ADVERTISEMENT_SUCCESSFUL_DELETE = "Объявление было удалено.";
+    public static final String ADVERTISEMENT_DELETE =
+            "Объявление было автоматически удалено после 3 попыток уточнения его актуальности.";
     public static final String DELETE_AD = "delete";
     static final String INCORRECT_PREVIOUS_STATE = """
             Невозможно выполнить текущую команду.
@@ -77,23 +90,32 @@ public abstract class Command extends BotCommand {
         InlineKeyboardMarkup ikm = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> tags = new ArrayList<>(1);
         int count = 0;
+        int i = 0;
+        List<InlineKeyboardButton> tagButton = new ArrayList<>(2);
         for (Tag tag : Tag.values()) {
             if (tag.getTagType() == tagType) {
-                List<InlineKeyboardButton> tagButton = new ArrayList<>(1);
-
                 String text = tag.getName();
                 String callbackData = String.format("%s %s", TAG_CALLBACK_DATA, tag.getName());
                 if (isMultipleChoice) {
                     text = String.format(NOT_CHOSEN_TAG, text);
-                    callbackData = String.format("%s %s %d 0", TAGS_CALLBACK_DATA, tag.getName(), count++);
+                    callbackData = String.format("%s %s %d %d 0", TAGS_CALLBACK_DATA, tag.getName(),
+                            Math.floorDiv(count, 2), i % 2 == 0 ? 0 : 1);
+                    count++;
                 }
 
                 tagButton.add(InlineKeyboardButton.builder()
                         .text(text)
                         .callbackData(callbackData)
                         .build());
-                tags.add(tagButton);
+
+                if (i++ % 2 == 1) {
+                    tags.add(tagButton);
+                    tagButton = new ArrayList<>(2);
+                }
             }
+        }
+        if (i % 2 == 1) {
+            tags.add(tagButton);
         }
         ikm.setKeyboard(tags);
         return ikm;

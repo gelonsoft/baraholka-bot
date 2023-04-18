@@ -16,8 +16,8 @@ public class StartCommand extends Command {
             Также Вы можете перейти в главное меню /%s и следовать дальнейшим инструкциям.
             Справочная информация по функциям бота представлена по команде /%s.""";
 
-    public StartCommand(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
-        super(commandIdentifier, description, lastSentMessage);
+    public StartCommand(Map<Long, Message> lastSentMessage) {
+        super(State.Start.getIdentifier(), State.Start.getDescription(), lastSentMessage);
     }
 
     @Override

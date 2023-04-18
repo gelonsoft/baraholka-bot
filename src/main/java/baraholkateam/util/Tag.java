@@ -19,6 +19,8 @@ public enum Tag {
     Sale(TagType.AdvertisementType, "#продажа"),
     Exchange(TagType.AdvertisementType, "#обмен"),
     Gift(TagType.AdvertisementType, "#дар"),
+    Bargaining(TagType.AdvertisementType, "#торг_уместен"),
+    Urgently(TagType.AdvertisementType, "#срочно"),
     Clothes(TagType.ProductCategories, "#одежда"),
     Shoes(TagType.ProductCategories, "#обувь"),
     ChildrenProducts(TagType.ProductCategories, "#детские_товары"),

@@ -38,27 +38,29 @@ public class SearchAdvertisements_ShowFoundAdvertisements extends Command {
     private final Map<Long, State> previousState;
     private final Logger logger = LoggerFactory.getLogger(SearchAdvertisements_ShowFoundAdvertisements.class);
 
-    public SearchAdvertisements_ShowFoundAdvertisements(String commandIdentifier, String description,
-                                                        Map<Long, Message> lastSentMessage,
+    public SearchAdvertisements_ShowFoundAdvertisements(Map<Long, Message> lastSentMessage,
                                                         Map<Long, String> chosenTags,
                                                         SQLExecutor sqlExecutor,
-                                                        Map<Long, State> previousState) {
-        super(commandIdentifier, description, lastSentMessage);
+                                                        Map<Long, State> previousState,
+                                                        TelegramAPIRequests telegramAPIRequests) {
+        super(State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
+                State.SearchAdvertisements_ShowFoundAdvertisements.getDescription(), lastSentMessage);
         this.chosenTags = chosenTags;
         this.sqlExecutor = sqlExecutor;
-        telegramAPIRequests = new TelegramAPIRequests();
+        this.telegramAPIRequests = telegramAPIRequests;
         this.previousState = previousState;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
-        int count = forwardMessages(chat.getId());
-
         String chosenTagsString = chosenTags.get(chat.getId());
 
         if (previousState.get(chat.getId()) == State.SearchAdvertisements_AddProductCategories) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                     String.format(CHOSEN_HASHTAGS, chosenTagsString == null ? NO_HASHTAGS : chosenTagsString), null);
+
+            int count = forwardMessages(chat.getId());
+
             if (count == 0) {
                 sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                         String.format(CANNOT_FIND_ADVERTISEMENTS,
