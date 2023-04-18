@@ -174,6 +174,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         register(new StartCommand(lastSentMessage));
         register(new HelpCommand(lastSentMessage));
         register(new MainMenuCommand(lastSentMessage));
+        register(new DeleteAd(State.DeleteAd.getIdentifier(), State.DeleteAd.getDescription(), sqlExecutor, lastSentMessage));
         register(new NewAdvertisementCommand(lastSentMessage, advertisement, chosenTags));
         register(new NewAdvertisement_AddPhotos(lastSentMessage));
         register(new NewAdvertisement_ConfirmPhoto(lastSentMessage));
