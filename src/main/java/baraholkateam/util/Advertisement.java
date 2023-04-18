@@ -196,11 +196,16 @@ public class Advertisement {
 
         String phone = this.getPhone();
         if (phone != null) {
+            sb.append("-".repeat(70));
             sb.append("\n").append(String.format("Номер телефона: %s", phone));
         }
 
         List<String> contacts = this.getContacts();
         if (contacts.size() > 0) {
+            if (phone == null) {
+                sb.append("-".repeat(70));
+            }
+
             sb.append("\n");
             StringBuilder contactsString = new StringBuilder();
             for (String contact : contacts) {

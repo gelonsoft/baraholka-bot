@@ -472,8 +472,11 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                     if (sentAd != null) {
                         ad.setMessageId(Long.parseLong(String.valueOf(sentAd.getMessageId())))
                                 .setCreationTime(System.currentTimeMillis())
-                                .setNextUpdateTime(System.currentTimeMillis() +
-                                        FIRST_REPEAT_NOTIFICATION_TIME_UNIT.toMillis(FIRST_REPEAT_NOTIFICATION_PERIOD))
+                                .setNextUpdateTime(
+                                        System.currentTimeMillis()
+                                                + FIRST_REPEAT_NOTIFICATION_TIME_UNIT
+                                                .toMillis(FIRST_REPEAT_NOTIFICATION_PERIOD)
+                                )
                                 .setUpdateAttempt(0);
                         sqlExecutor.insertNewAdvertisement(ad);
                         sendAnswer(msg.getChatId(), SUCCESS_TEXT, null);
