@@ -184,13 +184,23 @@ public class SQLExecutor {
             return null;
         }
     }
+    public String adText(Long messageId) {
+        try {
+            PreparedStatement adText = connection.prepareStatement(GET_AD_TEXT);
+            adText.setLong(1, messageId);
+            return String.valueOf(adText.executeUpdate());
+        } catch (SQLException e) {
+            logger.error(String.format("Error while getting ad text from database: %s", e.getMessage()));
+            return null;
+        }
+    }
     public int deleteAd(Long messageId) {
         try {
             PreparedStatement deleteAd = connection.prepareStatement(DELETE_AD);
             deleteAd.setLong(1, messageId);
             return deleteAd.executeUpdate();
         } catch (SQLException e) {
-            logger.error(String.format("Error while deleting ad in database: %s", e.getMessage()));
+            logger.error(String.format("Error while deleting ad from database: %s", e.getMessage()));
             return -1;
         }
     }

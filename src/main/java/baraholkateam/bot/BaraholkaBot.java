@@ -106,28 +106,6 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         nonCommand = new NonCommand();
         telegramAPIRequests = new TelegramAPIRequests();
 
-        register(new StartCommand(State.Start.getIdentifier(), State.Start.getDescription(), lastSentMessage));
-        register(new HelpCommand(State.Help.getIdentifier(), State.Help.getDescription(), lastSentMessage,
-                getRegisteredCommands()));
-        register(new MainMenuCommand(State.MainMenu.getIdentifier(), State.MainMenu.getDescription(),
-                lastSentMessage));
-        register(new NewAdvertisementCommand(State.NewAdvertisement.getIdentifier(),
-                State.NewAdvertisement.getDescription(), lastSentMessage));
-        register(new DeleteAd(State.DeleteAd.getIdentifier(), State.DeleteAd.getDescription(), sqlExecutor, lastSentMessage));
-        register(new SearchAdvertisements(State.SearchAdvertisements.getIdentifier(),
-                State.SearchAdvertisements.getDescription(), lastSentMessage, chosenTags));
-        register(new SearchAdvertisements_AddAdvertisementType(
-                State.SearchAdvertisements_AddAdvertisementType.getIdentifier(),
-                State.SearchAdvertisements_AddAdvertisementType.getDescription(), lastSentMessage, chosenTags,
-                sqlExecutor, previousState));
-        register(new SearchAdvertisements_AddProductCategories(
-                State.SearchAdvertisements_AddProductCategories.getIdentifier(),
-                State.SearchAdvertisements_AddProductCategories.getDescription(), lastSentMessage, chosenTags,
-                previousState));
-        register(new SearchAdvertisements_ShowFoundAdvertisements(
-                State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
-                State.SearchAdvertisements_ShowFoundAdvertisements.getDescription(), lastSentMessage, chosenTags,
-                sqlExecutor, previousState));
         NotificationExecutor.startNotificationExecutor(sqlExecutor, this, telegramAPIRequests,
                 notificationMessages);
 
@@ -174,7 +152,8 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         register(new StartCommand(lastSentMessage));
         register(new HelpCommand(lastSentMessage));
         register(new MainMenuCommand(lastSentMessage));
-        register(new DeleteAd(State.DeleteAd.getIdentifier(), State.DeleteAd.getDescription(), sqlExecutor, lastSentMessage));
+        // TODO Почему тут везде стало в рагументах только "lastSeenMessage"?
+        register(new DeleteAd(sqlExecutor, lastSentMessage));
         register(new NewAdvertisementCommand(lastSentMessage, advertisement, chosenTags));
         register(new NewAdvertisement_AddPhotos(lastSentMessage));
         register(new NewAdvertisement_ConfirmPhoto(lastSentMessage));
@@ -523,15 +502,14 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                         Long.parseLong(dataParts[2]));
             }
             case DELETE_AD -> {
-//                sqlExecutor.deleteAd(Long.parseLong(dataParts[1]));
+                String ad_text = sqlExecutor.adText(Long.parseLong(dataParts[1]));
+                sqlExecutor.deleteAd(Long.parseLong(dataParts[1]));
                 EditMessageText editMessage = new EditMessageText();
-
                 // TODO id message - int type?
                 editMessage.setChatId(BaraholkaBotProperties.CHANNEL_CHAT_ID);
                 editMessage.setMessageId(Integer.parseInt(dataParts[1]));
-                System.out.println("Текст объявления: ");
 //                editMessage.setText(editAdText(editMessage.getText()));
-                editMessage.setText("TEST1");
+                editMessage.setText(ad_text);
                 try {
                     execute(editMessage);
                 } catch (TelegramApiException e){

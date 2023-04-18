@@ -23,6 +23,10 @@ public final class SecureConstants {
             SELECT * FROM "Advertisement"
             WHERE chat_id = ?;
             """;
+    public static final String GET_AD_TEXT = """
+            SELECT all_text FROM "Advertisement"
+            WHERE message_id = ?;
+            """;
     public static final String DELETE_AD = """
             DELETE FROM "Advertisement"
             WHERE message_id = ?;
