@@ -36,6 +36,7 @@ import org.springframework.boot.autoconfigure.integration.IntegrationProperties;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageCaption;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
@@ -50,7 +51,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import javax.swing.text.html.HTML;
 import java.io.File;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -388,7 +392,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         }
     }
 
-    private void parseKeyboardData(String callbackQuery, Message msg) {
+    private void parseKeyboardData(String callbackQuery, Message msg){
         String[] dataParts = callbackQuery.split(" ");
         switch (dataParts[0]) {
             case TAG_CALLBACK_DATA -> {
@@ -505,14 +509,14 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                         Long.parseLong(dataParts[2]));
             }
             case DELETE_AD -> {
-                String ad_text = sqlExecutor.adText(Long.parseLong(dataParts[1]));
-                sqlExecutor.deleteAd(Long.parseLong(dataParts[1]));
-                EditMessageText editMessage = new EditMessageText();
-                // TODO id message - int type?
+//          TODO Раскомментировать удаление объявления из БД
+//                sqlExecutor.deleteAd(Long.parseLong(dataParts[1]));
+                EditMessageCaption editMessage = new EditMessageCaption();
+                String editedText = "<b>НЕАКТУАЛЬНО</b> \n" + sqlExecutor.adText(Long.parseLong(dataParts[1]));
                 editMessage.setChatId(BaraholkaBotProperties.CHANNEL_CHAT_ID);
                 editMessage.setMessageId(Integer.parseInt(dataParts[1]));
-//                editMessage.setText(editAdText(editMessage.getText()));
-                editMessage.setText(ad_text);
+                editMessage.setParseMode(ParseMode.HTML);
+                editMessage.setCaption(editedText);
                 try {
                     execute(editMessage);
                 } catch (TelegramApiException e){

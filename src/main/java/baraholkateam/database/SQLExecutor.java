@@ -184,16 +184,22 @@ public class SQLExecutor {
             return null;
         }
     }
-    public String adText(Long messageId) {
+    public String adText(Long messageId){
         try {
+            String text = null;
             PreparedStatement adText = connection.prepareStatement(GET_AD_TEXT);
             adText.setLong(1, messageId);
-            return String.valueOf(adText.executeUpdate());
+            ResultSet rs = adText.executeQuery();
+            if (rs.next()) {
+                text = rs.getString("all_text");
+            }
+            return text;
         } catch (SQLException e) {
             logger.error(String.format("Error while getting ad text from database: %s", e.getMessage()));
             return null;
         }
     }
+    // TODO Удаление объявления из БД (для Саши)
     public int deleteAd(Long messageId) {
         try {
             PreparedStatement deleteAd = connection.prepareStatement(DELETE_AD);

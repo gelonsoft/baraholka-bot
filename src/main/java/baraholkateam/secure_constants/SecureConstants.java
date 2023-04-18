@@ -15,7 +15,7 @@ public final class SecureConstants {
             PRIMARY KEY (chat_id, message_id)
         );""";
     public static final String INSERT_NEW_ADVERTISEMENT = """
-            INSERT INTO "Advertisement" VALUES (?, ?, ?, ?, ?, ?, ?, ?);""";
+            INSERT INTO "Advertisement" VALUES (?, ?, ?, ?, ?, ?, ?);""";
     public static final String REMOVE_ALL_DATA = """
             DELETE * FROM "Advertisement";""";
 
