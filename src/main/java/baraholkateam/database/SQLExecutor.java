@@ -15,14 +15,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static baraholkateam.bot.BaraholkaBot.SEARCH_ADVERTISEMENTS_LIMIT;
-import static baraholkateam.secure_constants.SecureConstants.ASK_ACTUAL_ADVERTISEMENTS;
 import static baraholkateam.secure_constants.SecureConstants.CREATE_TABLES;
 import static baraholkateam.secure_constants.SecureConstants.INSERT_NEW_ADVERTISEMENT;
-import static baraholkateam.secure_constants.SecureConstants.REMOVE_ADVERTISEMENT;
 import static baraholkateam.secure_constants.SecureConstants.REMOVE_ALL_DATA;
 import static baraholkateam.secure_constants.SecureConstants.TAGS_SEARCH;
-import static baraholkateam.secure_constants.SecureConstants.UPDATE_ATTEMPT_NUMBER;
-import static baraholkateam.secure_constants.SecureConstants.UPDATE_NEXT_UPDATE_TIME;
 
 public class SQLExecutor {
     private final Connection connection;
@@ -42,12 +38,12 @@ public class SQLExecutor {
                     BaraholkaBotProperties.DB_USER,
                     BaraholkaBotProperties.DB_PASS
             );
+
+            createTables();
         } catch (SQLException e) {
             logger.error(String.format("Cannot connect to the database: %s", e.getMessage()));
             throw new RuntimeException("Failed to connect to the database.", e);
         }
-
-        createTables();
     }
 
     private void createTables() {
@@ -71,7 +67,6 @@ public class SQLExecutor {
                     .collect(Collectors.joining(" ")));
             insertNewAdvertisement.setLong(4, advertisement.getCreationTime());
             insertNewAdvertisement.setLong(5, advertisement.getNextUpdateTime());
-            insertNewAdvertisement.setInt(6, 0);
 
             return insertNewAdvertisement.executeUpdate();
         } catch (SQLException e) {
@@ -94,63 +89,6 @@ public class SQLExecutor {
         } catch (SQLException e) {
             logger.error(String.format("Error while searching advertisements by tags in database: %s", e.getMessage()));
             return null;
-        }
-    }
-
-    public ResultSet askActualAdvertisements(Long currentTime) {
-        try {
-            PreparedStatement askActualAdvertisements = connection.prepareStatement(ASK_ACTUAL_ADVERTISEMENTS);
-
-            askActualAdvertisements.setLong(1, currentTime);
-
-            return askActualAdvertisements.executeQuery();
-        } catch (SQLException e) {
-            logger.error(String.format("Error while taking actual advertisements from database: %s", e.getMessage()));
-            return null;
-        }
-    }
-
-    public boolean removeAdvertisement(long chatId, long messageId) {
-        try {
-            PreparedStatement removeAdvertisement = connection.prepareStatement(REMOVE_ADVERTISEMENT);
-
-            removeAdvertisement.setLong(1, chatId);
-            removeAdvertisement.setLong(2, messageId);
-
-            return removeAdvertisement.execute();
-        } catch (SQLException e) {
-            logger.error(String.format("Error while deleting advertisements from database: %s", e.getMessage()));
-            return false;
-        }
-    }
-
-    public boolean updateAttemptNumber(long chatId, long messageId, int newAttemptNum) {
-        try {
-            PreparedStatement updateAttemptNumber = connection.prepareStatement(UPDATE_ATTEMPT_NUMBER);
-
-            updateAttemptNumber.setInt(1, newAttemptNum);
-            updateAttemptNumber.setLong(2, chatId);
-            updateAttemptNumber.setLong(3, messageId);
-
-            return updateAttemptNumber.execute();
-        } catch (SQLException e) {
-            logger.error(String.format("Error while deleting advertisements from database: %s", e.getMessage()));
-            return false;
-        }
-    }
-
-    public boolean updateNextUpdateTime(long chatId, long messageId, long nextUpdateTime) {
-        try {
-            PreparedStatement updateNextUpdateTime = connection.prepareStatement(UPDATE_NEXT_UPDATE_TIME);
-
-            updateNextUpdateTime.setLong(1, nextUpdateTime);
-            updateNextUpdateTime.setLong(2, chatId);
-            updateNextUpdateTime.setLong(3, messageId);
-
-            return updateNextUpdateTime.execute();
-        } catch (SQLException e) {
-            logger.error(String.format("Error while deleting advertisements from database: %s", e.getMessage()));
-            return false;
         }
     }
 
