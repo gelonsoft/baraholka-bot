@@ -11,18 +11,20 @@ public class Advertisement {
     private Long chatId;
     private Long messageId;
     private List<PhotoSize> photos = new ArrayList<>();
-    private String description = null;
+    private String description;
     private final List<Tag> tags = new ArrayList<>();
-    private Long price = null;
-    private String phone = null;
+    private Long price;
+    private String phone;
     private List<String> contacts = new ArrayList<>();
     private Long creationTime;
     private Long nextUpdateTime;
+    private Integer updateAttempt;
     private final Logger logger = LoggerFactory.getLogger(Advertisement.class);
 
     public Advertisement(Long chatId) {
         this.tags.add(Tag.Actual);
         this.chatId = chatId;
+        updateAttempt = 0;
     }
 
     public Advertisement(List<PhotoSize> photos, String description, List<Tag> tags, Long price,
@@ -33,6 +35,7 @@ public class Advertisement {
         this.tags.addAll(tags);
         this.price = price;
         this.contacts = contacts;
+        updateAttempt = 0;
     }
 
     public Long getChatId() {
@@ -102,6 +105,10 @@ public class Advertisement {
         return nextUpdateTime;
     }
 
+    public Integer getUpdateAttempt() {
+        return updateAttempt;
+    }
+
     public Advertisement setChatId(Long chatId) {
         this.chatId = chatId;
         return this;
@@ -157,5 +164,53 @@ public class Advertisement {
     public Advertisement setNextUpdateTime(Long nextUpdateTime) {
         this.nextUpdateTime = nextUpdateTime;
         return this;
+    }
+
+    public Advertisement setUpdateAttempt(Integer updateAttempt) {
+        this.updateAttempt = updateAttempt;
+        return this;
+    }
+
+    public String getAdvertisementText() {
+        List<Tag> tags = this.getTags();
+        StringBuilder tagsString = new StringBuilder();
+        for (Tag tag : tags) {
+            tagsString.append(tag.getName()).append(" ");
+        }
+        if (tagsString.length() > 1) {
+            tagsString.setLength(tagsString.length() - 1);
+        }
+
+        Long price = this.getPrice();
+        String description = this.getDescription();
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(String.format("""
+            %s
+            
+            Цена: %s руб.
+            
+            Описание: %s""", tagsString, price, description));
+        sb.append("\n");
+
+        String phone = this.getPhone();
+        if (phone != null) {
+            sb.append("\n").append(String.format("Номер телефона: %s", phone));
+        }
+
+        List<String> contacts = this.getContacts();
+        if (contacts.size() > 0) {
+            sb.append("\n");
+            StringBuilder contactsString = new StringBuilder();
+            for (String contact : contacts) {
+                contactsString.append(contact).append(", ");
+            }
+            if (contactsString.length() > 0) {
+                contactsString.setLength(contactsString.length() - 2);
+            }
+            sb.append(String.format("Контакты: %s", contactsString));
+        }
+        return sb.toString();
     }
 }

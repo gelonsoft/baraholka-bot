@@ -1,17 +1,13 @@
 package baraholkateam.command;
 
 import baraholkateam.database.SQLExecutor;
-import baraholkateam.util.Advertisement;
 import baraholkateam.util.State;
-import baraholkateam.util.Tag;
 import baraholkateam.util.TagType;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public class SearchAdvertisements_AddAdvertisementTypes extends Command {
@@ -36,11 +32,6 @@ public class SearchAdvertisements_AddAdvertisementTypes extends Command {
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
-        // TODO убрать метод
-        sqlExecutor.removeAllData();
-        // TODO убрать метод-заглушку
-        createAds();
-
         String chosenTagsString = chosenTags.get(chat.getId());
 
         if (previousState.get(chat.getId()) == State.SearchAdvertisements) {
@@ -54,40 +45,5 @@ public class SearchAdvertisements_AddAdvertisementTypes extends Command {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                     String.format(INCORRECT_PREVIOUS_STATE, State.MainMenu.getIdentifier()), null);
         }
-    }
-
-    // TODO убрать метод-заглушку
-    private void createAds() {
-        Advertisement ad1 = new Advertisement(new ArrayList<>(1), "описание1", List.of(Tag.Exchange, Tag.Sale, Tag.Belgorod, Tag.Hobby), 1000L, List.of("контакт 1", "контакт 2"))
-                .setChatId(1L)
-                .setMessageId(3L)
-                .setCreationTime(123L)
-                .setNextUpdateTime(456L);
-        Advertisement ad2 = new Advertisement(new ArrayList<>(1), "описание2", List.of(Tag.Exchange, Tag.Sale, Tag.Belgorod), 2000L, List.of("контакт 3"))
-                .setChatId(3L)
-                .setMessageId(4L)
-                .setCreationTime(789L)
-                .setNextUpdateTime(101112L);
-        Advertisement ad3 = new Advertisement(new ArrayList<>(1), "описание3", List.of(Tag.Sale, Tag.Belgorod, Tag.Hobby), 3000L, List.of("контакт 4", "контакт 5", "контакт 6"))
-                .setChatId(5L)
-                .setMessageId(5L)
-                .setCreationTime(131415L)
-                .setNextUpdateTime(161718L);
-        Advertisement ad4 = new Advertisement(new ArrayList<>(1), "описание4", List.of(Tag.Exchange, Tag.Sale, Tag.Belgorod, Tag.Hobby, Tag.Books), 4000L, new ArrayList<>(1))
-                .setChatId(7L)
-                .setMessageId(6L)
-                .setCreationTime(192021L)
-                .setNextUpdateTime(222324L);
-        Advertisement ad5 = new Advertisement(new ArrayList<>(1), "описание5", List.of(Tag.Exchange, Tag.Sale, Tag.Belgorod, Tag.Hobby, Tag.Ekaterinburg), 5000L, List.of("контакт 7"))
-                .setChatId(9L)
-                .setMessageId(7L)
-                .setCreationTime(252627L)
-                .setNextUpdateTime(282930L);
-
-        sqlExecutor.insertNewAdvertisement(ad1);
-        sqlExecutor.insertNewAdvertisement(ad2);
-        sqlExecutor.insertNewAdvertisement(ad3);
-        sqlExecutor.insertNewAdvertisement(ad4);
-        sqlExecutor.insertNewAdvertisement(ad5);
     }
 }

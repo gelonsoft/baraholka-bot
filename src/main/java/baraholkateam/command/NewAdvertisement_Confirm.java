@@ -1,11 +1,9 @@
 package baraholkateam.command;
 
 import baraholkateam.bot.BaraholkaBot;
-import baraholkateam.bot.BaraholkaBotProperties;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
 import baraholkateam.util.Advertisement;
 import baraholkateam.util.State;
-import baraholkateam.util.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
@@ -41,11 +39,11 @@ public class NewAdvertisement_Confirm extends Command {
     private static final Logger logger = LoggerFactory.getLogger(NewAdvertisement_Confirm.class);
 
     public NewAdvertisement_Confirm(Map<Long, Message> lastSentMessage, Map<Long, Advertisement> advertisement,
-                                    BaraholkaBot bot) {
+                                    TelegramAPIRequests telegramAPIRequests, BaraholkaBot bot) {
         super(State.NewAdvertisement_Confirm.getIdentifier(),
                 State.NewAdvertisement_Confirm.getDescription(), lastSentMessage);
         this.advertisement = advertisement;
-        telegramAPIRequests = new TelegramAPIRequests();
+        this.telegramAPIRequests = telegramAPIRequests;
         this.bot = bot;
     }
 
@@ -53,7 +51,7 @@ public class NewAdvertisement_Confirm extends Command {
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         Advertisement ad = advertisement.get(chat.getId());
 
-        String text = getAdvertisementText(ad);
+        String text = ad.getAdvertisementText();
 
         List<PhotoSize> photos = ad.getPhotos();
 
@@ -64,75 +62,11 @@ public class NewAdvertisement_Confirm extends Command {
             for (PhotoSize photoSize : photos) {
                 photoFiles.add(Objects.requireNonNull(downloadPhoto(bot, photoSize)));
             }
-            List<Message> messages = sendPhotoMediaGroup(absSender, chat.getId(), photoFiles, text);
-            messages.size();
+            sendPhotoMediaGroup(absSender, chat.getId(), photoFiles, text);
         }
-
-        InlineKeyboardButton yesButton = new InlineKeyboardButton();
-        yesButton.setText("Да");
-        String yesCallbackData = String.format("%s %s %d", CONFIRM_AD_CALLBACK_DATA, "yes", photos.size() == 1 ? 0 : 1);
-        yesButton.setCallbackData(yesCallbackData);
-
-        InlineKeyboardButton noButton = new InlineKeyboardButton();
-        noButton.setText("Нет");
-        String noCallbackData = String.format("%s %s", CONFIRM_AD_CALLBACK_DATA, "no");
-        noButton.setCallbackData(noCallbackData);
-
-        List<InlineKeyboardButton> keyboardFirstRow = new ArrayList<>();
-        keyboardFirstRow.add(yesButton);
-        keyboardFirstRow.add(noButton);
-
-        List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
-        keyboardRows.add(keyboardFirstRow);
-
-        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        inlineKeyboardMarkup.setKeyboard(keyboardRows);
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                CONFIRM_AD_TEXT, inlineKeyboardMarkup);
-    }
-
-    public String getAdvertisementText(Advertisement ad) {
-        List<Tag> tags = ad.getTags();
-        StringBuilder tagsString = new StringBuilder();
-        for (Tag tag : tags) {
-            tagsString.append(tag.getName()).append(" ");
-        }
-        if (tagsString.length() > 1) {
-            tagsString.setLength(tagsString.length() - 1);
-        }
-
-        Long price = ad.getPrice();
-        String description = ad.getDescription();
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(String.format("""
-            %s
-            
-            Цена: %s руб.
-            
-            Описание: %s""", tagsString, price, description));
-        sb.append("\n");
-
-        String phone = ad.getPhone();
-        if (phone != null) {
-            sb.append("\n").append(String.format("Номер телефона: %s", phone));
-        }
-
-        List<String> contacts = ad.getContacts();
-        if (contacts.size() > 0) {
-            sb.append("\n");
-            StringBuilder contactsString = new StringBuilder();
-            for (String contact : contacts) {
-                contactsString.append(contact).append(", ");
-            }
-            if (contactsString.length() > 0) {
-                contactsString.setLength(contactsString.length() - 2);
-            }
-            sb.append(String.format("Контакты: %s", contactsString));
-        }
-        return sb.toString();
+                CONFIRM_AD_TEXT, getConfirmAdvertisement(photos));
     }
 
     public Message sendPhotoMessage(AbsSender absSender, long chatId, File photoFile, String text) {
@@ -193,5 +127,29 @@ public class NewAdvertisement_Confirm extends Command {
             logger.error("Cannot download photo", e);
             return null;
         }
+    }
+
+    private InlineKeyboardMarkup getConfirmAdvertisement(List<PhotoSize> photos) {
+        InlineKeyboardButton yesButton = new InlineKeyboardButton();
+        yesButton.setText("Да");
+        String yesCallbackData = String.format("%s %s %d", CONFIRM_AD_CALLBACK_DATA, "yes", photos.size() == 1 ? 0 : 1);
+        yesButton.setCallbackData(yesCallbackData);
+
+        InlineKeyboardButton noButton = new InlineKeyboardButton();
+        noButton.setText("Нет");
+        String noCallbackData = String.format("%s %s", CONFIRM_AD_CALLBACK_DATA, "no");
+        noButton.setCallbackData(noCallbackData);
+
+        List<InlineKeyboardButton> keyboardFirstRow = new ArrayList<>();
+        keyboardFirstRow.add(yesButton);
+        keyboardFirstRow.add(noButton);
+
+        List<List<InlineKeyboardButton>> keyboardRows = new ArrayList<>();
+        keyboardRows.add(keyboardFirstRow);
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        inlineKeyboardMarkup.setKeyboard(keyboardRows);
+
+        return inlineKeyboardMarkup;
     }
 }
