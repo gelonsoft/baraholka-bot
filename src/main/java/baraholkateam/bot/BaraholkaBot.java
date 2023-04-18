@@ -23,9 +23,12 @@ import baraholkateam.command.SearchAdvertisements_AddProductCategories;
 import baraholkateam.command.SearchAdvertisements_ShowFoundAdvertisements;
 import baraholkateam.command.StartCommand;
 import baraholkateam.database.SQLExecutor;
+<<<<<<< HEAD
 import baraholkateam.util.Advertisement;
+=======
 import baraholkateam.notification.NotificationExecutor;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
+>>>>>>> origin/dev
 import baraholkateam.util.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +59,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+<<<<<<< HEAD
 import static baraholkateam.command.Command.CHOSEN_TAG;
 import static baraholkateam.command.Command.CONFIRM_AD_CALLBACK_DATA;
 import static baraholkateam.command.Command.NEXT_BUTTON_TEXT;
@@ -67,6 +71,7 @@ import static baraholkateam.command.Command.UNSUCCESS_TEXT;
 import static baraholkateam.command.Command.ADVERTISEMENT_CANCELLED_TEXT;
 import static baraholkateam.command.Command.TAGS_CALLBACK_DATA;
 import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
+=======
 import static baraholkateam.command.Command.ADVERTISEMENT_SUCCESSFUL_DELETE;
 import static baraholkateam.command.Command.ADVERTISEMENT_SUCCESSFUL_UPDATE;
 import static baraholkateam.command.Command.CHOSEN_TAG;
@@ -75,6 +80,7 @@ import static baraholkateam.command.Command.NOT_CHOSEN_TAG;
 import static baraholkateam.command.Command.TAGS_CALLBACK_DATA;
 import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
 import static baraholkateam.command.Command.YES_NO_ANSWER;
+>>>>>>> origin/dev
 
 @Component
 public class BaraholkaBot extends TelegramLongPollingCommandBot {
@@ -88,9 +94,12 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
     private final Map<Long, Message> lastSentMessage = new ConcurrentHashMap<>();
     private final Map<Long, String> chosenTags = new ConcurrentHashMap<>();
     private final Map<Long, State> previousState = new ConcurrentHashMap<>();
+<<<<<<< HEAD
     private final Map<Long, Advertisement> advertisement = new ConcurrentHashMap<>();
     private NewAdvertisement_Confirm newAdvertisementConfirm;
+=======
     private final Map<Long, Map<Long, List<Message>>> notificationMessages = new ConcurrentHashMap<>();
+>>>>>>> origin/dev
     private final Logger logger = LoggerFactory.getLogger(BaraholkaBot.class);
 
     public BaraholkaBot(@Value("${bot.name}") String botName, @Value("${bot.token}") String botToken) {
@@ -108,7 +117,9 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         NotificationExecutor.startNotificationExecutor(sqlExecutor, this, telegramAPIRequests,
                 notificationMessages);
 
+<<<<<<< HEAD
         newAdvertisementConfirm = new NewAdvertisement_Confirm(lastSentMessage, advertisement, this);
+=======
         register(new StartCommand(State.Start.getIdentifier(), State.Start.getDescription(), lastSentMessage));
         register(new HelpCommand(State.Help.getIdentifier(), State.Help.getDescription(), lastSentMessage,
                 getRegisteredCommands()));
@@ -130,6 +141,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
                 State.SearchAdvertisements_ShowFoundAdvertisements.getDescription(), lastSentMessage, chosenTags,
                 sqlExecutor, telegramAPIRequests, previousState));
+>>>>>>> origin/dev
     }
 
     @Override
@@ -444,6 +456,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                     editMessageReplyMarkup(msg.getChatId(), buttons);
                 }
             }
+<<<<<<< HEAD
             case PHONE_CALLBACK_DATA -> {
                 if (Objects.equals(dataParts[1], "yes")) {
                     currentState.put(msg.getChatId(), State.NewAdvertisement_AddPhone);
@@ -502,6 +515,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 }
                 getRegisteredCommand(State.MainMenu.getIdentifier())
                         .processMessage(this, msg, null);
+=======
             case YES_NO_ANSWER -> {
                 if (Objects.equals(dataParts[4], "0")) {
                     sqlExecutor.removeAdvertisement(Long.parseLong(dataParts[1]), Long.parseLong(dataParts[2]));
@@ -515,6 +529,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 }
                 NotificationExecutor.deleteMessages(this, notificationMessages, Long.parseLong(dataParts[1]),
                         Long.parseLong(dataParts[2]));
+>>>>>>> origin/dev
             }
             default -> logger.error(String.format("Unknown command in callback data: %s", callbackQuery));
         }
