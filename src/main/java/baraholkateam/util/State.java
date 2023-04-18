@@ -24,9 +24,9 @@ public enum State {
     NewAdvertisement_AddSocial("add_social", "Добавить ссылку"),
     NewAdvertisement_Confirm("confirm_ad", "Подтвердить"),
     SearchAdvertisements("search_advertisement", "Поиск объявлений по хэштегам"),
-    SearchAdvertisements_AddAdvertisementTypes("add_advertisement_types",
+    SearchAdvertisements_AddAdvertisementTypes("search_advertisement_types",
             "Выбор типов объявления для поиска"),
-    SearchAdvertisements_AddProductCategories("add_product_categories",
+    SearchAdvertisements_AddProductCategories("search_product_categories",
             "Выбор категорий товаров для поиска"),
     SearchAdvertisements_ShowFoundAdvertisements("show_found_advertisements",
             "Вывод найденных объявлений");

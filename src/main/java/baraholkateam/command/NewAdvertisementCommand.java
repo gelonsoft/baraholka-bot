@@ -23,15 +23,19 @@ public class NewAdvertisementCommand extends Command {
             Чтобы прервать создание, нужно вернуться в главное меню /%s.
             Добавьте фотографии к вашему объявлению.""";
     private final Map<Long, Advertisement> advertisement;
+    private final Map<Long, String> chosenTags;
 
-    public NewAdvertisementCommand(Map<Long, Message> lastSentMessage, Map<Long, Advertisement> advertisement) {
+    public NewAdvertisementCommand(Map<Long, Message> lastSentMessage, Map<Long, Advertisement> advertisement,
+                                   Map<Long, String> chosenTags) {
         super(State.NewAdvertisement.getIdentifier(), State.NewAdvertisement.getDescription(), lastSentMessage);
         this.advertisement = advertisement;
+        this.chosenTags = chosenTags;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         advertisement.put(chat.getId(), new Advertisement(chat.getId()));
+        chosenTags.remove(chat.getId());
 
         SendMessage message = suggestAddingPhotos(chat.getId());
         try {

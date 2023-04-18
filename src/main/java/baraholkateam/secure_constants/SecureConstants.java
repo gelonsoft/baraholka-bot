@@ -6,8 +6,8 @@ public final class SecureConstants {
         (
             chat_id bigint NOT NULL,
             message_id bigint NOT NULL,
-            tags character(100),
-            all_text character(1000),
+            tags character(200),
+            all_text character(2000),
             creation_time bigint,
             next_update_time bigint,
             update_attempt int,
