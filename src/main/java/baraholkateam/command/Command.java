@@ -31,7 +31,9 @@ public abstract class Command extends BotCommand {
     public static final String SOCIAL_CALLBACK_DATA = "social";
     public static final String CONFIRM_AD_CALLBACK_DATA = "confirm_ad";
     public static final String CHOSEN_TAG = "✅ %s";
-    public static final String SUCCESS_TEXT = "Объявление успешно добавлено";
+    public static final String SUCCESS_TEXT = "Объявление успешно добавлено.";
+    public static final String UNSUCCESS_TEXT = "Объявление не было успешно добавлено.";
+    public static final String ADVERTISEMENT_CANCELLED_TEXT = "Формирование объявления было отменено.";
     static final String INCORRECT_PREVIOUS_STATE = """
             Невозможно выполнить текущую команду.
             Пожалуйста, вернитесь в главное меню /%s и попробуйте снова.""";

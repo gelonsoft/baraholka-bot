@@ -17,7 +17,9 @@ public class NonCommand {
     private static final String CHOOSE_CITY = "Пожалуйста, выберите город для поиска.";
     private static final String CHOOSE_ADVERTISEMENT_TYPES = "Пожалуйста, выберите типы объявления.";
     private static final String CHOOSE_PRODUCT_CATEGORIES = "Пожалуйста, выберите категории объявлений.";
+    private static final String EMPTY_DESCRIPTION = "Описание пустое.";
     private static final String INVALID_PHONE_NUMBER = "Номер телефона имеет неверный формат.";
+    private static final String INVALID_SOCIAL = "Ссылка на социальную сеть имеет неверный формат";
     private static final String INVALID_PRICE = "Введенная цена имеет неверный формат.";
 
     public NonCommand() {
@@ -32,8 +34,12 @@ public class NonCommand {
                 || currentState.equals(State.NewAdvertisement)) {
             return List.of(new AnswerPair(String.format(COMMAND_ERROR_MESSAGE, currentState.getIdentifier(),
                     State.MainMenu.getIdentifier()), true, null));
+        } else if (currentState.equals(State.NewAdvertisement_AddDescription)) {
+            return List.of(new AnswerPair(EMPTY_DESCRIPTION, true, null));
         } else if (currentState.equals(State.NewAdvertisement_AddPhone)) {
            return List.of(new AnswerPair(INVALID_PHONE_NUMBER, true, null));
+        } else if (currentState.equals(State.NewAdvertisement_AddSocial)) {
+            return List.of(new AnswerPair(INVALID_SOCIAL, true, null));
         } else if (currentState.equals(State.NewAdvertisement_AddPrice)) {
             return List.of(new AnswerPair(INVALID_PRICE, true, null));
         } else if (currentState.equals(State.SearchAdvertisements)) {

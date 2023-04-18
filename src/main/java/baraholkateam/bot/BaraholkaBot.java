@@ -34,17 +34,26 @@ import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
-import org.telegram.telegrambots.meta.api.objects.*;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.PhotoSize;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static baraholkateam.command.Command.CHOSEN_TAG;
 import static baraholkateam.command.Command.CONFIRM_AD_CALLBACK_DATA;
@@ -53,6 +62,8 @@ import static baraholkateam.command.Command.NOT_CHOSEN_TAG;
 import static baraholkateam.command.Command.PHONE_CALLBACK_DATA;
 import static baraholkateam.command.Command.SOCIAL_CALLBACK_DATA;
 import static baraholkateam.command.Command.SUCCESS_TEXT;
+import static baraholkateam.command.Command.UNSUCCESS_TEXT;
+import static baraholkateam.command.Command.ADVERTISEMENT_CANCELLED_TEXT;
 import static baraholkateam.command.Command.TAGS_CALLBACK_DATA;
 import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
 
@@ -68,6 +79,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
     private final Map<Long, String> chosenTags = new ConcurrentHashMap<>();
     private final Map<Long, State> previousState = new ConcurrentHashMap<>();
     private final Map<Long, Advertisement> advertisement = new ConcurrentHashMap<>();
+    private NewAdvertisement_Confirm newAdvertisementConfirm;
     private final Logger logger = LoggerFactory.getLogger(BaraholkaBot.class);
 
     public BaraholkaBot(@Value("${bot.name}") String botName, @Value("${bot.token}") String botToken) {
@@ -77,6 +89,8 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
 
         sqlExecutor = new SQLExecutor();
         nonCommand = new NonCommand();
+
+        newAdvertisementConfirm = new NewAdvertisement_Confirm(lastSentMessage, advertisement, this);
     }
 
     @Override
@@ -131,7 +145,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         register(new NewAdvertisement_AddPhone(lastSentMessage));
         register(new NewAdvertisement_ConfirmPhone(lastSentMessage, advertisement));
         register(new NewAdvertisement_AddSocial(lastSentMessage));
-        register(new NewAdvertisement_Confirm(lastSentMessage, advertisement));
+        register(newAdvertisementConfirm);
         register(new SearchAdvertisements(lastSentMessage, chosenTags));
         register(new SearchAdvertisements_AddAdvertisementTypes(lastSentMessage, chosenTags, sqlExecutor,
                 previousState));
@@ -205,6 +219,9 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         Advertisement ad = advertisement.get(msg.getChatId());
 
         if (state == State.NewAdvertisement_AddDescription) {
+            if (!msg.getText().matches(".+")) {
+                return false;
+            }
             ad.setDescription(msg.getText());
             updateStateOnTextData(msg);
             return true;
@@ -234,6 +251,9 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         }
 
         if (state == State.NewAdvertisement_AddSocial) {
+            if (!msg.getText().matches("https://.+/.+")) {
+                return false;
+            }
             ad.addSocial(msg.getText());
             updateStateOnTextData(msg);
             return true;
@@ -250,14 +270,23 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
     private boolean addAdvertisementPhotos(Message msg) {
         if (currentState.get(msg.getChatId()) == State.NewAdvertisement_AddPhotos) {
             Advertisement ad = advertisement.get(msg.getChatId());
-            List<PhotoSize> photos = msg.getPhoto();
 
-            for (PhotoSize photo : photos) {
-                ad.addPhoto(photo);
-            }
+            Map<String, TreeSet<PhotoSize>> photos = msg.getPhoto().stream()
+                    .collect(
+                            Collectors.groupingBy(
+                                    // FIXME мапим пока только по первой половине символов id фотографий
+                                    photo -> photo.getFileId().substring(0, photo.getFileId().length() / 2),
+                                    Collectors.toCollection(
+                                            () -> new TreeSet<>(Comparator.comparingInt(PhotoSize::getWidth))
+                                    )
+                            )
+                    );
+
+            photos.forEach((make, photo) -> ad.addPhoto(photo.last()));
 
             // TODO убрать эти две строчки чтобы менять стейт только после закидывания всех фоток
-            getRegisteredCommand(State.NewAdvertisement_ConfirmPhoto.getIdentifier()).processMessage(this, msg, null);
+            getRegisteredCommand(State.NewAdvertisement_ConfirmPhoto.getIdentifier())
+                    .processMessage(this, msg, null);
             currentState.put(msg.getChatId(), State.NewAdvertisement_ConfirmPhoto);
             return true;
         }
@@ -406,11 +435,40 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
             }
             case CONFIRM_AD_CALLBACK_DATA -> {
                 if (Objects.equals(dataParts[1], "yes")) {
-                    sqlExecutor.insertNewAdvertisement(advertisement.get(msg.getChatId()));
-                    sendAnswer(msg.getChatId(), getUserName(msg), SUCCESS_TEXT, null);
+                    Advertisement ad = advertisement.get(msg.getChatId());
+                    Message sentAd;
+                    if (Objects.equals(dataParts[2], "0")) {
+                        sentAd = newAdvertisementConfirm.sendPhotoMessage(this,
+                                Long.parseLong(BaraholkaBotProperties.CHANNEL_CHAT_ID),
+                                newAdvertisementConfirm.downloadPhoto(this, ad.getPhotos().get(0)),
+                                newAdvertisementConfirm.getAdvertisementText(ad));
+                    } else {
+                        List<File> photoFiles = new ArrayList<>();
+                        for (PhotoSize photoSize : ad.getPhotos()) {
+                            photoFiles.add(Objects.requireNonNull(newAdvertisementConfirm.downloadPhoto(this,
+                                    photoSize)));
+                        }
+                        sentAd = newAdvertisementConfirm.sendPhotoMediaGroup(this,
+                                Long.parseLong(BaraholkaBotProperties.CHANNEL_CHAT_ID),
+                                photoFiles,
+                                newAdvertisementConfirm.getAdvertisementText(ad)).get(0);
+                    }
+                    if (sentAd != null) {
+                        ad.setMessageId(Long.parseLong(String.valueOf(sentAd.getMessageId())));
+                        ad.setCreationTime(System.currentTimeMillis());
+                        //TODO исправить время следующего обновления на текущее время + 14 дней
+                        ad.setNextUpdateTime(System.currentTimeMillis() + 14L * 24 * 60 * 60 * 1000000);
+                        sqlExecutor.insertNewAdvertisement(advertisement.get(msg.getChatId()));
+                        sendAnswer(msg.getChatId(), getUserName(msg), SUCCESS_TEXT, null);
+                    } else {
+                        sendAnswer(msg.getChatId(), getUserName(msg), UNSUCCESS_TEXT, null);
+                        logger.error("Error while sending advertisement to channel.");
+                    }
                 } else if (Objects.equals(dataParts[1], "no")) {
-                    // TODO обработать сброс объявления
+                    sendAnswer(msg.getChatId(), getUserName(msg), ADVERTISEMENT_CANCELLED_TEXT, null);
                 }
+                getRegisteredCommand(State.MainMenu.getIdentifier())
+                        .processMessage(this, msg, null);
             }
             default -> logger.error(String.format("Unknown command in callback data: %s", callbackQuery));
         }
