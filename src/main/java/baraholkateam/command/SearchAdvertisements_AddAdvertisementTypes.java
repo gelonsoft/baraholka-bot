@@ -10,6 +10,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class SearchAdvertisements_AddAdvertisementTypes extends Command {
@@ -18,28 +20,27 @@ public class SearchAdvertisements_AddAdvertisementTypes extends Command {
             Вы можете выбрать несколько хэштегов, нажав на них, либо не выбрать ни один.
             Для подтверждения выбора, нажмите на кнопку '%s'.""";
     private final Map<Long, String> chosenTags;
+    private final SQLExecutor sqlExecutor;
     private final Map<Long, State> previousState;
 
-<<<<<<< HEAD:src/main/java/baraholkateam/command/SearchAdvertisements_AddAdvertisementTypes.java
     public SearchAdvertisements_AddAdvertisementTypes(Map<Long, Message> lastSentMessage,
                                                       Map<Long, String> chosenTags,
                                                       SQLExecutor sqlExecutor,
                                                       Map<Long, State> previousState) {
         super(State.SearchAdvertisements_AddAdvertisementTypes.getIdentifier(),
                 State.SearchAdvertisements_AddAdvertisementTypes.getDescription(), lastSentMessage);
-=======
-    public SearchAdvertisements_AddAdvertisementType(String commandIdentifier, String description,
-                                                     Map<Long, Message> lastSentMessage,
-                                                     Map<Long, String> chosenTags,
-                                                     Map<Long, State> previousState) {
-        super(commandIdentifier, description, lastSentMessage);
->>>>>>> origin/dev:src/main/java/baraholkateam/command/SearchAdvertisements_AddAdvertisementType.java
         this.chosenTags = chosenTags;
+        this.sqlExecutor = sqlExecutor;
         this.previousState = previousState;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
+        // TODO убрать метод
+        sqlExecutor.removeAllData();
+        // TODO убрать метод-заглушку
+        createAds();
+
         String chosenTagsString = chosenTags.get(chat.getId());
 
         if (previousState.get(chat.getId()) == State.SearchAdvertisements) {
@@ -54,7 +55,6 @@ public class SearchAdvertisements_AddAdvertisementTypes extends Command {
                     String.format(INCORRECT_PREVIOUS_STATE, State.MainMenu.getIdentifier()), null);
         }
     }
-<<<<<<< HEAD:src/main/java/baraholkateam/command/SearchAdvertisements_AddAdvertisementTypes.java
 
     // TODO убрать метод-заглушку
     private void createAds() {
@@ -90,6 +90,4 @@ public class SearchAdvertisements_AddAdvertisementTypes extends Command {
         sqlExecutor.insertNewAdvertisement(ad4);
         sqlExecutor.insertNewAdvertisement(ad5);
     }
-=======
->>>>>>> origin/dev:src/main/java/baraholkateam/command/SearchAdvertisements_AddAdvertisementType.java
 }
