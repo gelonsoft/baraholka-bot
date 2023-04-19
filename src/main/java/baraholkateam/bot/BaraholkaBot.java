@@ -434,6 +434,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 }
             }
             case PHONE_CALLBACK_DATA -> {
+                deleteLastMessage(msg.getChatId());
                 if (Objects.equals(dataParts[1], "yes")) {
                     currentState.put(msg.getChatId(), State.NewAdvertisement_AddPhone);
                     getRegisteredCommand(State.NewAdvertisement_AddPhone.getIdentifier())
@@ -445,6 +446,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 }
             }
             case SOCIAL_CALLBACK_DATA -> {
+                deleteLastMessage(msg.getChatId());
                 if (Objects.equals(dataParts[1], "yes")) {
                     currentState.put(msg.getChatId(), State.NewAdvertisement_AddSocial);
                     getRegisteredCommand(State.NewAdvertisement_AddSocial.getIdentifier())
@@ -456,6 +458,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 }
             }
             case CONFIRM_AD_CALLBACK_DATA -> {
+                deleteLastMessage(msg.getChatId());
                 if (Objects.equals(dataParts[1], "yes")) {
                     Advertisement ad = advertisement.get(msg.getChatId());
                     Message sentAd;

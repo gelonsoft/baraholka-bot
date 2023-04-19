@@ -31,6 +31,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class NewAdvertisement_Confirm extends Command {
+    private static final String CONTACTS_LIST_TEXT = """
+            Добавлены ссылки на следующие социальные сети:
+            %s""";
     private static final String CONFIRM_AD_TEXT = """
             Желаете опубликовать ваше объявление в канале?""";
     private final Map<Long, Advertisement> advertisement;
@@ -54,6 +57,11 @@ public class NewAdvertisement_Confirm extends Command {
         String text = ad.getAdvertisementText();
 
         List<PhotoSize> photos = ad.getPhotos();
+
+        if (ad.getContacts() != null && !ad.getContacts().isEmpty()) {
+            sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                    String.format(CONTACTS_LIST_TEXT, String.join("\n", ad.getContacts())), null);
+        }
 
         if (photos.size() == 1) {
             sendPhotoMessage(absSender, chat.getId(), downloadPhoto(bot, photos.get(0)), text);
