@@ -14,7 +14,7 @@ public class MainMenuCommand extends Command {
             Добро пожаловать в главное меню. Здесь Вы можете:
             1. Создать новое объявление: /%s;
             2. Удалить созданное объявление: /%s;
-            3. Найти нужные объявления по хэштегам: /%s.
+            3. Найти нужные объявления по хэштегам: /%s;
             4. Получить справку по командам бота: /%s.""";
 
     public MainMenuCommand(Map<Long, Message> lastSentMessage) {
@@ -24,7 +24,8 @@ public class MainMenuCommand extends Command {
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                String.format(MAIN_MENU, State.NewAdvertisement.getIdentifier(), State.DeleteAd.getIdentifier(),
-                        State.SearchAdvertisements.getIdentifier(), State.Help.getIdentifier()), null);
+                String.format(MAIN_MENU, State.NewAdvertisement.getIdentifier(),
+                        State.DeleteAdvertisement.getIdentifier(), State.SearchAdvertisements.getIdentifier(),
+                        State.Help.getIdentifier()), null);
     }
 }

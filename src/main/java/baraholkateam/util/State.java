@@ -10,7 +10,7 @@ public enum State {
     Help("help", "Справочная информация по боту"),
     MainMenu("menu", "Главное меню"),
     NewAdvertisement("new_advertisement", "Создание нового объявления"),
-    DeleteAd("delete_ad", "Удалить объявление"),
+    DeleteAdvertisement("delete_advertisement", "Удаление созданного объявления"),
     NewAdvertisement_AddPhotos("add_photos", "Добавить фотографии"),
     NewAdvertisement_ConfirmPhoto("confirm_photo", "Подтвердить фотографии"),
     NewAdvertisement_AddDescription("add_description", "Добавить описание"),

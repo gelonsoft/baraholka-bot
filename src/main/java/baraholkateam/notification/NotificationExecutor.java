@@ -3,11 +3,14 @@ package baraholkateam.notification;
 import baraholkateam.bot.BaraholkaBotProperties;
 import baraholkateam.database.SQLExecutor;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
+import baraholkateam.util.Tag;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageCaption;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
@@ -28,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 import static baraholkateam.command.Command.ADVERTISEMENT_DELETE;
 import static baraholkateam.command.Command.NOTIFICATION_CALLBACK_DATA;
+import static baraholkateam.command.DeleteAdvertisement.NOT_ACTUAL_TEXT;
 
 public class NotificationExecutor {
     private static final String DELETE_IF_NOT_UPDATE = """
@@ -58,8 +62,8 @@ public class NotificationExecutor {
                     long chatId = askActualAdvertisements.getLong("chat_id");
                     long messageId = askActualAdvertisements.getLong("message_id");
                     if (attemptNum == 3) {
+                        editAdText(sender, String.valueOf(messageId), sqlExecutor);
                         sqlExecutor.removeAdvertisement(chatId, messageId);
-                        // TODO добавить удаление объявления из канала
                         deleteMessages(sender, notificationMessages, chatId, messageId);
                         sendMessageWithoutDelete(sender, chatId, ADVERTISEMENT_DELETE, null);
                     } else if (attemptNum <= 2) {
@@ -190,6 +194,22 @@ public class NotificationExecutor {
                 }
             }
             notificationMessages.get(chatId).remove(messageId);
+        }
+    }
+
+    public static void editAdText(AbsSender absSender, String messageId, SQLExecutor sqlExecutor) {
+        EditMessageCaption editMessage = new EditMessageCaption();
+        String editedText = String.format("%s\n\n%s", NOT_ACTUAL_TEXT, sqlExecutor.adText(Long.parseLong(messageId))
+                .substring(Tag.Actual.getName().length() + 1));
+        editMessage.setChatId(BaraholkaBotProperties.CHANNEL_CHAT_ID);
+        editMessage.setMessageId(Integer.parseInt(messageId));
+        editMessage.setParseMode(ParseMode.HTML);
+        editMessage.setCaption(editedText);
+
+        try {
+            absSender.execute(editMessage);
+        } catch (TelegramApiException e) {
+            LOGGER.error(String.format("Cannot edit deleted message: %s", e.getMessage()));
         }
     }
 }

@@ -31,15 +31,20 @@ public abstract class Command extends BotCommand {
     public static final String SOCIAL_CALLBACK_DATA = "social";
     public static final String CONFIRM_AD_CALLBACK_DATA = "confirm_ad";
     public static final String NOTIFICATION_CALLBACK_DATA = "notification";
+    public static final String DELETE_CALLBACK_TEXT = "delete";
+    public static final String DELETE_AD_CALLBACK_TEXT = "delete_ad";
     public static final String CHOSEN_TAG = "✅ %s";
     public static final String SUCCESS_TEXT = "Объявление успешно добавлено.";
     public static final String UNSUCCESS_TEXT = "Объявление не было успешно добавлено.";
+    public static final String SUCCESS_DELETE_AD_TEXT = """
+            Объявление успешно удалено.
+            Текущий статус объявления: неактуальное.""";
+    public static final String UNSUCCESS_DELETE_AD_TEXT = "Удаление объявление было отменено.";
     public static final String ADVERTISEMENT_CANCELLED_TEXT = "Формирование объявления было отменено.";
     public static final String ADVERTISEMENT_SUCCESSFUL_UPDATE = "Актуальность объявления была продлена.";
     public static final String ADVERTISEMENT_SUCCESSFUL_DELETE = "Объявление было удалено.";
     public static final String ADVERTISEMENT_DELETE =
             "Объявление было автоматически удалено после 3 попыток уточнения его актуальности.";
-    public static final String DELETE_AD = "delete";
     static final String INCORRECT_PREVIOUS_STATE = """
             Невозможно выполнить текущую команду.
             Пожалуйста, вернитесь в главное меню /%s и попробуйте снова.""";

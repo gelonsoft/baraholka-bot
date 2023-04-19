@@ -18,14 +18,13 @@ import java.util.stream.Collectors;
 import static baraholkateam.bot.BaraholkaBot.SEARCH_ADVERTISEMENTS_LIMIT;
 import static baraholkateam.secure_constants.SecureConstants.ASK_ACTUAL_ADVERTISEMENTS;
 import static baraholkateam.secure_constants.SecureConstants.CREATE_TABLES;
+import static baraholkateam.secure_constants.SecureConstants.GET_AD_TEXT;
 import static baraholkateam.secure_constants.SecureConstants.INSERT_NEW_ADVERTISEMENT;
 import static baraholkateam.secure_constants.SecureConstants.REMOVE_ADVERTISEMENT;
-import static baraholkateam.secure_constants.SecureConstants.REMOVE_ALL_DATA;
 import static baraholkateam.secure_constants.SecureConstants.TAGS_SEARCH;
 import static baraholkateam.secure_constants.SecureConstants.UPDATE_ATTEMPT_NUMBER;
 import static baraholkateam.secure_constants.SecureConstants.UPDATE_NEXT_UPDATE_TIME;
-import static baraholkateam.secure_constants.SecureConstants.*;
-import static baraholkateam.secure_constants.SecureConstants.DELETE_AD;
+import static baraholkateam.secure_constants.SecureConstants.USER_ADS;
 
 public class SQLExecutor {
     private final Connection connection;
@@ -63,7 +62,7 @@ public class SQLExecutor {
         }
     }
 
-    public int insertNewAdvertisement(Advertisement advertisement) {
+    public void insertNewAdvertisement(Advertisement advertisement) {
         try {
             PreparedStatement insertNewAdvertisement = connection.prepareStatement(INSERT_NEW_ADVERTISEMENT);
 
@@ -77,10 +76,9 @@ public class SQLExecutor {
             insertNewAdvertisement.setLong(6, advertisement.getNextUpdateTime());
             insertNewAdvertisement.setInt(7, advertisement.getUpdateAttempt());
 
-            return insertNewAdvertisement.executeUpdate();
+            insertNewAdvertisement.executeUpdate();
         } catch (SQLException e) {
             logger.error(String.format("Error while inserting new advertisement into database: %s", e.getMessage()));
-            return -1;
         }
     }
 
@@ -114,21 +112,20 @@ public class SQLExecutor {
         }
     }
 
-    public boolean removeAdvertisement(long chatId, long messageId) {
+    public void removeAdvertisement(long chatId, long messageId) {
         try {
             PreparedStatement removeAdvertisement = connection.prepareStatement(REMOVE_ADVERTISEMENT);
 
             removeAdvertisement.setLong(1, chatId);
             removeAdvertisement.setLong(2, messageId);
 
-            return removeAdvertisement.execute();
+            removeAdvertisement.execute();
         } catch (SQLException e) {
             logger.error(String.format("Error while deleting advertisements from database: %s", e.getMessage()));
-            return false;
         }
     }
 
-    public boolean updateAttemptNumber(long chatId, long messageId, int newAttemptNum) {
+    public void updateAttemptNumber(long chatId, long messageId, int newAttemptNum) {
         try {
             PreparedStatement updateAttemptNumber = connection.prepareStatement(UPDATE_ATTEMPT_NUMBER);
 
@@ -136,14 +133,13 @@ public class SQLExecutor {
             updateAttemptNumber.setLong(2, chatId);
             updateAttemptNumber.setLong(3, messageId);
 
-            return updateAttemptNumber.execute();
+            updateAttemptNumber.execute();
         } catch (SQLException e) {
             logger.error(String.format("Error while deleting advertisements from database: %s", e.getMessage()));
-            return false;
         }
     }
 
-    public boolean updateNextUpdateTime(long chatId, long messageId, long nextUpdateTime) {
+    public void updateNextUpdateTime(long chatId, long messageId, long nextUpdateTime) {
         try {
             PreparedStatement updateNextUpdateTime = connection.prepareStatement(UPDATE_NEXT_UPDATE_TIME);
 
@@ -151,32 +147,27 @@ public class SQLExecutor {
             updateNextUpdateTime.setLong(2, chatId);
             updateNextUpdateTime.setLong(3, messageId);
 
-            return updateNextUpdateTime.execute();
+            updateNextUpdateTime.execute();
         } catch (SQLException e) {
             logger.error(String.format("Error while deleting advertisements from database: %s", e.getMessage()));
-            return false;
         }
     }
 
-    // только для тестирования!
-    public int removeAllData() {
-        try {
-            PreparedStatement removeAllData = connection.prepareStatement(REMOVE_ALL_DATA);
-
-            return removeAllData.executeUpdate();
-        } catch (SQLException e) {
-            logger.error(String.format("Error while searching advertisements by tags in database: %s", e.getMessage()));
-            return -1;
-        }
-    }
-    public List<Long> userAds(Long chatId) {
+    public List<AdvertisementScheme> userAds(Long chatId) {
         try {
             PreparedStatement userAds = connection.prepareStatement(USER_ADS);
             userAds.setLong(1, chatId);
             ResultSet result = userAds.executeQuery();
-            List<Long> ads = new ArrayList<>();
+            List<AdvertisementScheme> ads = new ArrayList<>();
             while (result.next()) {
-                ads.add(result.getLong("message_id"));
+                Long messageId = result.getLong("message_id");
+                String tags = result.getString("tags");
+                String allText = result.getString("all_text");
+                Long creationTime = result.getLong("creation_time");
+                Long nextUpdateTime = result.getLong("next_update_time");
+                Integer updateAttempt = result.getInt("update_attempt");
+                ads.add(new AdvertisementScheme(chatId, messageId, tags, allText, creationTime, nextUpdateTime,
+                        updateAttempt));
             }
             return ads;
         } catch (SQLException e) {
@@ -184,7 +175,8 @@ public class SQLExecutor {
             return null;
         }
     }
-    public String adText(Long messageId){
+
+    public String adText(Long messageId) {
         try {
             String text = null;
             PreparedStatement adText = connection.prepareStatement(GET_AD_TEXT);
@@ -199,17 +191,6 @@ public class SQLExecutor {
             return null;
         }
     }
-    // TODO Удаление объявления из БД (для Саши)
-    public int deleteAd(Long messageId) {
-        try {
-            PreparedStatement deleteAd = connection.prepareStatement(DELETE_AD);
-            deleteAd.setLong(1, messageId);
-            return deleteAd.executeUpdate();
-        } catch (SQLException e) {
-            logger.error(String.format("Error while deleting ad from database: %s", e.getMessage()));
-            return -1;
-        }
-    }
 
     public void closeConnection() {
         try {
@@ -217,6 +198,55 @@ public class SQLExecutor {
         } catch (SQLException e) {
             logger.error(String.format("Cannot close connection due to: %s", e.getMessage()));
             throw new RuntimeException("Failed to close connection", e);
+        }
+    }
+
+    public static class AdvertisementScheme {
+        private final Long chatId;
+        private final Long messageId;
+        private final String tags;
+        private final String allText;
+        private final Long creationTime;
+        private final Long nextUpdateTime;
+        private final Integer updateAttempt;
+
+        public AdvertisementScheme(Long chatId, Long messageId, String tags, String allText, Long creationTime,
+                                   Long nextUpdateTime, Integer updateAttempt) {
+            this.chatId = chatId;
+            this.messageId = messageId;
+            this.tags = tags;
+            this.allText = allText;
+            this.creationTime = creationTime;
+            this.nextUpdateTime = nextUpdateTime;
+            this.updateAttempt = updateAttempt;
+        }
+
+        public Long getChatId() {
+            return chatId;
+        }
+
+        public Long getMessageId() {
+            return messageId;
+        }
+
+        public String getTags() {
+            return tags;
+        }
+
+        public String getAllText() {
+            return allText;
+        }
+
+        public Long getCreationTime() {
+            return creationTime;
+        }
+
+        public Long getNextUpdateTime() {
+            return nextUpdateTime;
+        }
+
+        public Integer getUpdateAttempt() {
+            return updateAttempt;
         }
     }
 }

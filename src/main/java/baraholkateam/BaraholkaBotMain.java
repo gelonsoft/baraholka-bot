@@ -12,7 +12,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 public class BaraholkaBotMain {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaraholkaBotMain.class);
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         SpringApplication.run(BaraholkaBotMain.class, args);
         try {
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);

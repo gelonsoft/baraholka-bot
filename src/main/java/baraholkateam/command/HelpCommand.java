@@ -16,7 +16,8 @@ public class HelpCommand extends Command {
     private static final List<State> AVAILABLE_STATES = List.of(
             State.MainMenu,
             State.NewAdvertisement,
-            State.SearchAdvertisements
+            State.SearchAdvertisements,
+            State.DeleteAdvertisement
     );
 
     public HelpCommand(Map<Long, Message> lastSentMessage) {

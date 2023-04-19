@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Advertisement {
+    public static String DESCRIPTION_TEXT = "Описание:";
     private Long chatId;
     private Long messageId;
     private List<PhotoSize> photos = new ArrayList<>();
@@ -191,7 +192,7 @@ public class Advertisement {
             
             Цена: %s руб.
             
-            Описание: %s""", tagsString, price, description));
+            %s %s""", tagsString, price, DESCRIPTION_TEXT, description));
         sb.append("\n");
 
         String phone = this.getPhone();

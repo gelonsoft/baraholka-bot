@@ -1,6 +1,6 @@
 package baraholkateam.bot;
 
-import baraholkateam.command.*;
+import baraholkateam.command.DeleteAdvertisement;
 import baraholkateam.command.HelpCommand;
 import baraholkateam.command.MainMenuCommand;
 import baraholkateam.command.NewAdvertisementCommand;
@@ -28,37 +28,30 @@ import baraholkateam.notification.NotificationExecutor;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
 import baraholkateam.util.Advertisement;
 import baraholkateam.util.State;
+import baraholkateam.util.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
-import org.springframework.boot.autoconfigure.integration.IntegrationProperties;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageCaption;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageCaption;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import javax.swing.text.html.HTML;
 import java.io.File;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.nio.channels.Channel;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -71,18 +64,23 @@ import static baraholkateam.command.Command.ADVERTISEMENT_SUCCESSFUL_DELETE;
 import static baraholkateam.command.Command.ADVERTISEMENT_SUCCESSFUL_UPDATE;
 import static baraholkateam.command.Command.CHOSEN_TAG;
 import static baraholkateam.command.Command.CONFIRM_AD_CALLBACK_DATA;
+import static baraholkateam.command.Command.DELETE_AD_CALLBACK_TEXT;
+import static baraholkateam.command.Command.DELETE_CALLBACK_TEXT;
 import static baraholkateam.command.Command.NEXT_BUTTON_TEXT;
 import static baraholkateam.command.Command.NOTIFICATION_CALLBACK_DATA;
 import static baraholkateam.command.Command.NOT_CHOSEN_TAG;
 import static baraholkateam.command.Command.PHONE_CALLBACK_DATA;
 import static baraholkateam.command.Command.SOCIAL_CALLBACK_DATA;
+import static baraholkateam.command.Command.SUCCESS_DELETE_AD_TEXT;
 import static baraholkateam.command.Command.SUCCESS_TEXT;
 import static baraholkateam.command.Command.TAGS_CALLBACK_DATA;
 import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
+import static baraholkateam.command.Command.UNSUCCESS_DELETE_AD_TEXT;
 import static baraholkateam.command.Command.UNSUCCESS_TEXT;
+import static baraholkateam.command.DeleteAdvertisement.DELETE_AD;
+import static baraholkateam.command.DeleteAdvertisement.NOT_ACTUAL_TEXT;
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_PERIOD;
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_TIME_UNIT;
-import static baraholkateam.command.Command.*;
 
 @Component
 public class BaraholkaBot extends TelegramLongPollingCommandBot {
@@ -156,8 +154,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         register(new StartCommand(lastSentMessage));
         register(new HelpCommand(lastSentMessage));
         register(new MainMenuCommand(lastSentMessage));
-        // TODO Почему тут везде стало в рагументах только "lastSeenMessage"?
-        register(new DeleteAd(sqlExecutor, lastSentMessage));
+        register(new DeleteAdvertisement(sqlExecutor, lastSentMessage));
         register(new NewAdvertisementCommand(lastSentMessage, advertisement, chosenTags));
         register(new NewAdvertisement_AddPhotos(lastSentMessage));
         register(new NewAdvertisement_ConfirmPhoto(lastSentMessage));
@@ -194,6 +191,11 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         }
 
         msg = update.getMessage();
+
+        if (msg == null) {
+            return;
+        }
+
         Long chatId = msg.getChatId();
 
         // Случай обновления данных во время создания объявления
@@ -392,7 +394,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         }
     }
 
-    private void parseKeyboardData(String callbackQuery, Message msg){
+    private void parseKeyboardData(String callbackQuery, Message msg) {
         String[] dataParts = callbackQuery.split(" ");
         switch (dataParts[0]) {
             case TAG_CALLBACK_DATA -> {
@@ -495,44 +497,59 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                         .processMessage(this, msg, null);
             }
             case NOTIFICATION_CALLBACK_DATA -> {
+                long chatId = Long.parseLong(dataParts[1]);
+                long messageId = Long.parseLong(dataParts[2]);
+
                 if (Objects.equals(dataParts[4], "0")) {
-                    sqlExecutor.removeAdvertisement(Long.parseLong(dataParts[1]), Long.parseLong(dataParts[2]));
-                    // TODO добавить удаление объявления из канала
-                    sendAnswer(Long.parseLong(dataParts[1]), ADVERTISEMENT_SUCCESSFUL_DELETE, null);
+                    editAdText(dataParts[2]);
+                    sqlExecutor.removeAdvertisement(chatId, messageId);
+                    sendAnswer(chatId, ADVERTISEMENT_SUCCESSFUL_DELETE, null);
                 } else {
-                    sqlExecutor.updateNextUpdateTime(Long.parseLong(dataParts[1]), Long.parseLong(dataParts[2]),
+                    sqlExecutor.updateNextUpdateTime(chatId, messageId,
                             System.currentTimeMillis() + Long.parseLong(dataParts[3]));
-                    sqlExecutor.updateAttemptNumber(Long.parseLong(dataParts[1]), Long.parseLong(dataParts[2]), 0);
-                    sendAnswer(Long.parseLong(dataParts[1]), ADVERTISEMENT_SUCCESSFUL_UPDATE, null);
+                    sqlExecutor.updateAttemptNumber(chatId, messageId, 0);
+                    sendAnswer(chatId, ADVERTISEMENT_SUCCESSFUL_UPDATE, null);
                 }
-                NotificationExecutor.deleteMessages(this, notificationMessages, Long.parseLong(dataParts[1]),
-                        Long.parseLong(dataParts[2]));
+                NotificationExecutor.deleteMessages(this, notificationMessages, chatId, messageId);
             }
-            case DELETE_AD -> {
-//          TODO Раскомментировать удаление объявления из БД
-//                sqlExecutor.deleteAd(Long.parseLong(dataParts[1]));
-                EditMessageCaption editMessage = new EditMessageCaption();
-                String editedText = "<b>НЕАКТУАЛЬНО</b> \n" + sqlExecutor.adText(Long.parseLong(dataParts[1]));
-                editMessage.setChatId(BaraholkaBotProperties.CHANNEL_CHAT_ID);
-                editMessage.setMessageId(Integer.parseInt(dataParts[1]));
-                editMessage.setParseMode(ParseMode.HTML);
-                editMessage.setCaption(editedText);
-                try {
-                    execute(editMessage);
-                } catch (TelegramApiException e){
-                    logger.error(String.format("Cannot edit deleted message: %s", e.getMessage()));
+            case DELETE_CALLBACK_TEXT -> {
+                long messageId = Long.parseLong(dataParts[1]);
+
+                deleteLastMessage(msg.getChatId());
+                telegramAPIRequests.forwardMessage(BaraholkaBotProperties.CHANNEL_USERNAME,
+                        String.valueOf(msg.getChatId()), messageId);
+                sendAnswer(msg.getChatId(), DELETE_AD, getDeleteAd(messageId));
+            }
+            case DELETE_AD_CALLBACK_TEXT -> {
+                deleteLastMessage(msg.getChatId());
+                if (Objects.equals(dataParts[1], "1")) {
+                    editAdText(dataParts[2]);
+                    sqlExecutor.removeAdvertisement(msg.getChatId(), Long.parseLong(dataParts[2]));
+                    sendAnswer(msg.getChatId(), SUCCESS_DELETE_AD_TEXT, null);
+                } else {
+                    sendAnswer(msg.getChatId(), UNSUCCESS_DELETE_AD_TEXT, null);
+                    getRegisteredCommand(State.DeleteAdvertisement.getIdentifier())
+                            .processMessage(this, msg, null);
                 }
             }
             default -> logger.error(String.format("Unknown command in callback data: %s", callbackQuery));
         }
     }
-    public String editAdText(String message) {
-//        TODO Раскомментировать основной функционал, удалить заглушку
-//        message = new StringBuffer(message).insert(0, "<b style=\"color:#ff0000\"> НЕ АКТУАЛЬНО </b> \n").toString();
-        StringBuffer sb = new StringBuffer(message);
-        sb = sb.insert(0, "НЕ АКТУАЛЬНО\n");
-        message = sb.toString();
-        return message;
+
+    public void editAdText(String messageId) {
+        EditMessageCaption editMessage = new EditMessageCaption();
+        String editedText = String.format("%s\n\n%s", NOT_ACTUAL_TEXT, sqlExecutor.adText(Long.parseLong(messageId))
+                .substring(Tag.Actual.getName().length() + 1));
+        editMessage.setChatId(BaraholkaBotProperties.CHANNEL_CHAT_ID);
+        editMessage.setMessageId(Integer.parseInt(messageId));
+        editMessage.setParseMode(ParseMode.HTML);
+        editMessage.setCaption(editedText);
+
+        try {
+            execute(editMessage);
+        } catch (TelegramApiException e) {
+            logger.error(String.format("Cannot edit deleted message: %s", e.getMessage()));
+        }
     }
 
     private void deleteLastMessage(Long chatId) {
@@ -558,5 +575,27 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         } catch (TelegramApiException e) {
             logger.error(String.format("Cannot edit message reply markup due to: %s", e.getMessage()));
         }
+    }
+
+    private InlineKeyboardMarkup getDeleteAd(Long messageId) {
+        List<InlineKeyboardButton> buttons = new ArrayList<>(2);
+
+        InlineKeyboardButton yes = new InlineKeyboardButton();
+        yes.setText("Да");
+        yes.setCallbackData(String.format("%s 1 %d", DELETE_AD_CALLBACK_TEXT, messageId));
+        buttons.add(yes);
+
+        InlineKeyboardButton no = new InlineKeyboardButton();
+        no.setText("Нет");
+        no.setCallbackData(String.format("%s 0", DELETE_AD_CALLBACK_TEXT));
+        buttons.add(no);
+
+        List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
+        rowList.add(buttons);
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        inlineKeyboardMarkup.setKeyboard(rowList);
+
+        return inlineKeyboardMarkup;
     }
 }
