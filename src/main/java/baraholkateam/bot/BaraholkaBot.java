@@ -398,8 +398,9 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 }
             }
             // ошибка в обработке сообщения пользователя, необходимо повторить данный шаг
-            deleteLastMessage(msg.getChatId());
-            getRegisteredCommand(currState.getIdentifier()).processMessage(this, msg, null);
+            if (currState != null) {
+                getRegisteredCommand(currState.getIdentifier()).processMessage(this, msg, null);
+            }
             return;
         } else {
             State nextState = State.nextState(currentState.get(msg.getChatId()));
