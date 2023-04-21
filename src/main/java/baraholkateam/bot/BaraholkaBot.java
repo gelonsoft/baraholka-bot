@@ -127,44 +127,28 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         return botToken;
     }
 
-    @Override
-    public void onUpdatesReceived(List<Update> updates) {
-        super.onUpdatesReceived(updates);
-        for (Update update:updates) {
-            Message msg = update.getMessage();
-            if (msg.isTopicMessage()){
-                String text = msg.getText();
-                Pattern filter = Pattern.compile("(?iu)\\b((у|[нз]а|(хитро|не)?вз?[ыьъ]|с[ьъ]|(и|ра)[зс]ъ?|(о[тб]|под)[ьъ]?|(.\\B)+?[оаеи])?-?([её]б(?!о[рй])|и[пб][ае][тц]).*?|(н[иеа]|([дп]|верт)о|ра[зс]|з?а|с(ме)?|о(т|дно)?|апч)?-?ху([яйиеёю]|ли(?!ган)).*?|(в[зы]|(три|два|четыре)жды|(н|сук)а)?-?бл(я(?!(х|ш[кн]|мб)[ауеыио]).*?|[еэ][дт]ь?)|(ра[сз]|[зн]а|[со]|вы?|п(ере|р[оие]|од)|и[зс]ъ?|[ао]т)?п[иеё]зд.*?|(за)?п[ие]д[аое]?р(ну.*?|[оа]м|(ас)?(и(ли)?[нщктл]ь?)?|(о(ч[еи])?|ас)?к(ой)|юг)[ауеы]?|манд([ауеыи](л(и[сзщ])?[ауеиы])?|ой|[ао]вошь?(е?к[ауе])?|юк(ов|[ауи])?)|муд([яаио].*?|е?н([ьюия]|ей))|мля([тд]ь)?|лять|([нз]а|по)х|м[ао]л[ао]фь([яию]|[еёо]й))\\b", Pattern.CASE_INSENSITIVE);
-                Matcher matcher = filter.matcher(text);
-                StringBuilder sb = new StringBuilder(text);
-                while (matcher.find()) {
-                    sb.replace(matcher.start(), matcher.end(), "*".repeat(matcher.end() - matcher.start()));
-                    text = sb.toString();
-                }
-                msg.setText(text);
-                System.out.println(text);
-            }
-
-        }
-    }
-
+    // TODO Решить, что делать с фильтром
 //    @Override
-//    public void onUpdateReceived(Update update) {
-//        Message msg = update.getMessage();
-//        if (msg.isTopicMessage()){
-//            String text = msg.getText();
-//            Pattern filter = Pattern.compile("(?iu)\\b((у|[нз]а|(хитро|не)?вз?[ыьъ]|с[ьъ]|(и|ра)[зс]ъ?|(о[тб]|под)[ьъ]?|(.\\B)+?[оаеи])?-?([её]б(?!о[рй])|и[пб][ае][тц]).*?|(н[иеа]|([дп]|верт)о|ра[зс]|з?а|с(ме)?|о(т|дно)?|апч)?-?ху([яйиеёю]|ли(?!ган)).*?|(в[зы]|(три|два|четыре)жды|(н|сук)а)?-?бл(я(?!(х|ш[кн]|мб)[ауеыио]).*?|[еэ][дт]ь?)|(ра[сз]|[зн]а|[со]|вы?|п(ере|р[оие]|од)|и[зс]ъ?|[ао]т)?п[иеё]зд.*?|(за)?п[ие]д[аое]?р(ну.*?|[оа]м|(ас)?(и(ли)?[нщктл]ь?)?|(о(ч[еи])?|ас)?к(ой)|юг)[ауеы]?|манд([ауеыи](л(и[сзщ])?[ауеиы])?|ой|[ао]вошь?(е?к[ауе])?|юк(ов|[ауи])?)|муд([яаио].*?|е?н([ьюия]|ей))|мля([тд]ь)?|лять|([нз]а|по)х|м[ао]л[ао]фь([яию]|[еёо]й))\\b", Pattern.CASE_INSENSITIVE);
-//            Matcher matcher = filter.matcher(text);
-//            StringBuilder sb = new StringBuilder(text);
-//            while (matcher.find()) {
-//                sb.replace(matcher.start(), matcher.end(), "*".repeat(matcher.end() - matcher.start()));
-//                text = sb.toString();
+//    public void onUpdatesReceived(List<Update> updates) {
+//        super.onUpdatesReceived(updates);
+//        for (Update update:updates) {
+//            Message msg = update.getMessage();
+//            if (msg.isTopicMessage()){
+//                String text = msg.getText();
+//                Pattern filter = Pattern.compile("(?iu)\\b((у|[нз]а|(хитро|не)?вз?[ыьъ]|с[ьъ]|(и|ра)[зс]ъ?|(о[тб]|под)[ьъ]?|(.\\B)+?[оаеи])?-?([её]б(?!о[рй])|и[пб][ае][тц]).*?|(н[иеа]|([дп]|верт)о|ра[зс]|з?а|с(ме)?|о(т|дно)?|апч)?-?ху([яйиеёю]|ли(?!ган)).*?|(в[зы]|(три|два|четыре)жды|(н|сук)а)?-?бл(я(?!(х|ш[кн]|мб)[ауеыио]).*?|[еэ][дт]ь?)|(ра[сз]|[зн]а|[со]|вы?|п(ере|р[оие]|од)|и[зс]ъ?|[ао]т)?п[иеё]зд.*?|(за)?п[ие]д[аое]?р(ну.*?|[оа]м|(ас)?(и(ли)?[нщктл]ь?)?|(о(ч[еи])?|ас)?к(ой)|юг)[ауеы]?|манд([ауеыи](л(и[сзщ])?[ауеиы])?|ой|[ао]вошь?(е?к[ауе])?|юк(ов|[ауи])?)|муд([яаио].*?|е?н([ьюия]|ей))|мля([тд]ь)?|лять|([нз]а|по)х|м[ао]л[ао]фь([яию]|[еёо]й))\\b", Pattern.CASE_INSENSITIVE);
+//                Matcher matcher = filter.matcher(text);
+//                StringBuilder sb = new StringBuilder(text);
+//                while (matcher.find()) {
+//                    sb.replace(matcher.start(), matcher.end(), "*".repeat(matcher.end() - matcher.start()));
+//                    text = sb.toString();
+//                }
+//                msg.setText(text);
+//                System.out.println(text);
 //            }
-//            msg.setText(text);
-//            System.out.println(text);
-//        }
 //
+//        }
 //    }
+
 
     /**
      * Устанавливает бота в определенное состояние в зависимости от введенной пользователем команды.
@@ -299,12 +283,20 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
     private boolean newAdvertisementUpdateData(Message msg) {
         State state = currentState.get(msg.getChatId());
         Advertisement ad = advertisement.get(msg.getChatId());
-
         if (state == State.NewAdvertisement_AddDescription) {
             if (!msg.getText().matches(".+")) {
                 return false;
             }
-            ad.setDescription(msg.getText());
+            // TODO Возможно, поменять реакцию на ненормативную лексику
+            String text = msg.getText();
+            Pattern filter = Pattern.compile("(?iu)\\b((у|[нз]а|(хитро|не)?вз?[ыьъ]|с[ьъ]|(и|ра)[зс]ъ?|(о[тб]|под)[ьъ]?|(.\\B)+?[оаеи])?-?([её]б(?!о[рй])|и[пб][ае][тц]).*?|(н[иеа]|([дп]|верт)о|ра[зс]|з?а|с(ме)?|о(т|дно)?|апч)?-?ху([яйиеёю]|ли(?!ган)).*?|(в[зы]|(три|два|четыре)жды|(н|сук)а)?-?бл(я(?!(х|ш[кн]|мб)[ауеыио]).*?|[еэ][дт]ь?)|(ра[сз]|[зн]а|[со]|вы?|п(ере|р[оие]|од)|и[зс]ъ?|[ао]т)?п[иеё]зд.*?|(за)?п[ие]д[аое]?р(ну.*?|[оа]м|(ас)?(и(ли)?[нщктл]ь?)?|(о(ч[еи])?|ас)?к(ой)|юг)[ауеы]?|манд([ауеыи](л(и[сзщ])?[ауеиы])?|ой|[ао]вошь?(е?к[ауе])?|юк(ов|[ауи])?)|муд([яаио].*?|е?н([ьюия]|ей))|мля([тд]ь)?|лять|([нз]а|по)х|м[ао]л[ао]фь([яию]|[еёо]й))\\b", Pattern.CASE_INSENSITIVE);
+            Matcher matcher = filter.matcher(text);
+            StringBuilder sb = new StringBuilder(text);
+            while (matcher.find()) {
+                sb.replace(matcher.start(), matcher.end(), "*".repeat(matcher.end() - matcher.start()));
+                text = sb.toString();
+            }
+            ad.setDescription(text);
             updateStateOnTextData(msg);
             return true;
         }
