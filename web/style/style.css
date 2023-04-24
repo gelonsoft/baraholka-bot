@@ -41,13 +41,20 @@ header {
     font-weight: bold;
 }
 
+.btn {
+    height: 40px;
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    line-height: 40px;
+}
+
 .btn-light {
     background-color: #419FD9;
     border-radius: 10px;
     color: white;
     border: none;
     margin-bottom: 20px;
-    margin-top: 5px;
     width: 290px;
 }
 
@@ -57,6 +64,10 @@ header {
     color: white;
     border: none;
     width: 100%;
+}
+
+.file-btn {
+    margin-top: 10px;
 }
 
 .header__exit-btn {
@@ -123,14 +134,6 @@ main {
 .main__form-title {
     font-size: 20px;
     margin-bottom: 5px;
-}
-
-.btn {
-    height: 40px;
-    display: inline-block;
-    cursor: pointer;
-    text-align: center;
-    line-height: 40px;
 }
 
 input[type="file"] {
