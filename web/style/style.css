@@ -1,0 +1,99 @@
+body {
+    background: linear-gradient(#B7BE6D, #81AB95);
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    color: black;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+header {
+    background-color: white;
+    padding: 10px 100px;
+    width: available;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header__content {
+}
+
+.header__logo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.header__logo-icon {
+    width: 80px;
+    height: 80px;
+    background-image: url("../img/icon.png");
+    background-position: center;
+    background-size: cover;
+    margin-right: 10px;
+}
+
+.header__logo-text {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.header__exit-btn {
+    background-color: #419FD9;
+    border-radius: 10px;
+    color: white;
+    width: 230px;
+    height: 50px;
+    border: none;
+    font-size: 20px;
+}
+
+main {
+    padding: 20px 100px;
+    display: flex;
+    flex-direction: row;
+}
+
+.main__menu {
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px 0;
+    border: solid 1px black;
+}
+
+.main__menu-tab {
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.main__menu-tab span {
+    white-space: nowrap;
+}
+
+.main__menu-tab-active {
+    background-color: #cfe9fd;
+    border-radius: 10px;
+}
+
+.main__menu-tab-pic {
+    margin-right: 10px;
+}
+
+.main__form {
+    width: 100%;
+    background-color: white;
+    border-radius: 10px;
+    padding: 30px 20px;
+    border: solid 1px black;
+}
+
