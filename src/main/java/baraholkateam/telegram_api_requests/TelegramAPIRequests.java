@@ -19,11 +19,11 @@ public class TelegramAPIRequests {
     private final HttpClient client = HttpClient.newHttpClient();
     private final Logger logger = LoggerFactory.getLogger(TelegramAPIRequests.class);
 
-    public Long forwardMessage(String from, String to, Long messageId) {
+    public Long forwardMessage(String fromChatId, String toChatId, Long messageId) {
         try {
             URI uri = new URIBuilder(String.format(FORWARD_MESSAGE, BaraholkaBotProperties.BOT_TOKEN))
-                    .addParameter("chat_id", String.format("%s", to))
-                    .addParameter("from_chat_id", String.format("%s", from))
+                    .addParameter("chat_id", String.format("%s", toChatId))
+                    .addParameter("fromChatId", String.format("%s", fromChatId))
                     .addParameter("message_id", String.valueOf(messageId))
                     .build();
 

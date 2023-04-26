@@ -51,7 +51,6 @@ public class NonCommand {
         } else if (currentState.equals(State.SearchAdvertisements_ShowFoundAdvertisements)) {
             return List.of(new AnswerPair(UNKNOWN_COMMAND, true, null));
         }
-        // TODO добавить обработку всех возможных состояний и подсостояний
         return List.of(new AnswerPair(UNKNOWN_COMMAND, true, null));
     }
 

@@ -11,6 +11,7 @@ import java.util.Map;
 public class StartCommand extends Command {
     private static final String START_ANSWER = """
             Добро пожаловать в бот по созданию и размещению объявлений!
+            Вы можете посмотреть список Ваших актуальных объявлений при помощи команды /%s.
             Вы можете начать создавать новое объявление при помощи команды /%s.
             Кроме того, Вы можете найти интересующие Вас объявления по хэштегам при помощи команды /%s.
             Также Вы можете перейти в главное меню /%s и следовать дальнейшим инструкциям.
@@ -24,6 +25,7 @@ public class StartCommand extends Command {
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                 String.format(START_ANSWER,
+                        State.UserAdvertisements.getIdentifier(),
                         State.NewAdvertisement.getIdentifier(),
                         State.SearchAdvertisements.getIdentifier(),
                         State.MainMenu.getIdentifier(),

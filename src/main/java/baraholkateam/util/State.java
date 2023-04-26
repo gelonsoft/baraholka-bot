@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.Objects;
 
 public enum State {
-    // TODO добавить новые состояния (команды)
     Start("start", "Старт"),
     Help("help", "Справочная информация по боту"),
     MainMenu("menu", "Главное меню"),
+    UserAdvertisements("my_advertisements", "Созданные пользователем актуальные объявления"),
     NewAdvertisement("new_advertisement", "Создание нового объявления"),
     DeleteAdvertisement("delete_advertisement", "Удаление созданного объявления"),
     NewAdvertisement_AddPhotos("add_photos", "Добавить фотографии"),
