@@ -83,10 +83,12 @@ import static baraholkateam.command.DeleteAdvertisement.DELETE_AD;
 import static baraholkateam.command.DeleteAdvertisement.NOT_ACTUAL_TEXT;
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_PERIOD;
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_TIME_UNIT;
+import static baraholkateam.secure_constants.SecureConstants.SWEAR_WORD_DETECTOR;
 
 @Component
 public class BaraholkaBot extends TelegramLongPollingCommandBot {
     public static final Integer SEARCH_ADVERTISEMENTS_LIMIT = 10;
+    public static final String AD_SWEAR_WORD_DETECTED = "Возможно ваше описание содержало ненормативную лексику, пожалуйста, введите измененный текст";
     private final String botName;
     private final String botToken;
     private final NonCommand nonCommand;
@@ -126,7 +128,6 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
     public String getBotToken() {
         return botToken;
     }
-
 
     /**
      * Устанавливает бота в определенное состояние в зависимости от введенной пользователем команды.
@@ -195,6 +196,10 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
 
         msg = update.getMessage();
 
+        if (msg == null) {
+            return;
+        }
+
         Long chatId = msg.getChatId();
 
         // Случай обновления данных во время создания объявления
@@ -249,10 +254,10 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 return false;
             }
             String text = msg.getText();
-            Pattern filter = Pattern.compile("(?iu)\\b((у|[нз]а|(хитро|не)?вз?[ыьъ]|с[ьъ]|(и|ра)[зс]ъ?|(о[тб]|под)[ьъ]?|(.\\B)+?[оаеи])?-?([её]б(?!о[рй])|и[пб][ае][тц]).*?|(н[иеа]|([дп]|верт)о|ра[зс]|з?а|с(ме)?|о(т|дно)?|апч)?-?ху([яйиеёю]|ли(?!ган)).*?|(в[зы]|(три|два|четыре)жды|(н|сук)а)?-?бл(я(?!(х|ш[кн]|мб)[ауеыио]).*?|[еэ][дт]ь?)|(ра[сз]|[зн]а|[со]|вы?|п(ере|р[оие]|од)|и[зс]ъ?|[ао]т)?п[иеё]зд.*?|(за)?п[ие]д[аое]?р(ну.*?|[оа]м|(ас)?(и(ли)?[нщктл]ь?)?|(о(ч[еи])?|ас)?к(ой)|юг)[ауеы]?|манд([ауеыи](л(и[сзщ])?[ауеиы])?|ой|[ао]вошь?(е?к[ауе])?|юк(ов|[ауи])?)|муд([яаио].*?|е?н([ьюия]|ей))|мля([тд]ь)?|лять|([нз]а|по)х|м[ао]л[ао]фь([яию]|[еёо]й))\\b", Pattern.CASE_INSENSITIVE);
+            Pattern filter = Pattern.compile(SWEAR_WORD_DETECTOR, Pattern.CASE_INSENSITIVE);
             Matcher matcher = filter.matcher(text);
             if (matcher.find()) {
-                sendAnswer(msg.getChatId(), "Возможно ваше описание содержало ненормативную лексику, пожалуйста, введите измененный текст", null);
+                sendAnswer(msg.getChatId(), AD_SWEAR_WORD_DETECTED, null);
                 return true;
             }
             ad.setDescription(text);
