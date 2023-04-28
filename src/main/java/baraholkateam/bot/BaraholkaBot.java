@@ -88,7 +88,7 @@ import static baraholkateam.secure_constants.SecureConstants.SWEAR_WORD_DETECTOR
 @Component
 public class BaraholkaBot extends TelegramLongPollingCommandBot {
     public static final Integer SEARCH_ADVERTISEMENTS_LIMIT = 10;
-    public static final String AD_SWEAR_WORD_DETECTED = "Возможно ваше описание содержало ненормативную лексику, пожалуйста, введите измененный текст";
+    public static final String AD_SWEAR_WORD_DETECTED = "Возможно, ваше описание содержало ненормативную лексику, пожалуйста, введите измененный текст";
     private final String botName;
     private final String botToken;
     private final NonCommand nonCommand;
