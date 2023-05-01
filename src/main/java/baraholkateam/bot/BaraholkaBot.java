@@ -58,6 +58,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static baraholkateam.command.Command.ADVERTISEMENT_CANCELLED_TEXT;
@@ -82,10 +84,12 @@ import static baraholkateam.command.DeleteAdvertisement.DELETE_AD;
 import static baraholkateam.command.DeleteAdvertisement.NOT_ACTUAL_TEXT;
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_PERIOD;
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_TIME_UNIT;
+import static baraholkateam.secure_constants.SecureConstants.SWEAR_WORD_DETECTOR;
 
 @Component
 public class BaraholkaBot extends TelegramLongPollingCommandBot {
     public static final Integer SEARCH_ADVERTISEMENTS_LIMIT = 10;
+    public static final String AD_SWEAR_WORD_DETECTED = "Возможно, ваше описание содержало ненормативную лексику, пожалуйста, введите измененный текст";
     private final String botName;
     private final String botToken;
     private final NonCommand nonCommand;
@@ -247,12 +251,18 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
     private boolean newAdvertisementUpdateData(Message msg) {
         State state = currentState.get(msg.getChatId());
         Advertisement ad = advertisement.get(msg.getChatId());
-
         if (state == State.NewAdvertisement_AddDescription) {
             if (!msg.getText().matches(".+")) {
                 return false;
             }
-            ad.setDescription(msg.getText());
+            String text = msg.getText();
+            Pattern filter = Pattern.compile(SWEAR_WORD_DETECTOR, Pattern.CASE_INSENSITIVE);
+            Matcher matcher = filter.matcher(text);
+            if (matcher.find()) {
+                sendAnswer(msg.getChatId(), AD_SWEAR_WORD_DETECTED, null);
+                return true;
+            }
+            ad.setDescription(text);
             updateStateOnTextData(msg);
             return true;
         }
@@ -347,8 +357,9 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 }
             }
             // ошибка в обработке сообщения пользователя, необходимо повторить данный шаг
-            deleteLastMessage(msg.getChatId());
-            getRegisteredCommand(currState.getIdentifier()).processMessage(this, msg, null);
+            if (currState != null) {
+                getRegisteredCommand(currState.getIdentifier()).processMessage(this, msg, null);
+            }
             return;
         } else {
             State nextState = State.nextState(currentState.get(msg.getChatId()));
