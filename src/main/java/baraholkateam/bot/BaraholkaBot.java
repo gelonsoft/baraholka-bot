@@ -23,6 +23,7 @@ import baraholkateam.command.SearchAdvertisements_AddAdvertisementTypes;
 import baraholkateam.command.SearchAdvertisements_AddProductCategories;
 import baraholkateam.command.SearchAdvertisements_ShowFoundAdvertisements;
 import baraholkateam.command.StartCommand;
+import baraholkateam.command.UserAdvertisements;
 import baraholkateam.database.SQLExecutor;
 import baraholkateam.notification.NotificationExecutor;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
@@ -154,7 +155,8 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         register(new StartCommand(lastSentMessage));
         register(new HelpCommand(lastSentMessage));
         register(new MainMenuCommand(lastSentMessage));
-        register(new DeleteAdvertisement(sqlExecutor, lastSentMessage));
+        register(new UserAdvertisements(lastSentMessage, sqlExecutor, telegramAPIRequests));
+        register(new DeleteAdvertisement(lastSentMessage, sqlExecutor));
         register(new NewAdvertisementCommand(lastSentMessage, advertisement, chosenTags));
         register(new NewAdvertisement_AddPhotos(lastSentMessage));
         register(new NewAdvertisement_ConfirmPhoto(lastSentMessage));
@@ -310,6 +312,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                             )
                     );
 
+            // добавляем фотографии самого высокого разрешения из числа одинаковых фотографий разного разрешения
             photos.forEach((make, photo) -> ad.addPhoto(photo.last()));
 
             // TODO убрать эти две строчки чтобы менять стейт только после закидывания всех фоток

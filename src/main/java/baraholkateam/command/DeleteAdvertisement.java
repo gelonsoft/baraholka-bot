@@ -26,7 +26,7 @@ public class DeleteAdvertisement extends Command {
             У вас нет актуальных объявлений.""";
     private final SQLExecutor sqlExecutor;
 
-    public DeleteAdvertisement(SQLExecutor sqlExecutor, Map<Long, Message> lastSentMessage) {
+    public DeleteAdvertisement(Map<Long, Message> lastSentMessage, SQLExecutor sqlExecutor) {
         super(State.DeleteAdvertisement.getIdentifier(), State.DeleteAdvertisement.getDescription(), lastSentMessage);
         this.sqlExecutor = sqlExecutor;
     }
