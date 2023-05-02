@@ -23,7 +23,7 @@ public class TelegramAPIRequests {
         try {
             URI uri = new URIBuilder(String.format(FORWARD_MESSAGE, BaraholkaBotProperties.BOT_TOKEN))
                     .addParameter("chat_id", String.format("%s", toChatId))
-                    .addParameter("fromChatId", String.format("%s", fromChatId))
+                    .addParameter("from_chat_id", String.format("%s", fromChatId))
                     .addParameter("message_id", String.valueOf(messageId))
                     .build();
 
