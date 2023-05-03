@@ -11,8 +11,6 @@ import java.util.Map;
 public class NewAdvertisement_AddPhone extends Command {
     private static final String ADD_PHONE_TEXT = """
             Введите ваш номер в формате
-            8-ххх-ххх-хх-хх
-            или
             +7-xxx-xxx-xx-xx""";
 
     public NewAdvertisement_AddPhone(Map<Long, Message> lastSentMessage) {

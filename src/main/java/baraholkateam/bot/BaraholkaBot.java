@@ -281,8 +281,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         }
 
         if (state == State.NewAdvertisement_AddPhone) {
-            if (!msg.getText().matches("8-\\d{3}-\\d{3}-\\d{2}-\\d{2}")
-                    && !msg.getText().matches("\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}")) {
+            if (!msg.getText().matches("\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}")) {
                 return false;
             }
             ad.setPhone(msg.getText());

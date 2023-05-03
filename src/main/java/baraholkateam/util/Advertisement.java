@@ -198,7 +198,7 @@ public class Advertisement {
         String phone = this.getPhone();
         if (phone != null) {
             sb.append("-".repeat(70));
-            sb.append("\n").append(String.format("Номер телефона: %s", phone));
+            sb.append("\n").append(String.format("Номер телефона: <span class=\"tg-spoiler\">%s</span>", phone));
         }
 
         List<String> contacts = this.getContacts();
@@ -215,7 +215,7 @@ public class Advertisement {
             if (contactsString.length() > 0) {
                 contactsString.setLength(contactsString.length() - 2);
             }
-            sb.append(String.format("Контакты: %s", contactsString));
+            sb.append(String.format("Контакты: <span class=\"tg-spoiler\">%s</span>", contactsString));
         }
         return sb.toString();
     }
