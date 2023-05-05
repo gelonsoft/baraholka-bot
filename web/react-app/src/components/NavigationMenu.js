@@ -65,20 +65,6 @@ class NavigationMenu extends React.Component {
                         <span>Поиск объявлений</span>
                     </div>
                 </Link>
-                <Link to="deleted_ads">
-                    <div className={
-                        this.state.currentTab === "deleted_ads" ? "main__menu-tab main__menu-tab-active" : "main__menu-tab"
-                    }
-                    onClick={
-                        () => {
-                            this.setState({currentTab: "deleted_ads"});
-                        }
-                    }>
-                        <img src={require('../img/deleted.png')} alt="Удалённые объявление"
-                             className="main__menu-tab-pic"/>
-                        <span>Удалённые объявление</span>
-                    </div>
-                </Link>
                 <Link to="help">
                     <div className={
                         this.state.currentTab === "help" ? "main__menu-tab main__menu-tab-active" : "main__menu-tab"

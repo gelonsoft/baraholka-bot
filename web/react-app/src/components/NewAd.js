@@ -126,7 +126,7 @@ class NewAd extends React.Component {
                 <input type="text" placeholder="1000"/>
                 <div className="main__form-title">Добавить номер телефона</div>
                 <div>Добавьте номер телефона (необязательно).</div>
-                <input type="tel" pattern="8-[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}" placeholder=" 8-900-000-00-00" />
+                <input type="tel" pattern="+7-[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}" placeholder="+7-900-000-00-00" />
                 <div className="main__form-title">Добавить социальные сети</div>
                 <div>Добавьте ссылки на ваши социальные сети (необязательно).</div>
                 <input type="tel" pattern="https://.+/.+" placeholder="https://vk.com/useruser"/>
