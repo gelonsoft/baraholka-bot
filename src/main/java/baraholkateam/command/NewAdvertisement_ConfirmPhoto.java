@@ -20,7 +20,7 @@ public class NewAdvertisement_ConfirmPhoto extends Command {
 
     public NewAdvertisement_ConfirmPhoto(Map<Long, Message> lastSentMessage) {
         super(State.NewAdvertisement_ConfirmPhoto.getIdentifier(),
-                State.NewAdvertisement_ConfirmPhoto.getDescription(), lastSentMessage);
+                State.NewAdvertisement_ConfirmPhoto.getDescription());
     }
 
     @Override

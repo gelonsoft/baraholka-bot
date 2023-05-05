@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static baraholkateam.util.Advertisement.DESCRIPTION_TEXT;
+import static baraholkateam.rest.model.Advertisement.DESCRIPTION_TEXT;
 
 public class DeleteAdvertisement extends Command {
     public static final String NOT_ACTUAL_TEXT = "<b>НЕАКТУАЛЬНО</b>";
@@ -27,7 +27,7 @@ public class DeleteAdvertisement extends Command {
     private final SQLExecutor sqlExecutor;
 
     public DeleteAdvertisement(Map<Long, Message> lastSentMessage, SQLExecutor sqlExecutor) {
-        super(State.DeleteAdvertisement.getIdentifier(), State.DeleteAdvertisement.getDescription(), lastSentMessage);
+        super(State.DeleteAdvertisement.getIdentifier(), State.DeleteAdvertisement.getDescription());
         this.sqlExecutor = sqlExecutor;
     }
 

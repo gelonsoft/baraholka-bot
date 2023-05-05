@@ -18,7 +18,7 @@ public class NewAdvertisement_AddContacts extends Command {
 
     public NewAdvertisement_AddContacts(Map<Long, Message> lastSentMessage) {
         super(State.NewAdvertisement_AddContacts.getIdentifier(),
-                State.NewAdvertisement_AddContacts.getDescription(), lastSentMessage);
+                State.NewAdvertisement_AddContacts.getDescription());
     }
 
     @Override

@@ -15,7 +15,7 @@ public class NewAdvertisement_AddPhone extends Command {
 
     public NewAdvertisement_AddPhone(Map<Long, Message> lastSentMessage) {
         super(State.NewAdvertisement_AddPhone.getIdentifier(),
-                State.NewAdvertisement_AddPhone.getDescription(), lastSentMessage);
+                State.NewAdvertisement_AddPhone.getDescription());
     }
 
     @Override

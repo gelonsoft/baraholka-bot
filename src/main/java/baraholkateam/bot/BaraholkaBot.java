@@ -26,13 +26,18 @@ import baraholkateam.command.StartCommand;
 import baraholkateam.command.UserAdvertisements;
 import baraholkateam.database.SQLExecutor;
 import baraholkateam.notification.NotificationExecutor;
+import baraholkateam.rest.repository.AdvertisementRepository;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
-import baraholkateam.util.Advertisement;
+import baraholkateam.rest.model.Advertisement;
 import baraholkateam.util.State;
 import baraholkateam.util.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
@@ -86,7 +91,7 @@ import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIF
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_TIME_UNIT;
 import static baraholkateam.secure_constants.SecureConstants.SWEAR_WORD_DETECTOR;
 
-@Component
+@Component("BaraholkaBot")
 public class BaraholkaBot extends TelegramLongPollingCommandBot {
     public static final Integer SEARCH_ADVERTISEMENTS_LIMIT = 10;
     public static final String AD_SWEAR_WORD_DETECTED = "Возможно, ваше описание содержало ненормативную лексику, пожалуйста, введите измененный текст";
@@ -102,9 +107,18 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
     private final Map<Long, State> previousState = new ConcurrentHashMap<>();
     private final Map<Long, Advertisement> advertisement = new ConcurrentHashMap<>();
     private final Map<Long, Map<Long, List<Message>>> notificationMessages = new ConcurrentHashMap<>();
-    private final Logger logger = LoggerFactory.getLogger(BaraholkaBot.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaraholkaBot.class);
 
-    public BaraholkaBot(@Value("${bot.name}") String botName, @Value("${bot.token}") String botToken) {
+    @Autowired
+    private AdvertisementRepository advertisementRepository;
+
+    @Autowired
+    private UserAdvertisements userAdvertisements;
+
+    public BaraholkaBot(
+            @Value("${bot.name}") String botName,
+            @Value("${bot.token}") String botToken
+    ) {
         super();
         this.botName = botName;
         this.botToken = botToken;
@@ -159,7 +173,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         register(new StartCommand(lastSentMessage));
         register(new HelpCommand(lastSentMessage));
         register(new MainMenuCommand(lastSentMessage));
-        register(new UserAdvertisements(lastSentMessage, sqlExecutor, telegramAPIRequests));
+        register(userAdvertisements);
         register(new DeleteAdvertisement(lastSentMessage, sqlExecutor));
         register(new NewAdvertisementCommand(lastSentMessage, advertisement, chosenTags));
         register(new NewAdvertisement_AddPhotos(lastSentMessage));
@@ -274,7 +288,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
             try {
                 ad.setPrice(Long.parseLong(msg.getText()));
             } catch (Exception e) {
-                logger.error("Invalid input from user");
+                LOGGER.error("Invalid input from user");
             }
             updateStateOnTextData(msg);
             return true;
@@ -352,7 +366,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                 try {
                     execute(sendMessage);
                 } catch (TelegramApiException e) {
-                    logger.error(String.format("Cannot send message: %s", e.getMessage()));
+                    LOGGER.error(String.format("Cannot send message: %s", e.getMessage()));
                 }
             }
             // ошибка в обработке сообщения пользователя, необходимо повторить данный шаг
@@ -388,7 +402,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
             Message sentMessage = execute(answer);
             lastSentMessage.put(chatId, sentMessage);
         } catch (TelegramApiException e) {
-            logger.error(String.format("Cannot execute command: %s", e.getMessage()));
+            LOGGER.error(String.format("Cannot execute command: %s", e.getMessage()));
         }
     }
 
@@ -504,7 +518,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                         sendAnswer(msg.getChatId(), SUCCESS_TEXT, null);
                     } else {
                         sendAnswer(msg.getChatId(), UNSUCCESS_TEXT, null);
-                        logger.error("Error while sending advertisement to channel.");
+                        LOGGER.error("Error while sending advertisement to channel.");
                     }
                 } else if (Objects.equals(dataParts[1], "no")) {
                     sendAnswer(msg.getChatId(), ADVERTISEMENT_CANCELLED_TEXT, null);
@@ -548,7 +562,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
                             .processMessage(this, msg, null);
                 }
             }
-            default -> logger.error(String.format("Unknown command in callback data: %s", callbackQuery));
+            default -> LOGGER.error(String.format("Unknown command in callback data: %s", callbackQuery));
         }
     }
 
@@ -564,7 +578,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         try {
             execute(editMessage);
         } catch (TelegramApiException e) {
-            logger.error(String.format("Cannot edit deleted message: %s", e.getMessage()));
+            LOGGER.error(String.format("Cannot edit deleted message: %s", e.getMessage()));
         }
     }
 
@@ -575,7 +589,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         try {
             execute(deleteLastMessage);
         } catch (TelegramApiException e) {
-            logger.error(String.format("Cannot delete last message due to: %s", e.getMessage()));
+            LOGGER.error(String.format("Cannot delete last message due to: %s", e.getMessage()));
         }
     }
 
@@ -589,7 +603,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot {
         try {
             execute(editMessageReplyMarkup);
         } catch (TelegramApiException e) {
-            logger.error(String.format("Cannot edit message reply markup due to: %s", e.getMessage()));
+            LOGGER.error(String.format("Cannot edit message reply markup due to: %s", e.getMessage()));
         }
     }
 

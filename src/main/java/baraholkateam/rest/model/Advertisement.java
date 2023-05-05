@@ -1,5 +1,11 @@
-package baraholkateam.util;
+package baraholkateam.rest.model;
 
+import baraholkateam.util.Tag;
+import baraholkateam.util.TagType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.PhotoSize;
@@ -7,24 +13,59 @@ import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "ActualAdvertisement")
 public class Advertisement {
-    public static String DESCRIPTION_TEXT = "Описание:";
-    private Long chatId;
-    private Long messageId;
-    private List<PhotoSize> photos = new ArrayList<>();
-    private String description;
-    private final List<Tag> tags = new ArrayList<>();
-    private Long price;
-    private String phone;
-    private List<String> contacts = new ArrayList<>();
-    private Long creationTime;
-    private Long nextUpdateTime;
-    private Integer updateAttempt;
-    private final Logger logger = LoggerFactory.getLogger(Advertisement.class);
 
-    public Advertisement(Long chatId) {
+    @Id
+    @Column(name = "message_id")
+    private Long messageId;
+
+    @Column(name = "owner_chat_id")
+    private Long ownerChatId;
+
+    @Column(name = "photos")
+    private List<PhotoSize> photos = new ArrayList<>();
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "tags")
+    private final List<Tag> tags = new ArrayList<>();
+
+    @Column(name = "price")
+    private Long price;
+
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "contacts")
+    private List<String> contacts = new ArrayList<>();
+
+    @Column(name = "creation_time")
+    private Long creationTime;
+
+    @Column(name = "next_update_time")
+    private Long nextUpdateTime;
+
+    @Column(name = "update_attempt")
+    private Integer updateAttempt;
+
+    public static final String DESCRIPTION_TEXT = "Описание:";
+    private static final String DESCRIPTION_BODY = """
+            %s
+
+            Цена: %s руб.
+
+            %s %s""";
+    private static final String PHONE_NUMBER = "Номер телефона: <span class=\"tg-spoiler\">%s</span>";
+    private static final String CONTACTS = "Контакты: ";
+    private static final String CONTACT = "<span class=\"tg-spoiler\">%s</span>";
+    private static final Logger LOGGER = LoggerFactory.getLogger(Advertisement.class);
+
+    public Advertisement(Long ownerChatId) {
         this.tags.add(Tag.Actual);
-        this.chatId = chatId;
+        this.ownerChatId = ownerChatId;
         updateAttempt = 0;
     }
 
@@ -39,29 +80,38 @@ public class Advertisement {
         updateAttempt = 0;
     }
 
-    public Long getChatId() {
-        if (chatId == null) {
-            logger.warn("Field 'chatId' of the advertisement is null!");
+    public Long getOwnerChatId() {
+        if (ownerChatId == null) {
+            LOGGER.warn("Field 'chatId' of the advertisement is null!");
         }
-        return chatId;
+        return ownerChatId;
     }
 
     public Long getMessageId() {
         if (messageId == null) {
-            logger.warn("Field 'messageId' of the advertisement is null!");
+            LOGGER.warn("Field 'messageId' of the advertisement is null!");
         }
         return messageId;
     }
 
     public List<PhotoSize> getPhotos() {
+        if (photos == null || photos.isEmpty()) {
+            LOGGER.warn("Field 'photos' of the advertisement is null!");
+        }
         return photos;
     }
 
     public String getDescription() {
+        if (description == null) {
+            LOGGER.warn("Field 'description' of the advertisement is null!");
+        }
         return description;
     }
 
     public List<Tag> getTags() {
+        if (tags.isEmpty()) {
+            LOGGER.warn("Field 'tags' of the advertisement is null!");
+        }
         return tags;
     }
 
@@ -94,24 +144,27 @@ public class Advertisement {
 
     public Long getCreationTime() {
         if (creationTime == null) {
-            logger.warn("Field 'creationTime' of the advertisement is null!");
+            LOGGER.warn("Field 'creationTime' of the advertisement is null!");
         }
         return creationTime;
     }
 
     public Long getNextUpdateTime() {
         if (nextUpdateTime == null) {
-            logger.warn("Field 'nextUpdateTime' of the advertisement is null!");
+            LOGGER.warn("Field 'nextUpdateTime' of the advertisement is null!");
         }
         return nextUpdateTime;
     }
 
     public Integer getUpdateAttempt() {
+        if (updateAttempt == null) {
+            LOGGER.warn("Field 'updateAttempt' of the advertisement is null!");
+        }
         return updateAttempt;
     }
 
-    public Advertisement setChatId(Long chatId) {
-        this.chatId = chatId;
+    public Advertisement setOwnerChatId(Long ownerChatId) {
+        this.ownerChatId = ownerChatId;
         return this;
     }
 
@@ -187,18 +240,13 @@ public class Advertisement {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(String.format("""
-            %s
-            
-            Цена: %s руб.
-            
-            %s %s""", tagsString, price, DESCRIPTION_TEXT, description));
+        sb.append(String.format(DESCRIPTION_BODY, tagsString, price, DESCRIPTION_TEXT, description));
         sb.append("\n");
 
         String phone = this.getPhone();
         if (phone != null) {
             sb.append("-".repeat(70));
-            sb.append("\n").append(String.format("Номер телефона: <span class=\"tg-spoiler\">%s</span>", phone));
+            sb.append("\n").append(String.format(PHONE_NUMBER, phone));
         }
 
         List<String> contacts = this.getContacts();
@@ -207,15 +255,15 @@ public class Advertisement {
                 sb.append("-".repeat(70));
             }
 
-            sb.append("\n");
+            sb.append("\n").append(CONTACTS);
             StringBuilder contactsString = new StringBuilder();
             for (String contact : contacts) {
-                contactsString.append(contact).append(", ");
+                contactsString.append(String.format(CONTACT, contact)).append(",\n");
             }
             if (contactsString.length() > 0) {
                 contactsString.setLength(contactsString.length() - 2);
             }
-            sb.append(String.format("Контакты: <span class=\"tg-spoiler\">%s</span>", contactsString));
+            sb.append(contactsString);
         }
         return sb.toString();
     }

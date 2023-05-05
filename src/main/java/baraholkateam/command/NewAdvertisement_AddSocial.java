@@ -19,7 +19,7 @@ public class NewAdvertisement_AddSocial extends Command {
 
     public NewAdvertisement_AddSocial(Map<Long, Message> lastSentMessage) {
         super(State.NewAdvertisement_AddSocial.getIdentifier(),
-                State.NewAdvertisement_AddSocial.getDescription(), lastSentMessage);
+                State.NewAdvertisement_AddSocial.getDescription());
     }
 
     @Override

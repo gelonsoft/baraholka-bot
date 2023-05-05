@@ -36,8 +36,8 @@ public final class BaraholkaBotProperties {
         CHANNEL_USERNAME = properties.getProperty("channel.username");
         CHANNEL_CHAT_ID = properties.getProperty("channel.chat_id");
         BOT_CHANNEL_ID = properties.getProperty("bot.channelId");
-        DB_URL = properties.getProperty("db.url");
-        DB_USER = properties.getProperty("db.user");
-        DB_PASS = properties.getProperty("db.password");
+        DB_URL = properties.getProperty("spring.datasource.url");
+        DB_USER = properties.getProperty("spring.datasource.username");
+        DB_PASS = properties.getProperty("spring.datasource.password");
     }
 }

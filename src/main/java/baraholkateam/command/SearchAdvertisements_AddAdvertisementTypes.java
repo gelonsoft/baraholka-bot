@@ -24,7 +24,7 @@ public class SearchAdvertisements_AddAdvertisementTypes extends Command {
                                                       SQLExecutor sqlExecutor,
                                                       Map<Long, State> previousState) {
         super(State.SearchAdvertisements_AddAdvertisementTypes.getIdentifier(),
-                State.SearchAdvertisements_AddAdvertisementTypes.getDescription(), lastSentMessage);
+                State.SearchAdvertisements_AddAdvertisementTypes.getDescription());
         this.chosenTags = chosenTags;
         this.sqlExecutor = sqlExecutor;
         this.previousState = previousState;

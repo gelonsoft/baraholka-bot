@@ -1,7 +1,7 @@
 package baraholkateam.database;
 
 import baraholkateam.bot.BaraholkaBotProperties;
-import baraholkateam.util.Advertisement;
+import baraholkateam.rest.model.Advertisement;
 import baraholkateam.util.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +66,7 @@ public class SQLExecutor {
         try {
             PreparedStatement insertNewAdvertisement = connection.prepareStatement(INSERT_NEW_ADVERTISEMENT);
 
-            insertNewAdvertisement.setLong(1, advertisement.getChatId());
+            insertNewAdvertisement.setLong(1, advertisement.getOwnerChatId());
             insertNewAdvertisement.setLong(2, advertisement.getMessageId());
             insertNewAdvertisement.setString(3, advertisement.getTags().stream()
                     .map(Tag::getName)

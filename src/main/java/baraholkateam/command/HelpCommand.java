@@ -22,7 +22,7 @@ public class HelpCommand extends Command {
     );
 
     public HelpCommand(Map<Long, Message> lastSentMessage) {
-        super(State.Help.getIdentifier(), State.Help.getDescription(), lastSentMessage);
+        super(State.Help.getIdentifier(), State.Help.getDescription());
     }
 
     @Override

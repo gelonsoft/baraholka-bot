@@ -20,7 +20,7 @@ public class SearchAdvertisements extends Command {
 
     public SearchAdvertisements(Map<Long, Message> lastSentMessage, Map<Long, String> chosenTags) {
         super(State.SearchAdvertisements.getIdentifier(),
-                State.SearchAdvertisements.getDescription(), lastSentMessage);
+                State.SearchAdvertisements.getDescription());
         this.chosenTags = chosenTags;
     }
 

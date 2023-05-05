@@ -20,7 +20,7 @@ public class SearchAdvertisements_AddProductCategories extends Command {
     public SearchAdvertisements_AddProductCategories(Map<Long, Message> lastSentMessage, Map<Long, String> chosenTags,
                                                      Map<Long, State> previousState) {
         super(State.SearchAdvertisements_AddProductCategories.getIdentifier(),
-                State.SearchAdvertisements_AddProductCategories.getDescription(), lastSentMessage);
+                State.SearchAdvertisements_AddProductCategories.getDescription());
         this.chosenTags = chosenTags;
         this.previousState = previousState;
     }

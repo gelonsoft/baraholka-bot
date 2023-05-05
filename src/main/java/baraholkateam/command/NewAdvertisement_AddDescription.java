@@ -14,7 +14,7 @@ public class NewAdvertisement_AddDescription extends Command {
 
     public NewAdvertisement_AddDescription(Map<Long, Message> lastSentMessage) {
         super(State.NewAdvertisement_AddDescription.getIdentifier(),
-                State.NewAdvertisement_AddDescription.getDescription(), lastSentMessage);
+                State.NewAdvertisement_AddDescription.getDescription());
     }
 
     @Override

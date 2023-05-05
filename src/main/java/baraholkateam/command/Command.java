@@ -4,6 +4,8 @@ import baraholkateam.util.Tag;
 import baraholkateam.util.TagType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public abstract class Command extends BotCommand {
     public static final String NEXT_BUTTON_TEXT = "Продолжить";
     public static final String NOT_CHOSEN_TAG = "➖ %s";
@@ -50,12 +53,13 @@ public abstract class Command extends BotCommand {
             Пожалуйста, вернитесь в главное меню /%s и попробуйте снова.""";
     static final String NO_HASHTAGS = "➖";
     static final String CHOSEN_HASHTAGS = "Текущие выбранные хэштеги: %s";
-    private final Map<Long, Message> lastSentMessage;
+
+    @Autowired
+    private Map<Long, Message> lastSentMessage;
     private final Logger logger = LoggerFactory.getLogger(Command.class);
 
-    public Command(String commandIdentifier, String description, Map<Long, Message> lastSentMessage) {
+    public Command(String commandIdentifier, String description) {
         super(commandIdentifier, description);
-        this.lastSentMessage = lastSentMessage;
     }
 
     void sendAnswer(AbsSender absSender, Long chatId, String commandName, String userName, String text,

@@ -1,6 +1,6 @@
 package baraholkateam.command;
 
-import baraholkateam.util.Advertisement;
+import baraholkateam.rest.model.Advertisement;
 import baraholkateam.util.State;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -22,7 +22,7 @@ public class NewAdvertisement_ConfirmPrice extends Command {
 
     public NewAdvertisement_ConfirmPrice(Map<Long, Message> lastSentMessage, Map<Long, Advertisement> advertisement) {
         super(State.NewAdvertisement_ConfirmPrice.getIdentifier(),
-                State.NewAdvertisement_ConfirmPrice.getDescription(), lastSentMessage);
+                State.NewAdvertisement_ConfirmPrice.getDescription());
         this.advertisement = advertisement;
     }
 

@@ -2,7 +2,7 @@ package baraholkateam.command;
 
 import baraholkateam.bot.BaraholkaBot;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
-import baraholkateam.util.Advertisement;
+import baraholkateam.rest.model.Advertisement;
 import baraholkateam.util.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class NewAdvertisement_Confirm extends Command {
     public NewAdvertisement_Confirm(Map<Long, Message> lastSentMessage, Map<Long, Advertisement> advertisement,
                                     TelegramAPIRequests telegramAPIRequests, BaraholkaBot bot) {
         super(State.NewAdvertisement_Confirm.getIdentifier(),
-                State.NewAdvertisement_Confirm.getDescription(), lastSentMessage);
+                State.NewAdvertisement_Confirm.getDescription());
         this.advertisement = advertisement;
         this.telegramAPIRequests = telegramAPIRequests;
         this.bot = bot;

@@ -13,8 +13,7 @@ public class NewAdvertisement_AddPhotos extends Command {
             Добавьте от 1 до 10 фотографий к вашему объявлению. Рекомендуемое число - 5.""";
 
     public NewAdvertisement_AddPhotos(Map<Long, Message> lastSentMessage) {
-        super(State.NewAdvertisement_AddPhotos.getIdentifier(), State.NewAdvertisement_AddPhotos.getDescription(),
-                lastSentMessage);
+        super(State.NewAdvertisement_AddPhotos.getIdentifier(), State.NewAdvertisement_AddPhotos.getDescription());
     }
 
     @Override

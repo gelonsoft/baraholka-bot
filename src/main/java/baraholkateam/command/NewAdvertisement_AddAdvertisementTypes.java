@@ -1,6 +1,6 @@
 package baraholkateam.command;
 
-import baraholkateam.util.Advertisement;
+import baraholkateam.rest.model.Advertisement;
 import baraholkateam.util.State;
 import baraholkateam.util.TagType;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -21,7 +21,7 @@ public class NewAdvertisement_AddAdvertisementTypes extends Command {
     public NewAdvertisement_AddAdvertisementTypes(Map<Long, Message> lastSentMessage,
                                                   Map<Long, Advertisement> advertisement) {
         super(State.NewAdvertisement_AddAdvertisementTypes.getIdentifier(),
-                State.NewAdvertisement_AddAdvertisementTypes.getDescription(), lastSentMessage);
+                State.NewAdvertisement_AddAdvertisementTypes.getDescription());
         this.advertisement = advertisement;
     }
 

@@ -5,6 +5,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,6 +14,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+@Component
 public class TelegramAPIRequests {
     private static final String FORWARD_MESSAGE = "https://api.telegram.org/bot%s/forwardMessage";
     private static final String GET_FILE = "https://api.telegram.org/bot%s/getFile";

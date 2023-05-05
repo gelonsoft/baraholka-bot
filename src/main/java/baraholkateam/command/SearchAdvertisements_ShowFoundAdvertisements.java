@@ -44,7 +44,7 @@ public class SearchAdvertisements_ShowFoundAdvertisements extends Command {
                                                         Map<Long, State> previousState,
                                                         TelegramAPIRequests telegramAPIRequests) {
         super(State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
-                State.SearchAdvertisements_ShowFoundAdvertisements.getDescription(), lastSentMessage);
+                State.SearchAdvertisements_ShowFoundAdvertisements.getDescription());
         this.chosenTags = chosenTags;
         this.sqlExecutor = sqlExecutor;
         this.telegramAPIRequests = telegramAPIRequests;

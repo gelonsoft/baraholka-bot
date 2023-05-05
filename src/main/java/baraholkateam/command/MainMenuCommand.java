@@ -18,7 +18,7 @@ public class MainMenuCommand extends Command {
             5. Получить справку по командам бота: /%s.""";
 
     public MainMenuCommand(Map<Long, Message> lastSentMessage) {
-        super(State.MainMenu.getIdentifier(), State.MainMenu.getDescription(), lastSentMessage);
+        super(State.MainMenu.getIdentifier(), State.MainMenu.getDescription());
     }
 
     @Override

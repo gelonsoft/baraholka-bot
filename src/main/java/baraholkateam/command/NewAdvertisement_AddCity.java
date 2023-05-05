@@ -23,7 +23,7 @@ public class NewAdvertisement_AddCity extends Command {
 
     public NewAdvertisement_AddCity(Map<Long, Message> lastSentMessage) {
         super(State.NewAdvertisement_AddCity.getIdentifier(),
-                State.NewAdvertisement_AddCity.getDescription(), lastSentMessage);
+                State.NewAdvertisement_AddCity.getDescription());
     }
 
     @Override
