@@ -80,10 +80,12 @@ header {
     font-size: 20px;
 }
 
-main {
+.app, main {
+    min-height: 100vh;
     padding: 20px 100px;
     display: flex;
     flex-direction: row;
+    height: fit-content;
 }
 
 .main__menu {
@@ -105,6 +107,11 @@ main {
     align-items: center;
 }
 
+a {
+    text-decoration: none;
+    color: black;
+}
+
 .main__menu-tab:hover {
     cursor: pointer;
 }
@@ -122,13 +129,17 @@ main {
     margin-right: 10px;
 }
 
-.main__form {
+.main {
     width: 100%;
     background-color: white;
     border-radius: 10px;
     padding: 30px 20px;
     border: solid 1px black;
     height: fit-content;
+}
+
+form {
+    text-align: left;
 }
 
 .main__form-title {
@@ -178,4 +189,6 @@ select {
     justify-content: space-between;
     flex-wrap: wrap;
 }
+
+
 
