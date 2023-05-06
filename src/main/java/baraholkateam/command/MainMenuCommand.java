@@ -1,13 +1,12 @@
 package baraholkateam.command;
 
 import baraholkateam.util.State;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
-import java.util.Map;
-
+@Component
 public class MainMenuCommand extends Command {
     private static final String MAIN_MENU = """
             Добро пожаловать в главное меню. Здесь Вы можете:
@@ -17,7 +16,7 @@ public class MainMenuCommand extends Command {
             4. Найти нужные объявления по хэштегам: /%s;
             5. Получить справку по командам бота: /%s.""";
 
-    public MainMenuCommand(Map<Long, Message> lastSentMessage) {
+    public MainMenuCommand() {
         super(State.MainMenu.getIdentifier(), State.MainMenu.getDescription());
     }
 

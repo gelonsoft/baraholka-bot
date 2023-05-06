@@ -1,8 +1,8 @@
 package baraholkateam.command;
 
 import baraholkateam.util.State;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -10,13 +10,13 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class NewAdvertisement_AddContacts extends Command {
+@Component
+public class NewAdvertisementAddContacts extends Command {
     private static final String ADD_CONTACTS_TEXT = """
             Желаете указать ваш номер телефона?""";
 
-    public NewAdvertisement_AddContacts(Map<Long, Message> lastSentMessage) {
+    public NewAdvertisementAddContacts() {
         super(State.NewAdvertisement_AddContacts.getIdentifier(),
                 State.NewAdvertisement_AddContacts.getDescription());
     }

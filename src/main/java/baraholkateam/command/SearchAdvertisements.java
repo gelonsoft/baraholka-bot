@@ -2,13 +2,14 @@ package baraholkateam.command;
 
 import baraholkateam.util.State;
 import baraholkateam.util.TagType;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.Map;
 
+@Component
 public class SearchAdvertisements extends Command {
     private static final String SEARCH_ADVERTISEMENTS = """
             Команда /%s позволяет искать объявления по одному или нескольким хэштегам.""";
@@ -18,7 +19,7 @@ public class SearchAdvertisements extends Command {
             Если не хотите выбирать ни одного города, то нажмите на кнопку '%s'.""";
     private final Map<Long, String> chosenTags;
 
-    public SearchAdvertisements(Map<Long, Message> lastSentMessage, Map<Long, String> chosenTags) {
+    public SearchAdvertisements(Map<Long, String> chosenTags) {
         super(State.SearchAdvertisements.getIdentifier(),
                 State.SearchAdvertisements.getDescription());
         this.chosenTags = chosenTags;

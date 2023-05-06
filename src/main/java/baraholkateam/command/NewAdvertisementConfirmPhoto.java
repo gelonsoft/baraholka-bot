@@ -1,8 +1,8 @@
 package baraholkateam.command;
 
 import baraholkateam.util.State;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -11,14 +11,14 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class NewAdvertisement_ConfirmPhoto extends Command {
+@Component
+public class NewAdvertisementConfirmPhoto extends Command {
     private static final String CONFIRM_PHOTOS_TEXT = """
             Фотографии успешно добавлены.
             Вы можете добавить еще или перейти к добавлению описания.""";
 
-    public NewAdvertisement_ConfirmPhoto(Map<Long, Message> lastSentMessage) {
+    public NewAdvertisementConfirmPhoto() {
         super(State.NewAdvertisement_ConfirmPhoto.getIdentifier(),
                 State.NewAdvertisement_ConfirmPhoto.getDescription());
     }

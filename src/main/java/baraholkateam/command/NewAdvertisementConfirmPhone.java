@@ -1,9 +1,10 @@
 package baraholkateam.command;
 
-import baraholkateam.rest.model.Advertisement;
+import baraholkateam.rest.service.CurrentAdvertisementService;
 import baraholkateam.util.State;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -11,25 +12,26 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class NewAdvertisement_ConfirmPhone extends Command {
+@Component
+public class NewAdvertisementConfirmPhone extends Command {
     private static final String PHONE_TEXT = """
             Ваш номер телефона: %s
             """;
     private static final String CONFIRM_PHONE_TEXT = """
             Желаете добавить ссылку на вашу социальную сеть?""";
-    private final Map<Long, Advertisement> advertisement;
 
-    public NewAdvertisement_ConfirmPhone(Map<Long, Message> lastSentMessage, Map<Long, Advertisement> advertisement) {
+    @Autowired
+    private CurrentAdvertisementService currentAdvertisementService;
+
+    public NewAdvertisementConfirmPhone() {
         super(State.NewAdvertisement_ConfirmPhone.getIdentifier(),
                 State.NewAdvertisement_ConfirmPhone.getDescription());
-        this.advertisement = advertisement;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        String phone = advertisement.get(chat.getId()).getPhone();
+        String phone = currentAdvertisementService.get(chat.getId()).getPhone();
         if (phone != null) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                     String.format(PHONE_TEXT, phone), null);

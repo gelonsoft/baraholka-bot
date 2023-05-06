@@ -1,7 +1,9 @@
 package baraholkateam.command;
 
+import baraholkateam.rest.service.LastSentMessageService;
 import baraholkateam.util.Tag;
 import baraholkateam.util.TagType;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public abstract class Command extends BotCommand {
@@ -53,10 +54,10 @@ public abstract class Command extends BotCommand {
             Пожалуйста, вернитесь в главное меню /%s и попробуйте снова.""";
     static final String NO_HASHTAGS = "➖";
     static final String CHOSEN_HASHTAGS = "Текущие выбранные хэштеги: %s";
+    private final Logger logger = LoggerFactory.getLogger(Command.class);
 
     @Autowired
-    private Map<Long, Message> lastSentMessage;
-    private final Logger logger = LoggerFactory.getLogger(Command.class);
+    private LastSentMessageService lastSentMessageService;
 
     public Command(String commandIdentifier, String description) {
         super(commandIdentifier, description);
@@ -75,7 +76,7 @@ public abstract class Command extends BotCommand {
 
         try {
             Message sentMessage = absSender.execute(message);
-            lastSentMessage.put(chatId, sentMessage);
+            lastSentMessageService.put(chatId, sentMessage);
         } catch (TelegramApiException e) {
             logger.error(String.format("Cannot execute command %s of user %s: %s", commandName, userName,
                     e.getMessage()));

@@ -1,18 +1,22 @@
 package baraholkateam.command;
 
-import baraholkateam.bot.BaraholkaBot;
+import baraholkateam.bot.TgFileLoader;
+import baraholkateam.rest.model.CurrentAdvertisement;
+import baraholkateam.rest.service.CurrentAdvertisementService;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
-import baraholkateam.rest.model.Advertisement;
 import baraholkateam.util.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Message;
-import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.media.InputMedia;
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
@@ -24,57 +28,60 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class NewAdvertisement_Confirm extends Command {
+@Component
+public class NewAdvertisementConfirm extends Command {
     private static final String CONTACTS_LIST_TEXT = """
             Добавлены ссылки на следующие социальные сети:
             %s""";
     private static final String CONFIRM_AD_TEXT = """
             Желаете опубликовать ваше объявление в канале?""";
-    private final Map<Long, Advertisement> advertisement;
-    private final TelegramAPIRequests telegramAPIRequests;
-    private final BaraholkaBot bot;
-    private static final Logger logger = LoggerFactory.getLogger(NewAdvertisement_Confirm.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewAdvertisementConfirm.class);
 
-    public NewAdvertisement_Confirm(Map<Long, Message> lastSentMessage, Map<Long, Advertisement> advertisement,
-                                    TelegramAPIRequests telegramAPIRequests, BaraholkaBot bot) {
-        super(State.NewAdvertisement_Confirm.getIdentifier(),
-                State.NewAdvertisement_Confirm.getDescription());
-        this.advertisement = advertisement;
-        this.telegramAPIRequests = telegramAPIRequests;
-        this.bot = bot;
+    @Autowired
+    private CurrentAdvertisementService currentAdvertisementService;
+
+    @Autowired
+    private TelegramAPIRequests telegramAPIRequests;
+
+    private final TgFileLoader tgFileLoader;
+
+    @Lazy
+    @Autowired
+    public NewAdvertisementConfirm(@Qualifier("BaraholkaBot") TgFileLoader tgFileLoader) {
+        super(State.NewAdvertisement_Confirm.getIdentifier(), State.NewAdvertisement_Confirm.getDescription());
+        this.tgFileLoader = tgFileLoader;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        Advertisement ad = advertisement.get(chat.getId());
+        CurrentAdvertisement ad = currentAdvertisementService.get(chat.getId());
 
         String text = ad.getAdvertisementText();
 
-        List<PhotoSize> photos = ad.getPhotos();
+        List<String> photoIds = ad.getPhotoIds();
 
         if (ad.getContacts() != null && !ad.getContacts().isEmpty()) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                     String.format(CONTACTS_LIST_TEXT, String.join("\n", ad.getContacts())), null);
         }
 
-        if (photos.size() == 1) {
-            sendPhotoMessage(absSender, chat.getId(), downloadPhoto(bot, photos.get(0)), text);
-        } else if (photos.size() > 1) {
+        if (photoIds.size() == 1) {
+            sendPhotoMessage(absSender, chat.getId(), downloadPhoto(photoIds.get(0)), text);
+        } else if (photoIds.size() > 1) {
             List<File> photoFiles = new ArrayList<>();
-            for (PhotoSize photoSize : photos) {
-                photoFiles.add(Objects.requireNonNull(downloadPhoto(bot, photoSize)));
+            for (String photoId : photoIds) {
+                photoFiles.add(Objects.requireNonNull(downloadPhoto(photoId)));
             }
             sendPhotoMediaGroup(absSender, chat.getId(), photoFiles, text);
         }
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                CONFIRM_AD_TEXT, getConfirmAdvertisement(photos));
+                CONFIRM_AD_TEXT, getConfirmAdvertisement(photoIds));
     }
 
     public Message sendPhotoMessage(AbsSender absSender, long chatId, File photoFile, String text) {
@@ -88,7 +95,7 @@ public class NewAdvertisement_Confirm extends Command {
         try {
             return absSender.execute(sendPhoto);
         } catch (TelegramApiException e) {
-            logger.error("Can't send photo message", e);
+            LOGGER.error("Can't send photo message", e);
             return null;
         }
     }
@@ -121,26 +128,26 @@ public class NewAdvertisement_Confirm extends Command {
         try {
             return absSender.execute(sendMediaGroup);
         } catch (TelegramApiException e) {
-            logger.error("Can't send photos with media group", e);
+            LOGGER.error("Can't send photos with media group", e);
             return null;
         }
     }
 
-    public File downloadPhoto(BaraholkaBot bot, PhotoSize photo) {
-        String filePath = telegramAPIRequests.getFilePath(photo.getFileId());
+    public File downloadPhoto(String photoId) {
+        String filePath = telegramAPIRequests.getFilePath(photoId);
 
         try {
-            return bot.downloadFile(filePath);
+            return tgFileLoader.downloadFileByFilePath(filePath);
         } catch (TelegramApiException e) {
-            logger.error("Cannot download photo", e);
+            LOGGER.error("Cannot download photo", e);
             return null;
         }
     }
 
-    private InlineKeyboardMarkup getConfirmAdvertisement(List<PhotoSize> photos) {
+    private InlineKeyboardMarkup getConfirmAdvertisement(List<String> photoIds) {
         InlineKeyboardButton yesButton = new InlineKeyboardButton();
         yesButton.setText("Да");
-        String yesCallbackData = String.format("%s %s %d", CONFIRM_AD_CALLBACK_DATA, "yes", photos.size() == 1 ? 0 : 1);
+        String yesCallbackData = String.format("%s %s %d", CONFIRM_AD_CALLBACK_DATA, "yes", photoIds.size() == 1 ? 0 : 1);
         yesButton.setCallbackData(yesCallbackData);
 
         InlineKeyboardButton noButton = new InlineKeyboardButton();

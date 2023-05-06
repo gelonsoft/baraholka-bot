@@ -8,48 +8,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Текущее создаваемое объявление
+ */
 @Entity
-@Table(name = "ActualAdvertisement")
-public class Advertisement {
-
-    @Id
-    @Column(name = "message_id")
-    private Long messageId;
-
-    @Column(name = "owner_chat_id")
-    private Long ownerChatId;
-
-    @Column(name = "photos")
-    private List<PhotoSize> photos = new ArrayList<>();
-
-    @Column(name = "description")
-    private String description;
-
-    @Column(name = "tags")
-    private final List<Tag> tags = new ArrayList<>();
-
-    @Column(name = "price")
-    private Long price;
-
-    @Column(name = "phone")
-    private String phone;
-
-    @Column(name = "contacts")
-    private List<String> contacts = new ArrayList<>();
-
-    @Column(name = "creation_time")
-    private Long creationTime;
-
-    @Column(name = "next_update_time")
-    private Long nextUpdateTime;
-
-    @Column(name = "update_attempt")
-    private Integer updateAttempt;
+@Table(name = "current_advertisement")
+public class CurrentAdvertisement {
 
     public static final String DESCRIPTION_TEXT = "Описание:";
     private static final String DESCRIPTION_BODY = """
@@ -61,56 +29,83 @@ public class Advertisement {
     private static final String PHONE_NUMBER = "Номер телефона: <span class=\"tg-spoiler\">%s</span>";
     private static final String CONTACTS = "Контакты: ";
     private static final String CONTACT = "<span class=\"tg-spoiler\">%s</span>";
-    private static final Logger LOGGER = LoggerFactory.getLogger(Advertisement.class);
 
-    public Advertisement(Long ownerChatId) {
-        this.tags.add(Tag.Actual);
-        this.ownerChatId = ownerChatId;
-        updateAttempt = 0;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CurrentAdvertisement.class);
+
+    @Id
+    @Column(name = "chat_id")
+    private Long chatId;
+
+    @Column(name = "message_id")
+    private Long messageId;
+
+    @Column(name = "photos", length = 1024)
+    private final List<String> photoIds = new ArrayList<>();
+
+    @Column(name = "description", length = 1024)
+    private String description;
+
+    @Column(name = "tags", length = 1024)
+    private final List<Tag> tags = new ArrayList<>();
+
+    @Column(name = "price")
+    private Long price;
+
+    @Column(name = "phone", length = 16)
+    private String phone;
+
+    @Column(name = "contacts", length = 256)
+    private final List<String> contacts = new ArrayList<>();
+
+    @Column(name = "creation_time")
+    private Long creationTime;
+
+    @Column(name = "next_update_time")
+    private Long nextUpdateTime;
+
+    @Column(name = "update_attempt")
+    private Integer updateAttempt;
+
+    public CurrentAdvertisement() {
+
     }
 
-    public Advertisement(List<PhotoSize> photos, String description, List<Tag> tags, Long price,
-                         List<String> contacts) {
+    public CurrentAdvertisement(Long chatId) {
         this.tags.add(Tag.Actual);
-        this.photos = photos;
-        this.description = description;
-        this.tags.addAll(tags);
-        this.price = price;
-        this.contacts = contacts;
-        updateAttempt = 0;
+        this.chatId = chatId;
     }
 
-    public Long getOwnerChatId() {
-        if (ownerChatId == null) {
-            LOGGER.warn("Field 'chatId' of the advertisement is null!");
+    public Long getChatId() {
+        if (chatId == null) {
+            LOGGER.error("Field 'chatId' of the current advertisement is null!");
         }
-        return ownerChatId;
+        return chatId;
     }
 
     public Long getMessageId() {
         if (messageId == null) {
-            LOGGER.warn("Field 'messageId' of the advertisement is null!");
+            LOGGER.error("Field 'messageId' of the current advertisement is null!");
         }
         return messageId;
     }
 
-    public List<PhotoSize> getPhotos() {
-        if (photos == null || photos.isEmpty()) {
-            LOGGER.warn("Field 'photos' of the advertisement is null!");
+    public List<String> getPhotoIds() {
+        if (photoIds.isEmpty()) {
+            LOGGER.error("Field 'photoIds' of the current advertisement is null!");
         }
-        return photos;
+        return photoIds;
     }
 
     public String getDescription() {
         if (description == null) {
-            LOGGER.warn("Field 'description' of the advertisement is null!");
+            LOGGER.error("Field 'description' of the current advertisement is null!");
         }
         return description;
     }
 
     public List<Tag> getTags() {
         if (tags.isEmpty()) {
-            LOGGER.warn("Field 'tags' of the advertisement is null!");
+            LOGGER.error("Field 'tags' of the current advertisement is null!");
         }
         return tags;
     }
@@ -144,83 +139,78 @@ public class Advertisement {
 
     public Long getCreationTime() {
         if (creationTime == null) {
-            LOGGER.warn("Field 'creationTime' of the advertisement is null!");
+            LOGGER.error("Field 'creationTime' of the current advertisement is null!");
         }
         return creationTime;
     }
 
     public Long getNextUpdateTime() {
         if (nextUpdateTime == null) {
-            LOGGER.warn("Field 'nextUpdateTime' of the advertisement is null!");
+            LOGGER.error("Field 'nextUpdateTime' of the current advertisement is null!");
         }
         return nextUpdateTime;
     }
 
     public Integer getUpdateAttempt() {
         if (updateAttempt == null) {
-            LOGGER.warn("Field 'updateAttempt' of the advertisement is null!");
+            LOGGER.error("Field 'updateAttempt' of the current advertisement is null!");
         }
         return updateAttempt;
     }
 
-    public Advertisement setOwnerChatId(Long ownerChatId) {
-        this.ownerChatId = ownerChatId;
+    public CurrentAdvertisement setMessageId(Long messageId) {
+        this.messageId = messageId;
         return this;
     }
 
-    public Advertisement setDescription(String description) {
+    public CurrentAdvertisement setDescription(String description) {
         this.description = description;
         return this;
     }
 
-    public Advertisement setPrice(Long price) {
+    public CurrentAdvertisement setPrice(Long price) {
         this.price = price;
         return this;
     }
 
-    public Advertisement setPhone(String phone) {
+    public CurrentAdvertisement setPhone(String phone) {
         this.phone = phone;
         return this;
     }
 
-    public Advertisement addSocial(String social) {
+    public CurrentAdvertisement addSocial(String social) {
         this.contacts.add(social);
         return this;
     }
 
-    public Advertisement addPhoto(PhotoSize photo) {
-        this.photos.add(photo);
+    public CurrentAdvertisement addPhoto(String photoId) {
+        this.photoIds.add(photoId);
         return this;
     }
 
-    public Advertisement addTags(List<String> tags) {
+    public CurrentAdvertisement addTags(List<String> tags) {
         for (String tagName : tags) {
             this.tags.add(Tag.getTagByName(tagName));
         }
         return this;
     }
 
-    public Advertisement addTag(String tag) {
+    public CurrentAdvertisement addTag(String tag) {
         tags.add(Tag.getTagByName(tag));
         return this;
     }
 
-    public Advertisement setMessageId(Long messageId) {
-        this.messageId = messageId;
-        return this;
-    }
-
-    public Advertisement setCreationTime(Long creationTime) {
+    public CurrentAdvertisement setCreationTime(Long creationTime) {
         this.creationTime = creationTime;
         return this;
     }
 
-    public Advertisement setNextUpdateTime(Long nextUpdateTime) {
+    public CurrentAdvertisement setNextUpdateTime(Long nextUpdateTime) {
         this.nextUpdateTime = nextUpdateTime;
         return this;
     }
 
-    public Advertisement setUpdateAttempt(Integer updateAttempt) {
+    public CurrentAdvertisement setUpdateAttempt(Integer updateAttempt) {
         this.updateAttempt = updateAttempt;
         return this;
     }

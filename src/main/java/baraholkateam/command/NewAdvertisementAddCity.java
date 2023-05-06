@@ -2,8 +2,8 @@ package baraholkateam.command;
 
 import baraholkateam.util.State;
 import baraholkateam.util.TagType;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -12,16 +12,16 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public class NewAdvertisement_AddCity extends Command {
+@Component
+public class NewAdvertisementAddCity extends Command {
     private static final String ADD_HASHTAGS_TEXT = """
             Описание успешно добавлено.
             Теперь необходимо добавить хэштеги.""";
     private static final String ADD_CITY_TEXT = """
             Выберите город, который хотите добавить:""";
 
-    public NewAdvertisement_AddCity(Map<Long, Message> lastSentMessage) {
+    public NewAdvertisementAddCity() {
         super(State.NewAdvertisement_AddCity.getIdentifier(),
                 State.NewAdvertisement_AddCity.getDescription());
     }

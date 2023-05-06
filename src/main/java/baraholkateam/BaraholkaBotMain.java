@@ -13,9 +13,10 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-@ComponentScan("baraholkateam.rest.repository.*")
-@EnableJpaRepositories("baraholkateam.rest.repository.*")
-@EntityScan("baraholkateam.rest.model.*")
+@ComponentScan("{ baraholkateam.bot, baraholkateam.command, baraholkateam.rest.notification, "
+        + "baraholkateam.rest.service, baraholkateam.telegram_api_requests }")
+@EnableJpaRepositories("baraholkateam.rest.repository")
+@EntityScan("baraholkateam.rest.model")
 @SpringBootApplication
 public class BaraholkaBotMain {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaraholkaBotMain.class);

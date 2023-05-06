@@ -1,10 +1,11 @@
-package baraholkateam.database;
+/*package baraholkateam.database;
 
 import baraholkateam.bot.BaraholkaBotProperties;
-import baraholkateam.rest.model.Advertisement;
+import baraholkateam.rest.model.ActualAdvertisement;
 import baraholkateam.util.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -26,6 +27,7 @@ import static baraholkateam.secure_constants.SecureConstants.UPDATE_ATTEMPT_NUMB
 import static baraholkateam.secure_constants.SecureConstants.UPDATE_NEXT_UPDATE_TIME;
 import static baraholkateam.secure_constants.SecureConstants.USER_ADS;
 
+@Component
 public class SQLExecutor {
     private final Connection connection;
     private final Logger logger = LoggerFactory.getLogger(SQLExecutor.class);
@@ -62,19 +64,19 @@ public class SQLExecutor {
         }
     }
 
-    public void insertNewAdvertisement(Advertisement advertisement) {
+    public void insertNewAdvertisement(ActualAdvertisement actualAdvertisement) {
         try {
             PreparedStatement insertNewAdvertisement = connection.prepareStatement(INSERT_NEW_ADVERTISEMENT);
 
-            insertNewAdvertisement.setLong(1, advertisement.getOwnerChatId());
-            insertNewAdvertisement.setLong(2, advertisement.getMessageId());
-            insertNewAdvertisement.setString(3, advertisement.getTags().stream()
+            insertNewAdvertisement.setLong(1, actualAdvertisement.getOwnerChatId());
+            insertNewAdvertisement.setLong(2, actualAdvertisement.getMessageId());
+            insertNewAdvertisement.setString(3, actualAdvertisement.getTags().stream()
                     .map(Tag::getName)
                     .collect(Collectors.joining(" ")));
-            insertNewAdvertisement.setString(4, advertisement.getAdvertisementText());
-            insertNewAdvertisement.setLong(5, advertisement.getCreationTime());
-            insertNewAdvertisement.setLong(6, advertisement.getNextUpdateTime());
-            insertNewAdvertisement.setInt(7, advertisement.getUpdateAttempt());
+            insertNewAdvertisement.setString(4, actualAdvertisement.getAdvertisementText());
+            insertNewAdvertisement.setLong(5, actualAdvertisement.getCreationTime());
+            insertNewAdvertisement.setLong(6, actualAdvertisement.getNextUpdateTime());
+            insertNewAdvertisement.setInt(7, actualAdvertisement.getUpdateAttempt());
 
             insertNewAdvertisement.executeUpdate();
         } catch (SQLException e) {
@@ -249,4 +251,4 @@ public class SQLExecutor {
             return updateAttempt;
         }
     }
-}
+}*/

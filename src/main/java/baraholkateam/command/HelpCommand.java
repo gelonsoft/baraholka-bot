@@ -1,14 +1,14 @@
 package baraholkateam.command;
 
 import baraholkateam.util.State;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.List;
-import java.util.Map;
 
+@Component
 public class HelpCommand extends Command {
     private static final String HELP_INFO = """
             Полный список команд:
@@ -21,7 +21,7 @@ public class HelpCommand extends Command {
             State.DeleteAdvertisement
     );
 
-    public HelpCommand(Map<Long, Message> lastSentMessage) {
+    public HelpCommand() {
         super(State.Help.getIdentifier(), State.Help.getDescription());
     }
 

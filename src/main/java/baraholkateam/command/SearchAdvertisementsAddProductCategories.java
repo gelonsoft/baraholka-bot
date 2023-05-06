@@ -1,37 +1,50 @@
 package baraholkateam.command;
 
+import baraholkateam.rest.service.ChosenTagsService;
+import baraholkateam.rest.service.PreviousStateService;
 import baraholkateam.util.State;
+import baraholkateam.util.Tag;
 import baraholkateam.util.TagType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
-import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class SearchAdvertisements_AddProductCategories extends Command {
+@Component
+public class SearchAdvertisementsAddProductCategories extends Command {
     private static final String CHOOSE_PRODUCT_CATEGORY = """
             Выберите категории товаров.
             Вы можете выбрать несколько хэштегов, нажав на них, либо не выбрать ни один.
             Для подтверждения выбора, нажмите на кнопку '%s'.""";
-    private final Map<Long, String> chosenTags;
-    private final Map<Long, State> previousState;
 
-    public SearchAdvertisements_AddProductCategories(Map<Long, Message> lastSentMessage, Map<Long, String> chosenTags,
-                                                     Map<Long, State> previousState) {
+    @Autowired
+    private ChosenTagsService chosenTagsService;
+
+    @Autowired
+    private PreviousStateService previousStateService;
+
+    public SearchAdvertisementsAddProductCategories() {
         super(State.SearchAdvertisements_AddProductCategories.getIdentifier(),
                 State.SearchAdvertisements_AddProductCategories.getDescription());
-        this.chosenTags = chosenTags;
-        this.previousState = previousState;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
-        String chosenTagsString = chosenTags.get(chat.getId());
+        List<Tag> tags = chosenTagsService.get(chat.getId());
 
-        if (previousState.get(chat.getId()) == State.SearchAdvertisements_AddAdvertisementTypes) {
+        if (previousStateService.get(chat.getId()) == State.SearchAdvertisements_AddAdvertisementTypes) {
+            String hashtags = NO_HASHTAGS;
+            if (tags != null && !tags.isEmpty()) {
+                hashtags = tags.stream()
+                        .map(Tag::getName)
+                        .collect(Collectors.joining(" "));
+            }
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                    String.format(CHOSEN_HASHTAGS, chosenTagsString == null ? NO_HASHTAGS : chosenTagsString),
+                    String.format(CHOSEN_HASHTAGS, hashtags),
                     showNextButton());
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                     String.format(CHOOSE_PRODUCT_CATEGORY, NEXT_BUTTON_TEXT),

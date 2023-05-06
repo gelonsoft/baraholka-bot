@@ -1,30 +1,30 @@
 package baraholkateam.command;
 
 import baraholkateam.bot.BaraholkaBotProperties;
-import baraholkateam.database.SQLExecutor;
+import baraholkateam.rest.model.ActualAdvertisement;
+import baraholkateam.rest.service.ActualAdvertisementService;
+import baraholkateam.rest.service.ChosenTagsService;
+import baraholkateam.rest.service.PreviousStateService;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
 import baraholkateam.util.State;
 import baraholkateam.util.Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import static baraholkateam.bot.BaraholkaBot.SEARCH_ADVERTISEMENTS_LIMIT;
 
-public class SearchAdvertisements_ShowFoundAdvertisements extends Command {
+@Component
+public class SearchAdvertisementsShowFoundAdvertisements extends Command {
     private static final String CANNOT_FIND_ADVERTISEMENTS = """
             По Вашему запросу ничего не нашлось.
             Вы можете вернуться в главное меню /%s или найти объявления по другим хэштегам /%s.""";
@@ -32,32 +32,37 @@ public class SearchAdvertisements_ShowFoundAdvertisements extends Command {
             По Вашему запросу нашлось объявлений: %d.
             Показывается не более %s самых актуальных объявлений.
             Вы можете вернуться в главное меню /%s или найти объявления по другим хэштегам /%s.""";
-    private final Map<Long, String> chosenTags;
-    private final SQLExecutor sqlExecutor;
-    private final TelegramAPIRequests telegramAPIRequests;
-    private final Map<Long, State> previousState;
-    private final Logger logger = LoggerFactory.getLogger(SearchAdvertisements_ShowFoundAdvertisements.class);
 
-    public SearchAdvertisements_ShowFoundAdvertisements(Map<Long, Message> lastSentMessage,
-                                                        Map<Long, String> chosenTags,
-                                                        SQLExecutor sqlExecutor,
-                                                        Map<Long, State> previousState,
-                                                        TelegramAPIRequests telegramAPIRequests) {
+    @Autowired
+    private ChosenTagsService chosenTagsService;
+
+    @Autowired
+    private TelegramAPIRequests telegramAPIRequests;
+
+    @Autowired
+    private ActualAdvertisementService actualAdvertisementService;
+
+    @Autowired
+    private PreviousStateService previousStateService;
+
+    public SearchAdvertisementsShowFoundAdvertisements() {
         super(State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
                 State.SearchAdvertisements_ShowFoundAdvertisements.getDescription());
-        this.chosenTags = chosenTags;
-        this.sqlExecutor = sqlExecutor;
-        this.telegramAPIRequests = telegramAPIRequests;
-        this.previousState = previousState;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
-        String chosenTagsString = chosenTags.get(chat.getId());
+        List<Tag> tags = chosenTagsService.get(chat.getId());
 
-        if (previousState.get(chat.getId()) == State.SearchAdvertisements_AddProductCategories) {
+        if (previousStateService.get(chat.getId()) == State.SearchAdvertisements_AddProductCategories) {
+            String hashtags = NO_HASHTAGS;
+            if (tags != null && !tags.isEmpty()) {
+                hashtags = tags.stream()
+                        .map(Tag::getName)
+                        .collect(Collectors.joining(" "));
+            }
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                    String.format(CHOSEN_HASHTAGS, chosenTagsString == null ? NO_HASHTAGS : chosenTagsString), null);
+                    String.format(CHOSEN_HASHTAGS, hashtags), null);
 
             int count = forwardMessages(chat.getId());
 
@@ -85,23 +90,18 @@ public class SearchAdvertisements_ShowFoundAdvertisements extends Command {
     }
 
     private int forwardMessages(Long chatId) {
-        if (chosenTags.get(chatId) == null) {
+        List<Tag> tags = chosenTagsService.get(chatId);
+        if (tags == null || tags.isEmpty()) {
             return 0;
         }
-        ResultSet messageIds = sqlExecutor.tagsSearch(Arrays.stream(chosenTags.get(chatId).split(" "))
-                .map(Tag::getTagByName)
-                .toList());
+        List<ActualAdvertisement> sortedAds = actualAdvertisementService.tagsSearch(tags.stream()
+                .map(Tag::getName)
+                .toArray(String[]::new));
         int count = 0;
-        while (true) {
-            try {
-                if (!messageIds.next()) break;
-                telegramAPIRequests.forwardMessage(BaraholkaBotProperties.CHANNEL_USERNAME, String.valueOf(chatId),
-                        messageIds.getLong("message_id"));
-                count++;
-            } catch (SQLException e) {
-                logger.error(String.format("Cannot handle sql: %s", e.getMessage()));
-                throw new RuntimeException("Failed to handle sql", e);
-            }
+        for (ActualAdvertisement sortedAd : sortedAds) {
+            telegramAPIRequests.forwardMessage(BaraholkaBotProperties.CHANNEL_USERNAME, String.valueOf(chatId),
+                    sortedAd.getMessageId());
+            count++;
         }
         return count;
     }

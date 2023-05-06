@@ -1,10 +1,12 @@
 package baraholkateam.command;
 
-import baraholkateam.rest.model.Advertisement;
+import baraholkateam.rest.model.CurrentAdvertisement;
+import baraholkateam.rest.service.CurrentAdvertisementService;
 import baraholkateam.util.State;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
@@ -16,25 +18,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class NewAdvertisementCommand extends Command {
     private static final String NEW_AD = """
             Команда /%s позволяет перейти к процессу создания нового объявления.
             Вам необходимо ответить на вопросы и заполнить макет объявления.
             Чтобы прервать создание, нужно вернуться в главное меню /%s.
             Добавьте фотографии к вашему объявлению.""";
-    private final Map<Long, Advertisement> advertisement;
+
+    @Autowired
+    private CurrentAdvertisementService currentAdvertisementService;
+
     private final Map<Long, String> chosenTags;
 
-    public NewAdvertisementCommand(Map<Long, Message> lastSentMessage, Map<Long, Advertisement> advertisement,
-                                   Map<Long, String> chosenTags) {
+    public NewAdvertisementCommand(Map<Long, String> chosenTags) {
         super(State.NewAdvertisement.getIdentifier(), State.NewAdvertisement.getDescription());
-        this.advertisement = advertisement;
         this.chosenTags = chosenTags;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        advertisement.put(chat.getId(), new Advertisement(chat.getId()));
+        currentAdvertisementService.put(new CurrentAdvertisement(chat.getId()));
         chosenTags.remove(chat.getId());
 
         SendMessage message = suggestAddingPhotos(chat.getId());
