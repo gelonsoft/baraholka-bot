@@ -7,10 +7,12 @@ import baraholkateam.rest.service.ActualAdvertisementService;
 import baraholkateam.rest.service.NotificationMessagesService;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
 import baraholkateam.util.Tag;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -28,8 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static baraholkateam.command.Command.ADVERTISEMENT_DELETE;
@@ -43,111 +43,116 @@ public class NotificationExecutor {
             Через %s часов объявление будет автоматически удалено, если не подтвердить его актуальность.""";
     private static final String ASK_NEXT_UPDATE = """
             Является ли данное объявление актуальным?""";
-    private static final int MAXIMUM_POOL_SIZE = Runtime.getRuntime().availableProcessors();
-    private static final int CORE_POOL_SIZE = MAXIMUM_POOL_SIZE > 2 ? MAXIMUM_POOL_SIZE - 2 : MAXIMUM_POOL_SIZE;
 
     /**
      * Период времени до первого уведомления пользователя о подтверждении актуальности объявления.
      */
-    public static final Long FIRST_REPEAT_NOTIFICATION_PERIOD = 14L;
+    public static final Long FIRST_REPEAT_NOTIFICATION_PERIOD = 10L;
 
     /**
      * Период времени до первого уведомления пользователя о подтверждении актуальности объявления.
      */
-    public static final TimeUnit FIRST_REPEAT_NOTIFICATION_TIME_UNIT = TimeUnit.DAYS;
+    public static final TimeUnit FIRST_REPEAT_NOTIFICATION_TIME_UNIT = TimeUnit.SECONDS;
 
     /**
      * Период времени до повторных уведомлений пользователя о подтверждении актуальности объявления.
      */
-    private static final Long REPEAT_NOTIFICATION_PERIOD = 24L;
+    private static final Long REPEAT_NOTIFICATION_PERIOD = 10L;
 
     /**
      * Период времени до повторных уведомлений пользователя о подтверждении актуальности объявления.
      */
-    private static final TimeUnit REPEAT_NOTIFICATION_TIME_UNIT = TimeUnit.HOURS;
+    private static final TimeUnit REPEAT_NOTIFICATION_TIME_UNIT = TimeUnit.SECONDS;
 
-    /**
-     * Период времени до очередной проверки актуальности объявлений (период работы ScheduleExecutor).
-     */
-    private static final Long SCHEDULE_NOTIFICATION_EXECUTOR_PERIOD = 1L;
-
-    /**
-     * Период времени до очередной проверки актуальности объявлений (период работы ScheduleExecutor).
-     */
-    private static final TimeUnit SCHEDULE_NOTIFICATION_EXECUTOR_TIME_UNIT = TimeUnit.HOURS;
-
-    private static final ScheduledExecutorService notificationExecutor =
-            Executors.newScheduledThreadPool(CORE_POOL_SIZE,
-                    new ThreadFactoryBuilder().setNameFormat("Notification-Executor-%d").build());
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationExecutor.class);
 
     @Autowired
-    private static TelegramAPIRequests telegramAPIRequests;
+    private TelegramAPIRequests telegramAPIRequests;
 
     @Autowired
-    private static BaraholkaBot sender;
+    private ActualAdvertisementService actualAdvertisementService;
 
     @Autowired
-    private static ActualAdvertisementService actualAdvertisementService;
+    private NotificationMessagesService notificationMessagesService;
 
+    private final BaraholkaBot sender;
+
+    @Lazy
     @Autowired
-    private static NotificationMessagesService notificationMessagesService;
-
-    public static void startNotificationExecutor() {
-        notificationExecutor.scheduleAtFixedRate(() -> {
-            List<ActualAdvertisement> actualAdvertisements =
-                         actualAdvertisementService.askActualAdvertisements(System.currentTimeMillis());
-            for (ActualAdvertisement actualAdvertisement : actualAdvertisements) {
-                int attemptNum = actualAdvertisement.getUpdateAttempt();
-                long chatId = actualAdvertisement.getOwnerChatId();
-                long messageId = actualAdvertisement.getMessageId();
-                if (attemptNum == 3) {
-                    editAdText(sender, String.valueOf(messageId));
-                    actualAdvertisementService.removeAdvertisement(messageId);
-                    deleteMessages(sender, chatId, messageId);
-                    sendMessageWithoutDelete(sender, chatId, ADVERTISEMENT_DELETE, null);
-                } else if (attemptNum <= 2) {
-                    actualAdvertisementService.setUpdateAttempt(messageId, attemptNum + 1);
-                    Long forwardedMessageId =
-                            telegramAPIRequests.forwardMessage(BaraholkaBotProperties.CHANNEL_USERNAME,
-                                    String.valueOf(chatId), messageId);
-
-                    if (attemptNum == 2) {
-                        deleteMessages(sender, chatId, messageId);
-                        sendMessage(sender, chatId, messageId,
-                                String.format("%s\n%s", String.format(DELETE_IF_NOT_UPDATE,
-                                        REPEAT_NOTIFICATION_PERIOD), ASK_NEXT_UPDATE), ifNextUpdate(chatId,
-                                        messageId,
-                                        REPEAT_NOTIFICATION_TIME_UNIT.toMillis(REPEAT_NOTIFICATION_PERIOD)));
-                    } else if (attemptNum == 1) {
-                        deleteMessages(sender, chatId, messageId);
-                        sendMessage(sender, chatId, messageId, ASK_NEXT_UPDATE, ifNextUpdate(chatId, messageId,
-                                        REPEAT_NOTIFICATION_TIME_UNIT.toMillis(REPEAT_NOTIFICATION_PERIOD)));
-                    } else {
-                        sendMessage(sender, chatId, messageId, ASK_NEXT_UPDATE, ifNextUpdate(chatId, messageId,
-                                        FIRST_REPEAT_NOTIFICATION_TIME_UNIT
-                                                .toMillis(FIRST_REPEAT_NOTIFICATION_PERIOD)));
-                    }
-
-                    Message forwardedMessage = new Message();
-                    forwardedMessage.setMessageId(Math.toIntExact(forwardedMessageId));
-                    Chat chat = new Chat();
-                    chat.setId(chatId);
-                    forwardedMessage.setChat(chat);
-
-                    addNotificationMessage(forwardedMessage, chatId, messageId);
-                } else {
-                    LOGGER.error(
-                            String.format("Incorrect number of update attempt: %d. Chat id: %d, message id: %d",
-                                    attemptNum, chatId, messageId)
-                    );
-                }
-            }
-        }, SCHEDULE_NOTIFICATION_EXECUTOR_PERIOD, SCHEDULE_NOTIFICATION_EXECUTOR_PERIOD,
-        SCHEDULE_NOTIFICATION_EXECUTOR_TIME_UNIT);
+    public NotificationExecutor(@Qualifier("BaraholkaBot") BaraholkaBot sender) {
+        this.sender = sender;
     }
 
-    private static void sendMessage(AbsSender sender, long chatId, long messageId, String text,
+    @Scheduled(initialDelayString = "${notificator.initial-delay-in-milliseconds}",
+            fixedRateString = "${notificator.fixed-rate-in-milliseconds}")
+    private void startNotificationExecutor() {
+        List<ActualAdvertisement> actualAdvertisements =
+                     actualAdvertisementService.askActualAdvertisements(System.currentTimeMillis());
+        for (ActualAdvertisement actualAdvertisement : actualAdvertisements) {
+            int attemptNum = actualAdvertisement.getUpdateAttempt();
+            long chatId = actualAdvertisement.getOwnerChatId();
+            long messageId = actualAdvertisement.getMessageId();
+            if (attemptNum == 3) {
+                editAdText(sender, String.valueOf(messageId));
+                actualAdvertisementService.removeAdvertisement(messageId);
+                deleteMessages(sender, chatId, messageId);
+                sendMessageWithoutDelete(sender, chatId, ADVERTISEMENT_DELETE, null);
+            } else if (attemptNum <= 2) {
+                actualAdvertisementService.setUpdateAttempt(messageId, attemptNum + 1);
+                Long forwardedMessageId =
+                        telegramAPIRequests.forwardMessage(BaraholkaBotProperties.CHANNEL_USERNAME,
+                                String.valueOf(chatId), messageId);
+
+                if (attemptNum == 2) {
+                    deleteMessages(sender, chatId, messageId);
+                    sendMessage(sender, chatId, messageId,
+                            String.format("%s\n%s", String.format(DELETE_IF_NOT_UPDATE,
+                                    REPEAT_NOTIFICATION_PERIOD), ASK_NEXT_UPDATE), ifNextUpdate(chatId,
+                                    messageId,
+                                    REPEAT_NOTIFICATION_TIME_UNIT.toMillis(REPEAT_NOTIFICATION_PERIOD)));
+                } else if (attemptNum == 1) {
+                    deleteMessages(sender, chatId, messageId);
+                    sendMessage(sender, chatId, messageId, ASK_NEXT_UPDATE, ifNextUpdate(chatId, messageId,
+                                    REPEAT_NOTIFICATION_TIME_UNIT.toMillis(REPEAT_NOTIFICATION_PERIOD)));
+                } else {
+                    sendMessage(sender, chatId, messageId, ASK_NEXT_UPDATE, ifNextUpdate(chatId, messageId,
+                                    FIRST_REPEAT_NOTIFICATION_TIME_UNIT
+                                            .toMillis(FIRST_REPEAT_NOTIFICATION_PERIOD)));
+                }
+
+                Message forwardedMessage = new Message();
+                forwardedMessage.setMessageId(Math.toIntExact(forwardedMessageId));
+                Chat chat = new Chat();
+                chat.setId(chatId);
+                forwardedMessage.setChat(chat);
+
+                addNotificationMessage(forwardedMessage, chatId, messageId);
+            } else {
+                LOGGER.error(
+                        String.format("Incorrect number of update attempt: %d. Chat id: %d, message id: %d",
+                                attemptNum, chatId, messageId)
+                );
+            }
+        }
+    }
+
+    public void deleteMessages(AbsSender absSender, Long chatId, Long messageId) {
+        DeleteMessage deleteLastMessage = new DeleteMessage();
+        if (notificationMessagesService.get(chatId) != null) {
+            for (Message message : notificationMessagesService.get(chatId).get(messageId)) {
+                deleteLastMessage.setMessageId(message.getMessageId());
+                deleteLastMessage.setChatId(message.getChatId());
+                try {
+                    absSender.execute(deleteLastMessage);
+                } catch (TelegramApiException e) {
+                    LOGGER.error(String.format("Cannot delete message due to: %s", e.getMessage()));
+                }
+            }
+            notificationMessagesService.removeMessage(chatId, messageId);
+        }
+    }
+
+    private void sendMessage(AbsSender sender, long chatId, long messageId, String text,
                                     InlineKeyboardMarkup buttons) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
@@ -163,7 +168,7 @@ public class NotificationExecutor {
         }
     }
 
-    private static void sendMessageWithoutDelete(AbsSender sender, long chatId, String text,
+    private void sendMessageWithoutDelete(AbsSender sender, long chatId, String text,
                                                  InlineKeyboardMarkup buttons) {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
@@ -178,22 +183,29 @@ public class NotificationExecutor {
         }
     }
 
-    private static void addNotificationMessage(Message message, Long chatId, Long messageId) {
-        if (notificationMessagesService.get(chatId) == null) {
+    private void addNotificationMessage(Message message, Long chatId, Long messageId) {
+        Map<Long, List<Message>> currentMessagesMap = notificationMessagesService.get(chatId);
+        if (currentMessagesMap == null) {
             Map<Long, List<Message>> newMessagesMap = new ConcurrentHashMap<>();
             List<Message> newMessage = new CopyOnWriteArrayList<>();
             newMessage.add(message);
             newMessagesMap.put(messageId, newMessage);
             notificationMessagesService.put(chatId, newMessagesMap);
         } else {
-            Map<Long, List<Message>> currentMessagesMap = notificationMessagesService.get(chatId);
-            currentMessagesMap.computeIfAbsent(messageId, k -> new CopyOnWriteArrayList<>());
-            currentMessagesMap.get(messageId).add(message);
+            List<Message> findMessages = currentMessagesMap.get(messageId);
+            List<Message> currentMessage;
+            if (findMessages == null) {
+                currentMessage = new CopyOnWriteArrayList<>();
+            } else {
+                currentMessage = new CopyOnWriteArrayList<>(currentMessagesMap.get(messageId));
+            }
+            currentMessage.add(message);
+            currentMessagesMap.put(messageId, currentMessage);
             notificationMessagesService.put(chatId, currentMessagesMap);
         }
     }
 
-    private static InlineKeyboardMarkup ifNextUpdate(long chatId, long messageId, long addNextUpdateTime) {
+    private InlineKeyboardMarkup ifNextUpdate(long chatId, long messageId, long addNextUpdateTime) {
         List<List<InlineKeyboardButton>> answers = new ArrayList<>(1);
         List<InlineKeyboardButton> yesNoAnswer = new ArrayList<>(1);
         yesNoAnswer.add(InlineKeyboardButton.builder()
@@ -211,23 +223,7 @@ public class NotificationExecutor {
         return ikm;
     }
 
-    public static void deleteMessages(AbsSender absSender, Long chatId, Long messageId) {
-        DeleteMessage deleteLastMessage = new DeleteMessage();
-        if (notificationMessagesService.get(chatId) != null) {
-            for (Message message : notificationMessagesService.get(chatId).get(messageId)) {
-                deleteLastMessage.setMessageId(message.getMessageId());
-                deleteLastMessage.setChatId(message.getChatId());
-                try {
-                    absSender.execute(deleteLastMessage);
-                } catch (TelegramApiException e) {
-                    LOGGER.error(String.format("Cannot delete message due to: %s", e.getMessage()));
-                }
-            }
-            notificationMessagesService.removeMessage(chatId, messageId);
-        }
-    }
-
-    public static void editAdText(AbsSender absSender, String messageId) {
+    private void editAdText(AbsSender absSender, String messageId) {
         EditMessageCaption editMessage = new EditMessageCaption();
         String editedText = String.format("%s\n\n%s", NOT_ACTUAL_TEXT,
                 actualAdvertisementService.adText(Long.parseLong(messageId))

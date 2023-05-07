@@ -122,6 +122,9 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
     private PreviousStateService previousStateService;
 
     @Autowired
+    private NotificationExecutor notificationExecutor;
+
+    @Autowired
     private TelegramAPIRequests telegramAPIRequests;
 
     @Autowired
@@ -202,8 +205,6 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         this.botToken = botToken;
 
         nonCommand = new NonCommand();
-
-        NotificationExecutor.startNotificationExecutor();
     }
 
     @Override
@@ -642,7 +643,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                     actualAdvertisementService.setUpdateAttempt(messageId, 0);
                     sendAnswer(chatId, ADVERTISEMENT_SUCCESSFUL_UPDATE, null);
                 }
-                NotificationExecutor.deleteMessages(this, chatId, messageId);
+                notificationExecutor.deleteMessages(this, chatId, messageId);
             }
             case DELETE_CALLBACK_TEXT -> {
                 long messageId = Long.parseLong(dataParts[1]);

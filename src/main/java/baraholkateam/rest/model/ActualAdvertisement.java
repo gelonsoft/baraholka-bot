@@ -123,7 +123,7 @@ public class ActualAdvertisement {
     public String getTagsOfType(TagType tagType) {
         StringBuilder sb = new StringBuilder();
         for (String tag : tags) {
-            if (Objects.equals(tag, tagType.name())) {
+            if (Objects.equals(Objects.requireNonNull(Tag.getTagByName(tag)).getTagType(), tagType)) {
                 sb
                         .append(tag)
                         .append(" ");

@@ -12,6 +12,7 @@ import java.util.List;
  */
 @Repository
 public interface ActualAdvertisementRepository extends JpaRepository<ActualAdvertisement, Long> {
+
     List<ActualAdvertisement> findAllByNextUpdateTimeLessThanEqual(Long currentTime);
 
     List<ActualAdvertisement> findAllByOwnerChatId(Long ownerChatId);
@@ -19,4 +20,5 @@ public interface ActualAdvertisementRepository extends JpaRepository<ActualAdver
     @Query(value = "SELECT * FROM \"actual_advertisement\" WHERE ?1 <@ tags ORDER BY creation_time DESC LIMIT ?2",
             nativeQuery = true)
     List<ActualAdvertisement> findAllByTagsIn(String[] tags, Integer limit);
+
 }
