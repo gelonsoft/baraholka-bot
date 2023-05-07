@@ -3,7 +3,6 @@ package baraholkateam.command;
 import baraholkateam.rest.service.LastSentMessageService;
 import baraholkateam.util.Tag;
 import baraholkateam.util.TagType;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,6 @@ public abstract class Command extends BotCommand {
     public static final String NOT_CHOSEN_TAG = "➖ %s";
     public static final String TAG_CALLBACK_DATA = "tag";
     public static final String TAGS_CALLBACK_DATA = "tags";
-
     public static final String PHONE_CALLBACK_DATA = "phone";
     public static final String SOCIAL_CALLBACK_DATA = "social";
     public static final String CONFIRM_AD_CALLBACK_DATA = "confirm_ad";
@@ -49,6 +47,16 @@ public abstract class Command extends BotCommand {
     public static final String ADVERTISEMENT_SUCCESSFUL_DELETE = "Объявление было удалено.";
     public static final String ADVERTISEMENT_DELETE =
             "Объявление было автоматически удалено после 3 попыток уточнения его актуальности.";
+    public static final String SWEAR_WORD_DETECTOR = "(?iu)\\b((у|[нз]а|(хитро|не)?вз?[ыьъ]|с[ьъ]|(и|ра)[зс]ъ?|"
+            + "(о[тб]|под)[ьъ]?|(.\\B)+?[оаеи])?-?([её]б(?!о[рй])|и[пб][ае][тц]).*?|(н[иеа]|([дп]|верт)о|ра[зс]|"
+            + "з?а|с(ме)?|о(т|дно)?|апч)?-?ху([яйиеёю]|ли(?!ган)).*?|(в[зы]|(три|два|четыре)жды|(н|сук)а)?"
+            + "-?бл(я(?!(х|ш[кн]|мб)[ауеыио]).*?|[еэ][дт]ь?)|(ра[сз]|[зн]а|[со]|вы?|п(ере|р[оие]|од)|и[зс]ъ?|[ао]т)?п"
+            + "[иеё]зд.*?|(за)?п[ие]д[аое]?р(ну.*?|[оа]м|(ас)?(и(ли)?[нщктл]ь?)?|(о(ч[еи])?|ас)?к(ой)|юг)[ауеы]?"
+            + "|манд([ауеыи](л(и[сзщ])?[ауеиы])?|ой|[ао]вошь?(е?к[ауе])?|юк(ов|[ауи])?)|муд([яаио].*?|е?н([ьюия]|ей))"
+            + "|мля([тд]ь)?|лять|([нз]а|по)х|м[ао]л[ао]фь([яию]|[еёо]й))\\b";
+    public static final String AD_SWEAR_WORD_DETECTED = """
+            Возможно, Ваше описание содержало ненормативную лексику.
+            Пожалуйста, введите измененный текст""";
     static final String INCORRECT_PREVIOUS_STATE = """
             Невозможно выполнить текущую команду.
             Пожалуйста, вернитесь в главное меню /%s и попробуйте снова.""";

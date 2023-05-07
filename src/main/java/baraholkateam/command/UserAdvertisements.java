@@ -34,7 +34,8 @@ public class UserAdvertisements extends Command {
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
-        List<ActualAdvertisement> actualAdvertisements = actualAdvertisementRepository.findAllByOwnerChatId(chat.getId());
+        List<ActualAdvertisement> actualAdvertisements = actualAdvertisementRepository
+                .findAllByOwnerChatId(chat.getId());
 
         if (actualAdvertisements != null && !actualAdvertisements.isEmpty()) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),

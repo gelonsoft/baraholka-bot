@@ -11,9 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * Текущее создаваемое объявление
+ * Текущее создаваемое объявление.
  */
 @Entity
 @Table(name = "current_advertisement")
@@ -46,7 +47,7 @@ public class CurrentAdvertisement {
     private String description;
 
     @Column(name = "tags", length = 1024)
-    private final List<Tag> tags = new ArrayList<>();
+    private final List<String> tags = new ArrayList<>();
 
     @Column(name = "price")
     private Long price;
@@ -71,7 +72,7 @@ public class CurrentAdvertisement {
     }
 
     public CurrentAdvertisement(Long chatId) {
-        this.tags.add(Tag.Actual);
+        this.tags.add(Tag.Actual.getName());
         this.chatId = chatId;
     }
 
@@ -103,7 +104,7 @@ public class CurrentAdvertisement {
         return description;
     }
 
-    public List<Tag> getTags() {
+    public List<String> getTags() {
         if (tags.isEmpty()) {
             LOGGER.error("Field 'tags' of the current advertisement is null!");
         }
@@ -112,10 +113,10 @@ public class CurrentAdvertisement {
 
     public String getTagsOfType(TagType tagType) {
         StringBuilder sb = new StringBuilder();
-        for (Tag tag : tags) {
-            if (tag.getTagType() == tagType) {
+        for (String tag : tags) {
+            if (Objects.equals(tag, tagType.name())) {
                 sb
-                        .append(tag.getName())
+                        .append(tag)
                         .append(" ");
             }
         }
@@ -189,14 +190,12 @@ public class CurrentAdvertisement {
     }
 
     public CurrentAdvertisement addTags(List<String> tags) {
-        for (String tagName : tags) {
-            this.tags.add(Tag.getTagByName(tagName));
-        }
+        this.tags.addAll(tags);
         return this;
     }
 
     public CurrentAdvertisement addTag(String tag) {
-        tags.add(Tag.getTagByName(tag));
+        tags.add(tag);
         return this;
     }
 
@@ -216,10 +215,10 @@ public class CurrentAdvertisement {
     }
 
     public String getAdvertisementText() {
-        List<Tag> tags = this.getTags();
+        List<String> tags = this.getTags();
         StringBuilder tagsString = new StringBuilder();
-        for (Tag tag : tags) {
-            tagsString.append(tag.getName()).append(" ");
+        for (String tag : tags) {
+            tagsString.append(tag).append(" ");
         }
         if (tagsString.length() > 1) {
             tagsString.setLength(tagsString.length() - 1);

@@ -147,7 +147,8 @@ public class NewAdvertisementConfirm extends Command {
     private InlineKeyboardMarkup getConfirmAdvertisement(List<String> photoIds) {
         InlineKeyboardButton yesButton = new InlineKeyboardButton();
         yesButton.setText("Да");
-        String yesCallbackData = String.format("%s %s %d", CONFIRM_AD_CALLBACK_DATA, "yes", photoIds.size() == 1 ? 0 : 1);
+        String yesCallbackData = String.format("%s %s %d", CONFIRM_AD_CALLBACK_DATA, "yes",
+                photoIds.size() == 1 ? 0 : 1);
         yesButton.setCallbackData(yesCallbackData);
 
         InlineKeyboardButton noButton = new InlineKeyboardButton();

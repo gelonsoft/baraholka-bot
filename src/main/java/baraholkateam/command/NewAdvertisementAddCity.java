@@ -22,8 +22,7 @@ public class NewAdvertisementAddCity extends Command {
             Выберите город, который хотите добавить:""";
 
     public NewAdvertisementAddCity() {
-        super(State.NewAdvertisement_AddCity.getIdentifier(),
-                State.NewAdvertisement_AddCity.getDescription());
+        super(State.NewAdvertisement_AddCity.getIdentifier(), State.NewAdvertisement_AddCity.getDescription());
     }
 
     @Override

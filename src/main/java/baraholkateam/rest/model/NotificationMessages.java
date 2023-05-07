@@ -1,12 +1,14 @@
 package baraholkateam.rest.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.util.List;
-
 /**
- * Сообщения, отправляемые пользователю во время уточнения актуальности уведомлений
+ * Сообщения, отправляемые пользователю во время уточнения актуальности уведомлений.
  */
 @Entity
 @IdClass(NotificationMessagesId.class)

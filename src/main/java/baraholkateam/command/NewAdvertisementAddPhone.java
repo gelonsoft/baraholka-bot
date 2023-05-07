@@ -13,8 +13,7 @@ public class NewAdvertisementAddPhone extends Command {
             +7-xxx-xxx-xx-xx""";
 
     public NewAdvertisementAddPhone() {
-        super(State.NewAdvertisement_AddPhone.getIdentifier(),
-                State.NewAdvertisement_AddPhone.getDescription());
+        super(State.NewAdvertisement_AddPhone.getIdentifier(), State.NewAdvertisement_AddPhone.getDescription());
     }
 
     @Override

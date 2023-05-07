@@ -11,9 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
- * Опубликованное актуальное объявление
+ * Опубликованное актуальное объявление.
  */
 @Entity
 @Table(name = "actual_advertisement")
@@ -45,7 +46,7 @@ public class ActualAdvertisement {
     private String description;
 
     @Column(name = "tags", length = 1024)
-    private final List<Tag> tags = new ArrayList<>();
+    private final List<String> tags = new ArrayList<>();
 
     @Column(name = "price")
     private Long price;
@@ -75,10 +76,10 @@ public class ActualAdvertisement {
 
     public ActualAdvertisement(List<String> photoIds, String description, List<Tag> tags, Long price,
                                List<String> contacts) {
-        this.tags.add(Tag.Actual);
+        this.tags.add(Tag.Actual.getName());
         this.photoIds = photoIds;
         this.description = description;
-        this.tags.addAll(tags);
+        this.tags.addAll(tags.stream().map(Tag::getName).toList());
         this.price = price;
         this.contacts = contacts;
         updateAttempt = 0;
@@ -112,7 +113,7 @@ public class ActualAdvertisement {
         return description;
     }
 
-    public List<Tag> getTags() {
+    public List<String> getTags() {
         if (tags.isEmpty()) {
             LOGGER.warn("Field 'tags' of the actual advertisement is null!");
         }
@@ -121,10 +122,10 @@ public class ActualAdvertisement {
 
     public String getTagsOfType(TagType tagType) {
         StringBuilder sb = new StringBuilder();
-        for (Tag tag : tags) {
-            if (tag.getTagType() == tagType) {
+        for (String tag : tags) {
+            if (Objects.equals(tag, tagType.name())) {
                 sb
-                        .append(tag.getName())
+                        .append(tag)
                         .append(" ");
             }
         }
@@ -208,14 +209,12 @@ public class ActualAdvertisement {
     }
 
     public ActualAdvertisement addTags(List<String> tags) {
-        for (String tagName : tags) {
-            this.tags.add(Tag.getTagByName(tagName));
-        }
+        this.tags.addAll(tags);
         return this;
     }
 
     public ActualAdvertisement addTag(String tag) {
-        tags.add(Tag.getTagByName(tag));
+        tags.add(tag);
         return this;
     }
 
@@ -240,10 +239,10 @@ public class ActualAdvertisement {
     }
 
     public String getAdvertisementText() {
-        List<Tag> tags = this.getTags();
+        List<String> tags = this.getTags();
         StringBuilder tagsString = new StringBuilder();
-        for (Tag tag : tags) {
-            tagsString.append(tag.getName()).append(" ");
+        for (String tag : tags) {
+            tagsString.append(tag).append(" ");
         }
         if (tagsString.length() > 1) {
             tagsString.setLength(tagsString.length() - 1);

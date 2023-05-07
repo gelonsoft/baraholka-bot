@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 /**
- * Сервис взаимодействия с сущностью "PreviousState"
+ * Сервис взаимодействия с сущностью "PreviousState".
  */
 @Service
 public class PreviousStateService {

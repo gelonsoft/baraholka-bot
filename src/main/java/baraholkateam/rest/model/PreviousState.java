@@ -7,17 +7,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * Предыдущее состояние бота
+ * Предыдущее состояние бота.
  */
 @Entity
 @Table(name = "previous_state")
 public class PreviousState {
     @Id
-    @Column
+    @Column(name = "chat_id")
     private Long chatId;
 
-    @Column
-    private State state;
+    @Column(name = "state", length = 64)
+    private String state;
 
     public PreviousState() {
 
@@ -25,7 +25,7 @@ public class PreviousState {
 
     public PreviousState(Long chatId, State state) {
         this.chatId = chatId;
-        this.state = state;
+        this.state = state.getIdentifier();
     }
 
     public Long getChatId() {
@@ -33,7 +33,7 @@ public class PreviousState {
     }
 
     public State getState() {
-        return state;
+        return State.findState(state);
     }
 
     public void setChatId(Long chatId) {
@@ -41,6 +41,6 @@ public class PreviousState {
     }
 
     public void setState(State state) {
-        this.state = state;
+        this.state = state.getIdentifier();
     }
 }

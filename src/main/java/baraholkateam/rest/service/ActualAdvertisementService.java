@@ -3,22 +3,19 @@ package baraholkateam.rest.service;
 import baraholkateam.rest.model.ActualAdvertisement;
 import baraholkateam.rest.model.CurrentAdvertisement;
 import baraholkateam.rest.repository.ActualAdvertisementRepository;
-import baraholkateam.util.Tag;
 import baraholkateam.util.TagType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static baraholkateam.bot.BaraholkaBot.SEARCH_ADVERTISEMENTS_LIMIT;
 
 /**
- * Сервис взаимодействия с сущностью "ActualAdvertisement"
+ * Сервис взаимодействия с сущностью "ActualAdvertisement".
  */
 @Service
 public class ActualAdvertisementService {
@@ -72,7 +69,7 @@ public class ActualAdvertisementService {
         }
     }
 
-    public List<Tag> getTags(Long messageId) {
+    public List<String> getTags(Long messageId) {
         Optional<ActualAdvertisement> actualAdvertisementOptional = actualAdvertisementRepository.findById(messageId);
         if (actualAdvertisementOptional.isPresent()) {
             return actualAdvertisementOptional.get().getTags();
@@ -327,9 +324,7 @@ public class ActualAdvertisementService {
                 .setPhotos(currentAdvertisement.getPhotoIds())
                 .setDescription(currentAdvertisement.getDescription())
                 .setPrice(currentAdvertisement.getPrice())
-                .addTags(currentAdvertisement.getTags().stream()
-                        .map(Tag::getName)
-                        .toList())
+                .addTags(currentAdvertisement.getTags())
                 .setPhone(currentAdvertisement.getPhone())
                 .setSocials(currentAdvertisement.getContacts())
                 .setCreationTime(currentAdvertisement.getCreationTime())

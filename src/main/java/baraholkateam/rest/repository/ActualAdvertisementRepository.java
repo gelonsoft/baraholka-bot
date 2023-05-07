@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * JPA репозиторий сущности "ActualAdvertisement"
+ * JPA репозиторий сущности "ActualAdvertisement".
  */
 @Repository
 public interface ActualAdvertisementRepository extends JpaRepository<ActualAdvertisement, Long> {

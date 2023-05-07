@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Контроллер взаимодействия с клиентами по REST API
+ * Контроллер взаимодействия с клиентами по REST API.
  */
 @RestController
 @RequestMapping("/api")

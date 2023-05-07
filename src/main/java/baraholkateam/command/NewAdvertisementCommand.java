@@ -1,6 +1,7 @@
 package baraholkateam.command;
 
 import baraholkateam.rest.model.CurrentAdvertisement;
+import baraholkateam.rest.service.ChosenTagsService;
 import baraholkateam.rest.service.CurrentAdvertisementService;
 import baraholkateam.util.State;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +30,17 @@ public class NewAdvertisementCommand extends Command {
     @Autowired
     private CurrentAdvertisementService currentAdvertisementService;
 
-    private final Map<Long, String> chosenTags;
+    @Autowired
+    private ChosenTagsService chosenTagsService;
 
-    public NewAdvertisementCommand(Map<Long, String> chosenTags) {
+    public NewAdvertisementCommand() {
         super(State.NewAdvertisement.getIdentifier(), State.NewAdvertisement.getDescription());
-        this.chosenTags = chosenTags;
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         currentAdvertisementService.put(new CurrentAdvertisement(chat.getId()));
-        chosenTags.remove(chat.getId());
+        chosenTagsService.delete(chat.getId());
 
         SendMessage message = suggestAddingPhotos(chat.getId());
         try {

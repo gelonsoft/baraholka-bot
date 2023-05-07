@@ -11,7 +11,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import java.util.Optional;
 
 /**
- * Сервис взаимодействия с сущностью "LastSentMessage"
+ * Сервис взаимодействия с сущностью "LastSentMessage".
  */
 @Service
 public class LastSentMessageService {

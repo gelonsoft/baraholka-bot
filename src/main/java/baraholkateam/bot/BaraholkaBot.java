@@ -3,7 +3,6 @@ package baraholkateam.bot;
 import baraholkateam.command.DeleteAdvertisement;
 import baraholkateam.command.HelpCommand;
 import baraholkateam.command.MainMenuCommand;
-import baraholkateam.command.NewAdvertisementCommand;
 import baraholkateam.command.NewAdvertisementAddAdvertisementTypes;
 import baraholkateam.command.NewAdvertisementAddCategories;
 import baraholkateam.command.NewAdvertisementAddCity;
@@ -13,6 +12,7 @@ import baraholkateam.command.NewAdvertisementAddPhone;
 import baraholkateam.command.NewAdvertisementAddPhotos;
 import baraholkateam.command.NewAdvertisementAddPrice;
 import baraholkateam.command.NewAdvertisementAddSocial;
+import baraholkateam.command.NewAdvertisementCommand;
 import baraholkateam.command.NewAdvertisementConfirm;
 import baraholkateam.command.NewAdvertisementConfirmPhone;
 import baraholkateam.command.NewAdvertisementConfirmPhoto;
@@ -70,6 +70,7 @@ import java.util.stream.Collectors;
 import static baraholkateam.command.Command.ADVERTISEMENT_CANCELLED_TEXT;
 import static baraholkateam.command.Command.ADVERTISEMENT_SUCCESSFUL_DELETE;
 import static baraholkateam.command.Command.ADVERTISEMENT_SUCCESSFUL_UPDATE;
+import static baraholkateam.command.Command.AD_SWEAR_WORD_DETECTED;
 import static baraholkateam.command.Command.CHOSEN_TAG;
 import static baraholkateam.command.Command.CONFIRM_AD_CALLBACK_DATA;
 import static baraholkateam.command.Command.DELETE_AD_CALLBACK_TEXT;
@@ -81,6 +82,7 @@ import static baraholkateam.command.Command.PHONE_CALLBACK_DATA;
 import static baraholkateam.command.Command.SOCIAL_CALLBACK_DATA;
 import static baraholkateam.command.Command.SUCCESS_DELETE_AD_TEXT;
 import static baraholkateam.command.Command.SUCCESS_TEXT;
+import static baraholkateam.command.Command.SWEAR_WORD_DETECTOR;
 import static baraholkateam.command.Command.TAGS_CALLBACK_DATA;
 import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
 import static baraholkateam.command.Command.UNSUCCESS_DELETE_AD_TEXT;
@@ -89,15 +91,13 @@ import static baraholkateam.command.DeleteAdvertisement.DELETE_AD;
 import static baraholkateam.command.DeleteAdvertisement.NOT_ACTUAL_TEXT;
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_PERIOD;
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_TIME_UNIT;
-import static baraholkateam.secure_constants.SecureConstants.SWEAR_WORD_DETECTOR;
 
 @Component("BaraholkaBot")
 public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFileLoader {
     /**
-     * Лимит выдачи объявлений в функции поиска объявлений по тегам
+     * Лимит выдачи объявлений в функции поиска объявлений по тегам.
      */
     public static final Integer SEARCH_ADVERTISEMENTS_LIMIT = 10;
-    public static final String AD_SWEAR_WORD_DETECTED = "Возможно, ваше описание содержало ненормативную лексику, пожалуйста, введите измененный текст";
     private final String botName;
     private final String botToken;
     private final NonCommand nonCommand;
@@ -339,10 +339,10 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
     private boolean newAdvertisementUpdateData(Message msg) {
         State state = currentStateService.get(msg.getChatId());
         if (state == State.NewAdvertisement_AddDescription) {
-            if (!msg.getText().matches(".+")) {
+            String text = msg.getText();
+            if (text == null || text.length() == 0) {
                 return false;
             }
-            String text = msg.getText();
             Pattern filter = Pattern.compile(SWEAR_WORD_DETECTOR, Pattern.CASE_INSENSITIVE);
             Matcher matcher = filter.matcher(text);
             if (matcher.find()) {
@@ -384,12 +384,6 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
             updateStateOnTextData(msg);
             return true;
         }
-
-        // TODO убрать если хотим сохранять недоделанные объявления
-        if (state == State.MainMenu) {
-            currentAdvertisementService.remove(msg.getChatId());
-        }
-
         return false;
     }
 

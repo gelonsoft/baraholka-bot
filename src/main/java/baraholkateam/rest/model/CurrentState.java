@@ -7,17 +7,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
- * Текущее состояние бота
+ * Текущее состояние бота.
  */
 @Entity
 @Table(name = "current_state")
 public class CurrentState {
     @Id
-    @Column
+    @Column(name = "chat_id")
     private Long chatId;
 
-    @Column
-    private State state;
+    @Column(name = "state", length = 64)
+    private String state;
 
     public CurrentState() {
 
@@ -25,7 +25,7 @@ public class CurrentState {
 
     public CurrentState(Long chatId, State state) {
         this.chatId = chatId;
-        this.state = state;
+        this.state = state.getIdentifier();
     }
 
     public Long getChatId() {
@@ -33,7 +33,7 @@ public class CurrentState {
     }
 
     public State getState() {
-        return state;
+        return State.findState(state);
     }
 
     public void setChatId(Long chatId) {
@@ -41,7 +41,7 @@ public class CurrentState {
     }
 
     public void setState(State state) {
-        this.state = state;
+        this.state = state.getIdentifier();
     }
 
 }

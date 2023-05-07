@@ -2,8 +2,6 @@ package baraholkateam.rest.service;
 
 import baraholkateam.rest.model.NotificationMessages;
 import baraholkateam.rest.repository.NotificationMessagesRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -14,12 +12,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Сервис взаимодействия с сущностью "NotificationMessages"
+ * Сервис взаимодействия с сущностью "NotificationMessages".
  */
 @Service
 public class NotificationMessagesService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationMessagesService.class);
 
     @Autowired
     private NotificationMessagesRepository notificationMessagesRepository;

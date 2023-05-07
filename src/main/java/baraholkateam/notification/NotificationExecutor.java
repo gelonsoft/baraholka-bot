@@ -47,32 +47,32 @@ public class NotificationExecutor {
     private static final int CORE_POOL_SIZE = MAXIMUM_POOL_SIZE > 2 ? MAXIMUM_POOL_SIZE - 2 : MAXIMUM_POOL_SIZE;
 
     /**
-     * Период времени до первого уведомления пользователя о подтверждении актуальности объявления
+     * Период времени до первого уведомления пользователя о подтверждении актуальности объявления.
      */
     public static final Long FIRST_REPEAT_NOTIFICATION_PERIOD = 14L;
 
     /**
-     * Период времени до первого уведомления пользователя о подтверждении актуальности объявления
+     * Период времени до первого уведомления пользователя о подтверждении актуальности объявления.
      */
     public static final TimeUnit FIRST_REPEAT_NOTIFICATION_TIME_UNIT = TimeUnit.DAYS;
 
     /**
-     * Период времени до повторных уведомлений пользователя о подтверждении актуальности объявления
+     * Период времени до повторных уведомлений пользователя о подтверждении актуальности объявления.
      */
     private static final Long REPEAT_NOTIFICATION_PERIOD = 24L;
 
     /**
-     * Период времени до повторных уведомлений пользователя о подтверждении актуальности объявления
+     * Период времени до повторных уведомлений пользователя о подтверждении актуальности объявления.
      */
     private static final TimeUnit REPEAT_NOTIFICATION_TIME_UNIT = TimeUnit.HOURS;
 
     /**
-     * Период времени до очередной проверки актуальности объявлений (период работы ScheduleExecutor)
+     * Период времени до очередной проверки актуальности объявлений (период работы ScheduleExecutor).
      */
     private static final Long SCHEDULE_NOTIFICATION_EXECUTOR_PERIOD = 1L;
 
     /**
-     * Период времени до очередной проверки актуальности объявлений (период работы ScheduleExecutor)
+     * Период времени до очередной проверки актуальности объявлений (период работы ScheduleExecutor).
      */
     private static final TimeUnit SCHEDULE_NOTIFICATION_EXECUTOR_TIME_UNIT = TimeUnit.HOURS;
 

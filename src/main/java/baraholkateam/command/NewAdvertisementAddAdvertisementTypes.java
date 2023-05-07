@@ -9,8 +9,6 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
-import java.util.Map;
-
 @Component
 public class NewAdvertisementAddAdvertisementTypes extends Command {
     private static final String CHOSEN_CITY = """

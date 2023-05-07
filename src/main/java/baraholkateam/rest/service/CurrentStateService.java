@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 /**
- * Сервис взаимодействия с сущностью "CurrentState"
+ * Сервис взаимодействия с сущностью "CurrentState".
  */
 @Service
 public class CurrentStateService {

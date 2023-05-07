@@ -1,7 +1,6 @@
 package baraholkateam.command;
 
 import baraholkateam.util.State;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 
 import java.util.List;

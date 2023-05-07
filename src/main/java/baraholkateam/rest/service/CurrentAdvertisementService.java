@@ -2,7 +2,6 @@ package baraholkateam.rest.service;
 
 import baraholkateam.rest.model.CurrentAdvertisement;
 import baraholkateam.rest.repository.CurrentAdvertisementRepository;
-import baraholkateam.util.Tag;
 import baraholkateam.util.TagType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Сервис взаимодействия с сущностью "CurrentAdvertisement"
+ * Сервис взаимодействия с сущностью "CurrentAdvertisement".
  */
 @Service
 public class CurrentAdvertisementService {
@@ -67,7 +66,7 @@ public class CurrentAdvertisementService {
         }
     }
 
-    public List<Tag> getTags(Long chatId) {
+    public List<String> getTags(Long chatId) {
         Optional<CurrentAdvertisement> currentAdvertisementOptional = currentAdvertisementRepository.findById(chatId);
         if (currentAdvertisementOptional.isPresent()) {
             return currentAdvertisementOptional.get().getTags();

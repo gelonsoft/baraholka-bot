@@ -17,8 +17,7 @@ public class NewAdvertisementAddContacts extends Command {
             Желаете указать ваш номер телефона?""";
 
     public NewAdvertisementAddContacts() {
-        super(State.NewAdvertisement_AddContacts.getIdentifier(),
-                State.NewAdvertisement_AddContacts.getDescription());
+        super(State.NewAdvertisement_AddContacts.getIdentifier(), State.NewAdvertisement_AddContacts.getDescription());
     }
 
     @Override

@@ -8,10 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.io.Serializable;
-
 /**
- * Последнее сообщение, отправленное ботом пользователю
+ * Последнее сообщение, отправленное ботом пользователю.
  */
 @Entity
 @Table(name = "last_sent_message")

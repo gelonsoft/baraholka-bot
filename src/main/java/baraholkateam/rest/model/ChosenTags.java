@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 import java.util.List;
 
 /**
- * Выбранные пользователем теги во время поиска объявлений по тегам
+ * Выбранные пользователем теги во время поиска объявлений по тегам.
  */
 @Entity
 @Table(name = "chosen_tags")
@@ -19,8 +19,8 @@ public class ChosenTags {
     @Column(name = "chat_id")
     private Long chatId;
 
-    @Column(name = "chosen_tags")
-    private List<Tag> chosenTags;
+    @Column(name = "chosen_tags", length = 1024)
+    private List<String> chosenTags;
 
     public ChosenTags() {
 
@@ -28,7 +28,7 @@ public class ChosenTags {
 
     public ChosenTags(Long chatId, List<Tag> tags) {
         this.chatId = chatId;
-        this.chosenTags = tags;
+        this.chosenTags = tags.stream().map(Tag::getName).toList();
     }
 
     public Long getChatId() {
@@ -36,7 +36,7 @@ public class ChosenTags {
     }
 
     public List<Tag> getChosenTags() {
-        return chosenTags;
+        return chosenTags.stream().map(Tag::getTagByName).toList();
     }
 
     public void setChatId(Long chatId) {
@@ -44,6 +44,6 @@ public class ChosenTags {
     }
 
     public void setChosenTags(List<Tag> chosenTags) {
-        this.chosenTags = chosenTags;
+        this.chosenTags = chosenTags.stream().map(Tag::getName).toList();
     }
 }
