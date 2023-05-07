@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api")
-public class AdvertisementController {
+public class BaraholkaBotRestController {
 
     @Autowired
     ActualAdvertisementRepository actualAdvertisementRepository;
