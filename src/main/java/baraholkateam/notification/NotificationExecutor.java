@@ -47,22 +47,22 @@ public class NotificationExecutor {
     /**
      * Период времени до первого уведомления пользователя о подтверждении актуальности объявления.
      */
-    public static final Long FIRST_REPEAT_NOTIFICATION_PERIOD = 10L;
+    public static final Long FIRST_REPEAT_NOTIFICATION_PERIOD = 14L;
 
     /**
      * Период времени до первого уведомления пользователя о подтверждении актуальности объявления.
      */
-    public static final TimeUnit FIRST_REPEAT_NOTIFICATION_TIME_UNIT = TimeUnit.SECONDS;
+    public static final TimeUnit FIRST_REPEAT_NOTIFICATION_TIME_UNIT = TimeUnit.DAYS;
 
     /**
      * Период времени до повторных уведомлений пользователя о подтверждении актуальности объявления.
      */
-    private static final Long REPEAT_NOTIFICATION_PERIOD = 10L;
+    private static final Long REPEAT_NOTIFICATION_PERIOD = 24L;
 
     /**
      * Период времени до повторных уведомлений пользователя о подтверждении актуальности объявления.
      */
-    private static final TimeUnit REPEAT_NOTIFICATION_TIME_UNIT = TimeUnit.SECONDS;
+    private static final TimeUnit REPEAT_NOTIFICATION_TIME_UNIT = TimeUnit.HOURS;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(NotificationExecutor.class);
 
