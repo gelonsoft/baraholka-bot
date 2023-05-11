@@ -93,7 +93,7 @@ public class BaraholkaBotRestControllerHelper {
                             .getBytes(StandardCharsets.UTF_8)
             ));
 
-            return /*calculatedHash.equals(userInfo.getHash())*/true;
+            return calculatedHash.equals(userInfo.getHash());
         } catch (NoSuchAlgorithmException e) {
             LOGGER.error("No such algorithm", e);
             return false;
