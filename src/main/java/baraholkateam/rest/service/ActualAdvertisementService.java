@@ -238,7 +238,7 @@ public class ActualAdvertisementService {
         Optional<ActualAdvertisement> actualAdvertisementOptional = actualAdvertisementRepository.findById(messageId);
         if (actualAdvertisementOptional.isPresent()) {
             ActualAdvertisement advertisement = actualAdvertisementOptional.get();
-            advertisement.addPhoto(photoId);
+            advertisement.addPhotoIds(photoId);
             return actualAdvertisementRepository.save(advertisement);
         } else {
             LOGGER.error(String.format("Cannot add photo for message id %d!", messageId));

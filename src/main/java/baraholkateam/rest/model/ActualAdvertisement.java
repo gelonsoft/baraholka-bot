@@ -2,6 +2,8 @@ package baraholkateam.rest.model;
 
 import baraholkateam.util.Tag;
 import baraholkateam.util.TagType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -9,6 +11,7 @@ import jakarta.persistence.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,7 +21,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "actual_advertisement")
-public class ActualAdvertisement {
+public class ActualAdvertisement implements Serializable {
 
     public static final String DESCRIPTION_TEXT = "Описание:";
     private static final String DESCRIPTION_BODY = """
@@ -34,36 +37,57 @@ public class ActualAdvertisement {
 
     @Id
     @Column(name = "message_id")
+    @JsonProperty("message_id")
     private Long messageId;
 
     @Column(name = "owner_chat_id")
+    @JsonIgnore
     private Long ownerChatId;
 
+    /**
+     * Список фотографий в виде file_id (в Телеграме).
+     */
     @Column(name = "photos", length = 1024)
+    @JsonIgnore
     private List<String> photoIds = new ArrayList<>();
 
+    /**
+     * Список фотографий в виде Base64 строк.
+     */
+    @Column(insertable = false, updatable = false)
+    @JsonProperty("photos")
+    private List<String> photos;
+
     @Column(name = "description", length = 1024)
+    @JsonProperty("description")
     private String description;
 
     @Column(name = "tags", length = 1024)
+    @JsonProperty("tags")
     private final List<String> tags = new ArrayList<>();
 
     @Column(name = "price")
+    @JsonProperty("price")
     private Long price;
 
     @Column(name = "phone", length = 16)
+    @JsonProperty("phone")
     private String phone;
 
     @Column(name = "contacts", length = 256)
+    @JsonProperty("contacts")
     private List<String> contacts = new ArrayList<>();
 
     @Column(name = "creation_time")
+    @JsonIgnore
     private Long creationTime;
 
     @Column(name = "next_update_time")
+    @JsonIgnore
     private Long nextUpdateTime;
 
     @Column(name = "update_attempt")
+    @JsonIgnore
     private Integer updateAttempt;
 
     public ActualAdvertisement() {
@@ -74,15 +98,15 @@ public class ActualAdvertisement {
         this.ownerChatId = ownerChatId;
     }
 
-    public ActualAdvertisement(List<String> photoIds, String description, List<Tag> tags, Long price,
+    public ActualAdvertisement(List<String> photoIds, String description, List<Tag> tags, Long price, String phone,
                                List<String> contacts) {
         this.tags.add(Tag.Actual.getName());
         this.photoIds = photoIds;
         this.description = description;
         this.tags.addAll(tags.stream().map(Tag::getName).toList());
         this.price = price;
+        this.phone = phone;
         this.contacts = contacts;
-        updateAttempt = 0;
     }
 
     public Long getOwnerChatId() {
@@ -168,6 +192,10 @@ public class ActualAdvertisement {
         return updateAttempt;
     }
 
+    public List<String> getPhotos() {
+        return photos;
+    }
+
     public ActualAdvertisement setOwnerChatId(Long ownerChatId) {
         this.ownerChatId = ownerChatId;
         return this;
@@ -198,12 +226,12 @@ public class ActualAdvertisement {
         return this;
     }
 
-    public ActualAdvertisement addPhoto(String photoId) {
+    public ActualAdvertisement addPhotoIds(String photoId) {
         this.photoIds.add(photoId);
         return this;
     }
 
-    public ActualAdvertisement setPhotos(List<String> photoIds) {
+    public ActualAdvertisement setPhotoIds(List<String> photoIds) {
         this.photoIds = photoIds;
         return this;
     }
@@ -238,6 +266,12 @@ public class ActualAdvertisement {
         return this;
     }
 
+    public ActualAdvertisement setPhotos(List<String> photos) {
+        this.photos = photos;
+        return this;
+    }
+
+    @JsonIgnore
     public String getAdvertisementText() {
         List<String> tags = this.getTags();
         StringBuilder tagsString = new StringBuilder();

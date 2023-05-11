@@ -15,7 +15,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @ComponentScan("{ baraholkateam.bot, baraholkateam.command, baraholkateam.notification, "
-        + "baraholkateam.rest.service, baraholkateam.telegram_api_requests }")
+        + "baraholkateam.rest.controller, baraholkateam.rest.service, baraholkateam.telegram_api_requests }")
 @EnableJpaRepositories("baraholkateam.rest.repository")
 @EntityScan("baraholkateam.rest.model")
 @EnableScheduling
