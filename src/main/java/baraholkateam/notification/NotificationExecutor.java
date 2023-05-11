@@ -1,7 +1,6 @@
 package baraholkateam.notification;
 
 import baraholkateam.bot.BaraholkaBot;
-import baraholkateam.bot.BaraholkaBotProperties;
 import baraholkateam.rest.model.ActualAdvertisement;
 import baraholkateam.rest.service.ActualAdvertisementService;
 import baraholkateam.rest.service.NotificationMessagesService;
@@ -11,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -75,6 +75,12 @@ public class NotificationExecutor {
     @Autowired
     private NotificationMessagesService notificationMessagesService;
 
+    @Value("${channel.username}")
+    private String channelUsername;
+
+    @Value("${channel.chat_id}")
+    private String channelChatId;
+
     private final BaraholkaBot sender;
 
     @Lazy
@@ -100,8 +106,7 @@ public class NotificationExecutor {
             } else if (attemptNum <= 2) {
                 actualAdvertisementService.setUpdateAttempt(messageId, attemptNum + 1);
                 Long forwardedMessageId =
-                        telegramAPIRequests.forwardMessage(BaraholkaBotProperties.CHANNEL_USERNAME,
-                                String.valueOf(chatId), messageId);
+                        telegramAPIRequests.forwardMessage(channelUsername, String.valueOf(chatId), messageId);
 
                 if (attemptNum == 2) {
                     deleteMessages(sender, chatId, messageId);
@@ -228,7 +233,7 @@ public class NotificationExecutor {
         String editedText = String.format("%s\n\n%s", NOT_ACTUAL_TEXT,
                 actualAdvertisementService.adText(Long.parseLong(messageId))
                 .substring(Tag.Actual.getName().length() + 1));
-        editMessage.setChatId(BaraholkaBotProperties.CHANNEL_CHAT_ID);
+        editMessage.setChatId(channelChatId);
         editMessage.setMessageId(Integer.parseInt(messageId));
         editMessage.setParseMode(ParseMode.HTML);
         editMessage.setCaption(editedText);

@@ -100,11 +100,10 @@ public class CurrentAdvertisement implements Serializable {
         this.chatId = chatId;
     }
 
-    public CurrentAdvertisement(Long chatId, List<String> photos, String description, List<Tag> tags, Long price,
+    public CurrentAdvertisement(Long chatId, String description, List<Tag> tags, Long price,
                                 String phone, List<String> contacts) {
         this.tags.add(Tag.Actual.getName());
         this.chatId = chatId;
-        this.photos = photos;
         this.description = description;
         this.tags.addAll(tags.stream().map(Tag::getName).toList());
         this.price = price;

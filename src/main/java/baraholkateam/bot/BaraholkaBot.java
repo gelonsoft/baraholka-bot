@@ -196,6 +196,12 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
     @Autowired
     private SearchAdvertisementsShowFoundAdvertisements searchAdvertisementsShowFoundAdvertisements;
 
+    @Value("${channel.chat_id}")
+    private String channelChatId;
+
+    @Value("${channel.username}")
+    private String channelUsername;
+
     public BaraholkaBot(
             @Value("${bot.name}") String botName,
             @Value("${bot.token}") String botToken
@@ -589,7 +595,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                     if (Objects.equals(dataParts[2], "0")) {
                         sentAd = newAdvertisementConfirm.sendPhotoMessage(
                                 this,
-                                Long.parseLong(BaraholkaBotProperties.CHANNEL_CHAT_ID),
+                                Long.parseLong(channelChatId),
                                 newAdvertisementConfirm.downloadPhoto(
                                         currentAdvertisementService.getPhotoIds(msg.getChatId()).get(0)
                                 ),
@@ -601,7 +607,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                             photoFiles.add(Objects.requireNonNull(newAdvertisementConfirm.downloadPhoto(photoId)));
                         }
                         sentAd = newAdvertisementConfirm.sendPhotoMediaGroup(this,
-                                Long.parseLong(BaraholkaBotProperties.CHANNEL_CHAT_ID),
+                                Long.parseLong(channelChatId),
                                 photoFiles,
                                 currentAdvertisementService.getAdvertisementText(msg.getChatId())).get(0);
                     }
@@ -649,8 +655,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                 long messageId = Long.parseLong(dataParts[1]);
 
                 deleteLastMessage(msg.getChatId());
-                telegramAPIRequests.forwardMessage(BaraholkaBotProperties.CHANNEL_USERNAME,
-                        String.valueOf(msg.getChatId()), messageId);
+                telegramAPIRequests.forwardMessage(channelUsername, String.valueOf(msg.getChatId()), messageId);
                 sendAnswer(msg.getChatId(), DELETE_AD, getDeleteAd(messageId));
             }
             case DELETE_AD_CALLBACK_TEXT -> {
@@ -674,7 +679,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         String adText = actualAdvertisementService.adText(Long.parseLong(messageId))
                 .substring(Tag.Actual.getName().length() + 1);
         String editedText = String.format("%s\n\n%s", NOT_ACTUAL_TEXT, adText);
-        editMessage.setChatId(BaraholkaBotProperties.CHANNEL_CHAT_ID);
+        editMessage.setChatId(channelChatId);
         editMessage.setMessageId(Integer.parseInt(messageId));
         editMessage.setParseMode(ParseMode.HTML);
         editMessage.setCaption(editedText);
