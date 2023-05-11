@@ -3,7 +3,7 @@ version: '4.19'
 services:
   postgresql:
     env_file:
-      - src\main\resources\application.properties
+      - src/main/resources/application.properties
     container_name: postgresql
     image: postgres:12.2-alpine
     environment:
