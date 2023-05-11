@@ -1,7 +1,6 @@
 package baraholkateam.command;
 
 import baraholkateam.util.State;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 
 import java.util.List;
@@ -23,9 +22,10 @@ public class NonCommand {
     private static final String INVALID_PRICE = "Введенная цена имеет неверный формат.";
 
     public NonCommand() {
+
     }
 
-    public List<AnswerPair> nonCommandExecute(Message msg, State currentState) {
+    public List<AnswerPair> nonCommandExecute(State currentState) {
         if (currentState == null) {
             return List.of(new AnswerPair(String.format(NO_CURRENT_STATE, State.MainMenu.getIdentifier()), true, null));
         }

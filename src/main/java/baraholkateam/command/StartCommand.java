@@ -1,13 +1,12 @@
 package baraholkateam.command;
 
 import baraholkateam.util.State;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
-import java.util.Map;
-
+@Component
 public class StartCommand extends Command {
     private static final String START_ANSWER = """
             Добро пожаловать в бот по созданию и размещению объявлений!
@@ -17,8 +16,8 @@ public class StartCommand extends Command {
             Также Вы можете перейти в главное меню /%s и следовать дальнейшим инструкциям.
             Справочная информация по функциям бота представлена по команде /%s.""";
 
-    public StartCommand(Map<Long, Message> lastSentMessage) {
-        super(State.Start.getIdentifier(), State.Start.getDescription(), lastSentMessage);
+    public StartCommand() {
+        super(State.Start.getIdentifier(), State.Start.getDescription());
     }
 
     @Override
