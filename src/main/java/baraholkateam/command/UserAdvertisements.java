@@ -1,12 +1,12 @@
 package baraholkateam.command;
 
-import baraholkateam.bot.BaraholkaBotProperties;
 import baraholkateam.rest.model.ActualAdvertisement;
 import baraholkateam.rest.repository.ActualAdvertisementRepository;
 import baraholkateam.rest.service.LastSentMessageService;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
 import baraholkateam.util.State;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -28,6 +28,9 @@ public class UserAdvertisements extends Command {
     @Autowired
     private LastSentMessageService lastSentMessageService;
 
+    @Value("${channel.chat_id}")
+    private String channelChatId;
+
     public UserAdvertisements() {
         super(State.UserAdvertisements.getIdentifier(), State.UserAdvertisements.getDescription());
     }
@@ -42,7 +45,7 @@ public class UserAdvertisements extends Command {
                     USER_ADVERTISEMENTS, null);
             for (ActualAdvertisement actualAdvertisement : actualAdvertisements) {
                 telegramAPIRequests.forwardMessage(
-                        BaraholkaBotProperties.CHANNEL_CHAT_ID,
+                        channelChatId,
                         String.valueOf(actualAdvertisement.getOwnerChatId()),
                         actualAdvertisement.getMessageId()
                 );

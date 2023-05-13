@@ -1,6 +1,5 @@
 package baraholkateam.command;
 
-import baraholkateam.bot.BaraholkaBotProperties;
 import baraholkateam.rest.model.ActualAdvertisement;
 import baraholkateam.rest.service.ActualAdvertisementService;
 import baraholkateam.rest.service.ChosenTagsService;
@@ -9,6 +8,7 @@ import baraholkateam.telegram_api_requests.TelegramAPIRequests;
 import baraholkateam.util.State;
 import baraholkateam.util.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -44,6 +44,9 @@ public class SearchAdvertisementsShowFoundAdvertisements extends Command {
 
     @Autowired
     private PreviousStateService previousStateService;
+
+    @Value("${channel.username}")
+    private String channelUsername;
 
     public SearchAdvertisementsShowFoundAdvertisements() {
         super(State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
@@ -99,7 +102,7 @@ public class SearchAdvertisementsShowFoundAdvertisements extends Command {
                 .toArray(String[]::new));
         int count = 0;
         for (ActualAdvertisement sortedAd : sortedAds) {
-            telegramAPIRequests.forwardMessage(BaraholkaBotProperties.CHANNEL_USERNAME, String.valueOf(chatId),
+            telegramAPIRequests.forwardMessage(channelUsername, String.valueOf(chatId),
                     sortedAd.getMessageId());
             count++;
         }

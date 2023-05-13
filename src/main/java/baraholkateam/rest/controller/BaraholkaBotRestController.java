@@ -71,7 +71,7 @@ public class BaraholkaBotRestController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        if (!controllerHelper.addNewAdvertisement(currentAdvertisement)) {
+        if (!controllerHelper.addNewAdvertisement(currentAdvertisement, json)) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

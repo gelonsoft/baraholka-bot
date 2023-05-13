@@ -321,7 +321,7 @@ public class ActualAdvertisementService {
     public void insertNewAdvertisement(CurrentAdvertisement currentAdvertisement) {
         ActualAdvertisement actualAdvertisement = new ActualAdvertisement(currentAdvertisement.getChatId())
                 .setMessageId(currentAdvertisement.getMessageId())
-                .setPhotos(currentAdvertisement.getPhotoIds())
+                .setPhotoIds(currentAdvertisement.getPhotoIds())
                 .setDescription(currentAdvertisement.getDescription())
                 .setPrice(currentAdvertisement.getPrice())
                 .addTags(currentAdvertisement.getTags())

@@ -1,0 +1,32 @@
+version: '4.19'
+
+services:
+  postgresql:
+    env_file:
+      - src/main/resources/application.properties
+    container_name: postgresql
+    image: postgres:12.2-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - ./init/:/docker-entrypoint-initdb.d/
+    networks:
+      - app-network
+
+  baraholka-bot:
+    depends_on:
+      - postgresql
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
