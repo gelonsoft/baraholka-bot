@@ -1,4 +1,5 @@
 import React from 'react';
+import {Link} from "react-router-dom";
 import '../style/style.css';
 
 class Header extends React.Component {
@@ -16,9 +17,11 @@ class Header extends React.Component {
                         baraholka-bot
                     </div>
                 </div>
-                <button className="header__exit-btn">
-                    Выйти
-                </button>
+                <Link to="/">
+                    <button className="header__exit-btn">
+                        Выйти
+                    </button>
+                </Link>
             </header>
         )
     }

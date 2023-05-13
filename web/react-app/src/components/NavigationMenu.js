@@ -13,7 +13,7 @@ class NavigationMenu extends React.Component {
     render() {
         return (
             <div className="main__menu">
-                <Link to="/">
+                <Link to="/baraholka/profile">
                     <div className={
                         this.state.currentTab === "profile" ? "main__menu-tab main__menu-tab-active" : "main__menu-tab"
                     }
@@ -26,7 +26,7 @@ class NavigationMenu extends React.Component {
                         <span>Профиль</span>
                     </div>
                 </Link>
-                <Link to="/my_ads">
+                <Link to="/baraholka/my_ads">
                     <div className={
                         this.state.currentTab === "my_ads" ? "main__menu-tab main__menu-tab-active" : "main__menu-tab"
                     }
@@ -39,7 +39,7 @@ class NavigationMenu extends React.Component {
                         <span>Мои объявления</span>
                     </div>
                 </Link>
-                <Link to="/new_ad">
+                <Link to="/baraholka/new_ad">
                     <div className={
                         this.state.currentTab === "new_ad" ? "main__menu-tab main__menu-tab-active" : "main__menu-tab"
                     }
@@ -52,7 +52,7 @@ class NavigationMenu extends React.Component {
                         <span>Создать объявление</span>
                     </div>
                 </Link>
-                <Link to="search_ads">
+                <Link to="/baraholka/search_ads">
                     <div className={
                         this.state.currentTab === "search_ad" ? "main__menu-tab main__menu-tab-active" : "main__menu-tab"
                     }
@@ -65,7 +65,7 @@ class NavigationMenu extends React.Component {
                         <span>Поиск объявлений</span>
                     </div>
                 </Link>
-                <Link to="help">
+                <Link to="/baraholka/help">
                     <div className={
                         this.state.currentTab === "help" ? "main__menu-tab main__menu-tab-active" : "main__menu-tab"
                     }
