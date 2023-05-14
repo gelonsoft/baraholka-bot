@@ -4,11 +4,32 @@ import '../style/style.css';
 class NewAd extends React.Component {
     constructor(props) {
         super(props);
+        this.createNewAd = this.createNewAd.bind(this);
+        this.getBase64 = this.getBase64.bind(this);
+    }
+
+    getBase64(file) {
+        let document = "";
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            document = reader.result;
+        };
+        reader.onerror = function (error) {
+            console.log('Error: ', error);
+        };
+
+        return document;
+    }
+
+    createNewAd(e) {
+        e.preventDefault();
+        console.log(e);
     }
 
     render() {
         return (
-            <form>
+            <form onSubmit={this.createNewAd}>
                 <div className="main__form-title">Добавить фотографии</div>
                 <div>Добавьте от 1 до 10 фотографий к вашему объявлению. Рекомендуемое число - 5.</div>
                 <label className="btn btn-light file-btn">
@@ -20,8 +41,8 @@ class NewAd extends React.Component {
                 <input type="text" placeholder="Описание"/>
                 <div className="main__form-title">Добавить город</div>
                 <div>Выберите город для публикации объявления.</div>
-                <select>
-                    <option selected disabled>Не выбран</option>
+                <select defaultValue="Не выбран">
+                    <option>Не выбран</option>
                 </select>
                 <div className="main__form-title">Добавить тип объявления</div>
                 <div>Выберите тип объявления.</div>
@@ -131,7 +152,7 @@ class NewAd extends React.Component {
                 <div>Добавьте ссылки на ваши социальные сети (необязательно).</div>
                 <input type="tel" pattern="https://.+/.+" placeholder="https://vk.com/useruser"/>
                 <button className="btn btn-light">Добавить социальную сеть</button><br />
-                <input type="submit" className="btn btn-dark" value="Опубликовать"/>
+                <input type="submit" className="btn btn-dark" value="Опубликовать" />
             </form>
         )
     }
