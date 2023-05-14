@@ -236,5 +236,19 @@ select {
     flex-wrap: wrap;
 }
 
+.chosen-photos {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.chosen-photo {
+    height: 150px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+
 
 

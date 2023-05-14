@@ -4,27 +4,51 @@ import '../style/style.css';
 class NewAd extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {chosenPhotos: []};
         this.createNewAd = this.createNewAd.bind(this);
         this.getBase64 = this.getBase64.bind(this);
+        this.onPhotosChange = this.onPhotosChange.bind(this);
+    }
+
+    componentDidMount() {
     }
 
     getBase64(file) {
-        let document = "";
-        let reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = function () {
-            document = reader.result;
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const base64String = reader.result
+                .replace('data:', '')
+                .replace(/^.+,/, '');
+            console.log(base64String);
         };
-        reader.onerror = function (error) {
-            console.log('Error: ', error);
-        };
-
-        return document;
+        console.log(reader.readAsDataURL(file));
     }
 
     createNewAd(e) {
         e.preventDefault();
-        console.log(e);
+        let userData = JSON.parse(localStorage.getItem('userData'));
+        let photos = [];
+        for (let i = 0; i < this.state.chosenPhotos.length; i++) {
+            this.getBase64(this.state.chosenPhotos[i])
+            // photos.push();
+        }
+        console.log(photos);
+    }
+
+    onPhotosChange(e) {
+        let photos = [];
+        if (e.target.files.length > 10) {
+            alert('Вы прикрепили слишком много фотографий. Чтобы добавить объявление, пожалуйста, оставьте не более 10 фото.');
+        }
+        if (e.target.files && e.target.files[0]) {
+            for (let i = 0; i < e.target.files.length; i++) {
+                if (i > 10) {
+                    break;
+                }
+                photos.push(e.target.files[i]);
+            }
+        }
+        this.setState({chosenPhotos: photos});
     }
 
     render() {
@@ -33,9 +57,14 @@ class NewAd extends React.Component {
                 <div className="main__form-title">Добавить фотографии</div>
                 <div>Добавьте от 1 до 10 фотографий к вашему объявлению. Рекомендуемое число - 5.</div>
                 <label className="btn btn-light file-btn">
-                    <input type="file"/>
+                    <input type="file" onChange={this.onPhotosChange} multiple />
                     Выбрать файл
                 </label>
+                <div className="chosen-photos">
+                    {this.state.chosenPhotos.map(function(photo) {
+                    return <img className="chosen-photo" alt="preview image" src={URL.createObjectURL(photo).toString()}/>
+                })}
+                </div>
                 <div className="main__form-title">Добавить описание</div>
                 <div>Добавьте краткое описание товара.</div>
                 <input type="text" placeholder="Описание"/>
