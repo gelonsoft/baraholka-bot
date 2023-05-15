@@ -7,7 +7,11 @@ class Help extends React.Component {
     }
 
     render() {
-        return <div>Help</div>
+        return (
+            <div>
+                Help
+            </div>
+        )
     }
 }
 

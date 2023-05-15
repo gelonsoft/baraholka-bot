@@ -7,8 +7,7 @@ class Profile extends React.Component {
     }
 
     render() {
-        // let userData = JSON.parse(localStorage.getItem('userData'));
-        let userData = {"auth_date":1684051188,"first_name":"Алиса","hash":"afc6a8181ae6eb8f494551c94c39a63fae2835470210428556f8db7f54b66603","id":538160964,"last_name":"Селецкая","photo_url":"https://t.me/i/userpic/320/Uim0VYUr3WRDc7ofnIj40wRzPe1L7t63Nv0FXKqydjM.jpg","username":"sealisaa"};
+        let userData = JSON.parse(localStorage.getItem('userData'));
         return (
             <div className="profile">
                 <img className="profile-photo" alt="profile photo" src={userData.photo_url}></img>
