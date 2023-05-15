@@ -3,18 +3,17 @@ import Flickity from "react-flickity-component";
 import '../style/style.css';
 import '../style/flickity.css';
 import ReactSpoiler from "react-spoiler";
-import axios from 'axios'
+import RequestService from '../services/RequestService';
 
-const URL_SEARCH = 'http://localhost:8080/api/search_advertisements';
 const types = ['#продажа', '#обмен', '#дар', '#торг_уместен', '#срочно']
 const categories = ['#одежда', '#обувь', '#детские_товары', '#красота_и_здоровье', '#книги', '#хобби', '#домашняя_техника', '#электроника', '#спорт', '#другое', '#мужское', '#женское']
 const cities = ['Москва', 'СПб', 'Екатеринбург', 'Челябинск', 'Ульяновск', 'Омск', 'Белгород', 'Петропавловск', 'Пермь', 'Волгоград', 'Киров', 'Хабаровск']
+
 class SearchAds extends React.Component {
     constructor(props) {
         super(props);
         this.handleStartClick = this.handleStartClick.bind(this);
         this.handleNewClick = this.handleNewClick.bind(this);
-        //TODO: Поменять обратно на false
         this.state = {
             isStarted: false, choosenTags: [], ads: [], currentCity: 'Не выбран'
         };
@@ -37,10 +36,20 @@ class SearchAds extends React.Component {
                 currentTags = currentTags.filter(tag => tag !== this.state.currentCity);
             }
             this.setState({choosenTags: currentTags, currentCity: event.target.value});
-
     };
 
     handleStartClick() {
+        //TODO: Заменить на let userData = localStorage.getItem('userData');
+        let userData = {"auth_date":1684051188,"first_name":"Алиса","hash":"afc6a8181ae6eb8f494551c94c39a63fae2835470210428556f8db7f54b66603","id":538160964,"last_name":"Селецкая","photo_url":"https://t.me/i/userpic/320/Uim0VYUr3WRDc7ofnIj40wRzPe1L7t63Nv0FXKqydjM.jpg","username":"sealisaa"};
+        RequestService.getSearchAds(userData, this.state.choosenTags).then((response) => {
+            if (response.data) {
+                this.setState({
+                    ads: response.data
+                });
+            }
+        }).catch(err => {
+            console.log(err);
+        });
         this.setState({isStarted: true});
     }
 
@@ -48,15 +57,10 @@ class SearchAds extends React.Component {
         this.setState({isStarted: false, choosenTags: [], ads: []});
     }
 
-    // componentDidMount() {
-    // TODO: Написать запрос на получение искомых объявлений
-    // }
-
-
     render() {
         const isStarted = this.state.isStarted;
         if (isStarted) {
-            return <StartNewSearch choosenTags={this.state.choosenTags} new={this.handleNewClick}/>;
+            return <StartNewSearch ads={this.state.ads} choosenTags={this.state.choosenTags} new={this.handleNewClick}/>;
         }
         return <ChooseSearchTags change={this.handleCheckboxChange} start={this.handleStartClick} select={this.handleSelectChange}/>;
     }
@@ -83,7 +87,7 @@ function ChooseSearchTags(props) {
         <div className="main__form-row">
             {listOfCategories}
         </div>
-        <input type="submit" className="btn btn-dark ad__form" value="Искать" onClick={props.start}/>
+        <input type="button" className="btn btn-dark ad__form" value="Искать" onClick={props.start}/>
     </form>)
 }
 
@@ -106,7 +110,6 @@ function SelectItem(props){
 
 
 function StartNewSearch(props) {
-    // const ads = props.ads;
     const listOfAds = props.ads?.map((ad) => <FoundAds key={ad.id} username={ad.username} photos={ad.photos}
     // const listOfAds = ads1?.map((ad) => <FoundAds key={ad.id} username={ad.username} photos={ad.photos}
                                                   tags={ad.tags.toString().replaceAll(",", " ")}
@@ -117,7 +120,7 @@ function StartNewSearch(props) {
         <div className="main__form-title">Хэштеги</div>
         <div>Вы выбрали следующие хэштеги для выполнения поиска.</div>
         <div className="custom-text">{props.choosenTags?.toString().replaceAll(",", " ")}</div>
-        <input type="submit" className="btn btn-dark ad__form" value="Выполнить новый поиск"/>
+        <input type="button" className="btn btn-dark ad__form" value="Выполнить новый поиск" onClick={props.new}/>
         <div className="grid">
             {listOfAds}
         </div>
@@ -180,7 +183,7 @@ function Carousel(props) {
 
 class Photo extends React.Component {
     render() {
-        return <img src={`data:image/png;base64,${this.props.photo}`}/>
+        return <img src={`data:image/png;base64,${this.props.photo}`} height="400"/>
     }
 }
 
