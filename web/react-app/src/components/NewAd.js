@@ -106,7 +106,7 @@ class NewAd extends React.Component {
         })
         .then(function (response) {
             alert("Объявление успешно добавлено");
-            location.reload();
+            document.getElementById("new-ad-form").reset();
         })
         .catch(function (response) {
             console.log(response);
@@ -131,7 +131,7 @@ class NewAd extends React.Component {
 
     render() {
         return (
-            <form onSubmit={this.createNewAd}>
+            <form id="new-ad-form" onSubmit={this.createNewAd}>
                 <div className="main__form-title">Добавить фотографии</div>
                 <div>Добавьте от 1 до 10 фотографий к вашему объявлению. Рекомендуемое число - 5.</div>
                 <label className="btn btn-light file-btn">
