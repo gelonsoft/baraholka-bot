@@ -8,9 +8,9 @@ class NewAd extends React.Component {
         super(props);
         this.state = {
             chosenPhotos: [],
-            cityTags: [],
-            advertisementTypeTags: [],
-            categoriesTags: []
+            cityTags: ['#Москва', '#СПб', '#Екатеринбург', '#Челябинск', '#Ульяновск', '#Омск', '#Белгород', '#Петропавловск', '#Пермь', '#Волгоград', '#Киров', '#Хабаровск'],
+            advertisementTypeTags: ['#продажа', '#обмен', '#дар', '#торг_уместен', '#срочно'],
+            categoriesTags: ['#одежда', '#обувь', '#детские_товары', '#красота_и_здоровье', '#книги', '#хобби', '#домашняя_техника', '#электроника', '#спорт', '#другое', '#мужское', '#женское']
         };
         this.createNewAd = this.createNewAd.bind(this);
         this.getBase64 = this.getBase64.bind(this);
@@ -39,7 +39,6 @@ class NewAd extends React.Component {
             const base64String = reader.result
                 .replace('data:', '')
                 .replace(/^.+,/, '');
-            console.log(base64String);
             return base64String;
         };
         reader.readAsDataURL(file);
