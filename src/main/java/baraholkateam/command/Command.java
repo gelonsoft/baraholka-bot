@@ -25,6 +25,7 @@ import java.util.List;
 
 @Component
 public abstract class Command extends BotCommand {
+    public static final String BACK_BUTTON = "Назад";
     public static final String NEXT_BUTTON_TEXT = "Продолжить";
     public static final String NOT_CHOSEN_TAG = "➖ %s";
     public static final String TAG_CALLBACK_DATA = "tag";
@@ -47,6 +48,12 @@ public abstract class Command extends BotCommand {
     public static final String ADVERTISEMENT_SUCCESSFUL_DELETE = "Объявление было удалено.";
     public static final String ADVERTISEMENT_DELETE =
             "Объявление было автоматически удалено после 3 попыток уточнения его актуальности.";
+    public static final String PHOTOS_DELETE = "Фотографии в создаваемом объявлении были успешно удалены.";
+    public static final String SOCIALS_DELETE = "Социальные сети в создаваемом объявлении были успешно удалены.";
+    public static final String NO_MORE_PHOTOS_ADD = """
+            Число загруженных фотографий превышает 10 штук.
+            В объявлении появятся первые 10 из всех загруженных фотографий.
+            Если Вы хотите изменить загруженные фотографии, пожалуйста, нажмите кнопку 'Удалить все фотографии'.""";
     public static final String SWEAR_WORD_DETECTOR = "(?iu)\\b((у|[нз]а|(хитро|не)?вз?[ыьъ]|с[ьъ]|(и|ра)[зс]ъ?|"
             + "(о[тб]|под)[ьъ]?|(.\\B)+?[оаеи])?-?([её]б(?!о[рй])|и[пб][ае][тц]).*?|(н[иеа]|([дп]|верт)о|ра[зс]|"
             + "з?а|с(ме)?|о(т|дно)?|апч)?-?ху([яйиеёю]|ли(?!ган)).*?|(в[зы]|(три|два|четыре)жды|(н|сук)а)?"
@@ -79,6 +86,17 @@ public abstract class Command extends BotCommand {
         message.setText(text);
         if (replyKeyboard != null) {
             message.setReplyMarkup(replyKeyboard);
+        } else {
+            KeyboardButton back = new KeyboardButton();
+            back.setText(BACK_BUTTON);
+            KeyboardRow line = new KeyboardRow();
+            line.add(back);
+            List<KeyboardRow> lines = new ArrayList<>(1);
+            lines.add(line);
+            ReplyKeyboardMarkup rkm = new ReplyKeyboardMarkup();
+            rkm.setKeyboard(lines);
+            rkm.setResizeKeyboard(true);
+            message.setReplyMarkup(rkm);
         }
         message.disableWebPagePreview();
 
@@ -137,5 +155,39 @@ public abstract class Command extends BotCommand {
         }
         ikm.setKeyboard(tags);
         return ikm;
+    }
+
+    ReplyKeyboardMarkup getReplyKeyboard(List<String> buttons) {
+        ReplyKeyboardMarkup rkm = new ReplyKeyboardMarkup();
+        List<KeyboardRow> lines = new ArrayList<>(1);
+        KeyboardRow line = new KeyboardRow();
+
+        if (buttons.size() == 1) {
+            line.add(buttons.get(0));
+            lines.add(line);
+        } else {
+            for (int i = 0; i < buttons.size(); i++) {
+                if (i % 2 == 0) {
+                    line = new KeyboardRow();
+                    line.add(buttons.get(i));
+                } else {
+                    line.add(buttons.get(i));
+                    lines.add(line);
+                }
+            }
+        }
+
+        if (buttons.size() > 1 && buttons.size() % 2 == 1) {
+            lines.add(line);
+        }
+
+        KeyboardButton back = new KeyboardButton();
+        back.setText(BACK_BUTTON);
+        line = new KeyboardRow();
+        line.add(back);
+        lines.add(line);
+        rkm.setKeyboard(lines);
+        rkm.setResizeKeyboard(true);
+        return rkm;
     }
 }

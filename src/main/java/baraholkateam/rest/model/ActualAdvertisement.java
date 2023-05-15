@@ -23,13 +23,8 @@ import java.util.Objects;
 @Table(name = "actual_advertisement")
 public class ActualAdvertisement implements Serializable {
 
-    public static final String DESCRIPTION_TEXT = "Описание:";
-    private static final String DESCRIPTION_BODY = """
-            %s
-
-            Цена: %s руб.
-
-            %s %s""";
+    public static final String DESCRIPTION_TEXT = "Описание: ";
+    private static final String PRICE_TEXT = "Цена: %s руб.";
     private static final String PHONE_NUMBER = "Номер телефона: <span class=\"tg-spoiler\">%s</span>";
     private static final String CONTACTS = "Контакты: ";
     private static final String CONTACT = "<span class=\"tg-spoiler\">%s</span>";
@@ -287,7 +282,12 @@ public class ActualAdvertisement implements Serializable {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(String.format(DESCRIPTION_BODY, tagsString, price, DESCRIPTION_TEXT, description));
+        sb.append(tagsString);
+        sb.append("\n\n");
+        if (price != null) {
+            sb.append(String.format(PRICE_TEXT, price)).append("\n\n");
+        }
+        sb.append(DESCRIPTION_TEXT).append(description);
         sb.append("\n");
 
         String phone = this.getPhone();

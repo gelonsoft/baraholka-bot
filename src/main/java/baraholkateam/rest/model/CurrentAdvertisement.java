@@ -23,13 +23,8 @@ import java.util.Objects;
 @Table(name = "current_advertisement")
 public class CurrentAdvertisement implements Serializable {
 
-    public static final String DESCRIPTION_TEXT = "Описание:";
-    private static final String DESCRIPTION_BODY = """
-            %s
-
-            Цена: %s руб.
-
-            %s %s""";
+    public static final String DESCRIPTION_TEXT = "Описание: ";
+    private static final String PRICE_TEXT = "Цена: %s руб.";
     private static final String PHONE_NUMBER = "Номер телефона: <span class=\"tg-spoiler\">%s</span>";
     private static final String CONTACTS = "Контакты: ";
     private static final String CONTACT = "<span class=\"tg-spoiler\">%s</span>";
@@ -50,7 +45,7 @@ public class CurrentAdvertisement implements Serializable {
      */
     @Column(name = "photos", length = 1024)
     @JsonIgnore
-    private final List<String> photoIds = new ArrayList<>();
+    private List<String> photoIds = new ArrayList<>();
 
     /**
      * Список фотографий в виде Base64 строк.
@@ -223,8 +218,18 @@ public class CurrentAdvertisement implements Serializable {
         return this;
     }
 
+    public CurrentAdvertisement setSocials(List<String> socials) {
+        this.contacts = socials;
+        return this;
+    }
+
     public CurrentAdvertisement addPhoto(String photoId) {
         this.photoIds.add(photoId);
+        return this;
+    }
+
+    public CurrentAdvertisement setPhotoIds(List<String> photoIds) {
+        this.photoIds = photoIds;
         return this;
     }
 
@@ -273,7 +278,12 @@ public class CurrentAdvertisement implements Serializable {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append(String.format(DESCRIPTION_BODY, tagsString, price, DESCRIPTION_TEXT, description));
+        sb.append(tagsString);
+        sb.append("\n\n");
+        if (price != null) {
+            sb.append(String.format(PRICE_TEXT, price)).append("\n\n");
+        }
+        sb.append(DESCRIPTION_TEXT).append(description);
         sb.append("\n");
 
         String phone = this.getPhone();

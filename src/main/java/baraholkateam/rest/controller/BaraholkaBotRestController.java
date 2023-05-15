@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,7 @@ import java.util.List;
  * Контроллер взаимодействия с клиентами по REST API.
  */
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/api")
 public class BaraholkaBotRestController {
 
@@ -32,7 +34,7 @@ public class BaraholkaBotRestController {
     @Autowired
     private ActualAdvertisementService actualAdvertisementService;
 
-    @RequestMapping(method = RequestMethod.GET, value = "/my_advertisements",
+    @RequestMapping(method = RequestMethod.POST, value = "/my_advertisements",
             headers = {"content-type=multipart/form-data"})
     public ResponseEntity<List<ActualAdvertisement>> getUserAdvertisements(@ModelAttribute TelegramUserInfo userInfo) {
         Long userId = userInfo.getId();
@@ -105,7 +107,7 @@ public class BaraholkaBotRestController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/search_advertisements",
+    @RequestMapping(method = RequestMethod.POST, value = "/search_advertisements",
             headers = {"content-type=multipart/form-data"})
     public ResponseEntity<List<ActualAdvertisement>> searchAdvertisements(@ModelAttribute TelegramUserInfo userInfo,
                                                                           @RequestParam String tags) {
@@ -129,7 +131,7 @@ public class BaraholkaBotRestController {
         return new ResponseEntity<>(advertisements, HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/all_tags",
+    @RequestMapping(method = RequestMethod.POST, value = "/all_tags",
             headers = {"content-type=multipart/form-data"})
     public ResponseEntity<AllTags> getAllTags(@ModelAttribute TelegramUserInfo userInfo) {
         Long userId = userInfo.getId();

@@ -6,18 +6,12 @@ import baraholkateam.rest.service.CurrentAdvertisementService;
 import baraholkateam.util.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.bots.AbsSender;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class NewAdvertisementCommand extends Command {
@@ -25,7 +19,7 @@ public class NewAdvertisementCommand extends Command {
             Команда /%s позволяет перейти к процессу создания нового объявления.
             Вам необходимо ответить на вопросы и заполнить макет объявления.
             Чтобы прервать создание, нужно вернуться в главное меню /%s.
-            Добавьте фотографии к вашему объявлению.""";
+            Нажмите на кнопку '%s', чтобы начать создание объявления.""";
 
     @Autowired
     private CurrentAdvertisementService currentAdvertisementService;
@@ -42,41 +36,12 @@ public class NewAdvertisementCommand extends Command {
         currentAdvertisementService.put(new CurrentAdvertisement(chat.getId()));
         chosenTagsService.delete(chat.getId());
 
-        SendMessage message = suggestAddingPhotos(chat.getId());
-        try {
-            absSender.execute(message);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private SendMessage suggestAddingPhotos(Long chatId) {
-        SendMessage message = new SendMessage();
-        message.setChatId(chatId);
-        message.setText(String.format(NEW_AD, State.NewAdvertisement.getIdentifier(),
-                State.NewAdvertisement.getIdentifier()));
-        message.setReplyMarkup(getAddReplyKeyboard());
-        return message;
+        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                String.format(NEW_AD, State.NewAdvertisement.getIdentifier(), State.NewAdvertisement.getIdentifier(),
+                        State.NewAdvertisement_AddPhotos.getDescription()), getAddReplyKeyboard());
     }
 
     private ReplyKeyboardMarkup getAddReplyKeyboard() {
-        KeyboardButton addPhotosButton = new KeyboardButton();
-        addPhotosButton.setText(State.NewAdvertisement_AddPhotos.getDescription());
-
-        KeyboardButton mainMenuButton = new KeyboardButton();
-        mainMenuButton.setText(State.MainMenu.getDescription());
-
-        KeyboardRow keyboardFirstRow = new KeyboardRow();
-        keyboardFirstRow.add(addPhotosButton);
-        keyboardFirstRow.add(mainMenuButton);
-
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        keyboardRows.add(keyboardFirstRow);
-
-        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-        replyKeyboardMarkup.setKeyboard(keyboardRows);
-        replyKeyboardMarkup.setResizeKeyboard(true);
-
-        return replyKeyboardMarkup;
+        return getReplyKeyboard(List.of(State.NewAdvertisement_AddPhotos.getDescription()));
     }
 }

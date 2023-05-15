@@ -5,13 +5,7 @@ import baraholkateam.util.TagType;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.bots.AbsSender;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class NewAdvertisementAddCity extends Command {
@@ -28,25 +22,8 @@ public class NewAdvertisementAddCity extends Command {
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                ADD_HASHTAGS_TEXT, getAddReplyKeyboard());
+                ADD_HASHTAGS_TEXT, null);
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                 ADD_CITY_TEXT, getTags(TagType.City, false));
-    }
-    
-    private ReplyKeyboardMarkup getAddReplyKeyboard() {
-        KeyboardButton mainMenuButton = new KeyboardButton();
-        mainMenuButton.setText(State.MainMenu.getDescription());
-
-        KeyboardRow keyboardFirstRow = new KeyboardRow();
-        keyboardFirstRow.add(mainMenuButton);
-
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        keyboardRows.add(keyboardFirstRow);
-
-        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-        replyKeyboardMarkup.setKeyboard(keyboardRows);
-        replyKeyboardMarkup.setResizeKeyboard(true);
-
-        return replyKeyboardMarkup;
     }
 }

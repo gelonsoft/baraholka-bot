@@ -1,12 +1,15 @@
 package baraholkateam.command;
 
+import baraholkateam.rest.model.CurrentAdvertisement;
 import baraholkateam.rest.service.CurrentAdvertisementService;
+import baraholkateam.rest.service.PreviousStateService;
 import baraholkateam.util.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
@@ -15,14 +18,16 @@ import java.util.List;
 
 @Component
 public class NewAdvertisementConfirmPhone extends Command {
-    private static final String PHONE_TEXT = """
-            Ваш номер телефона: %s
-            """;
-    private static final String CONFIRM_PHONE_TEXT = """
-            Желаете добавить ссылку на вашу социальную сеть?""";
+    private static final String PHONE_TEXT = "Ваш номер телефона: %s";
+    private static final String SOCIAL_TEXT = "Добавлена социальная сеть: %s";
+    private static final String CONFIRM_PHONE_TEXT = "Желаете добавить ссылку на вашу социальную сеть?";
+    public static final String DELETE_ALL_SOCIALS = "Удалить все социальные сети";
 
     @Autowired
     private CurrentAdvertisementService currentAdvertisementService;
+
+    @Autowired
+    private PreviousStateService previousStateService;
 
     public NewAdvertisementConfirmPhone() {
         super(State.NewAdvertisement_ConfirmPhone.getIdentifier(),
@@ -31,10 +36,15 @@ public class NewAdvertisementConfirmPhone extends Command {
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        String phone = currentAdvertisementService.get(chat.getId()).getPhone();
-        if (phone != null) {
+        CurrentAdvertisement currentAdvertisement = currentAdvertisementService.get(chat.getId());
+        String phone = currentAdvertisement.getPhone();
+        List<String> socials = currentAdvertisement.getContacts();
+        if (phone != null && previousStateService.get(chat.getId()) != State.NewAdvertisement_AddSocial) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                     String.format(PHONE_TEXT, phone), null);
+        } else if (!socials.isEmpty()) {
+            sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                    String.format(SOCIAL_TEXT, socials.get(socials.size() - 1)), getDeleteButton());
         }
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
@@ -63,5 +73,9 @@ public class NewAdvertisementConfirmPhone extends Command {
         inlineKeyboardMarkup.setKeyboard(keyboardRows);
 
         return inlineKeyboardMarkup;
+    }
+
+    private ReplyKeyboardMarkup getDeleteButton() {
+        return getReplyKeyboard(List.of(DELETE_ALL_SOCIALS));
     }
 }

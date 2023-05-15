@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.ArrayList;
@@ -36,23 +34,6 @@ public class NewAdvertisementConfirmPrice extends Command {
     }
 
     private ReplyKeyboardMarkup getAddReplyKeyboard() {
-        KeyboardButton addContactsButton = new KeyboardButton();
-        addContactsButton.setText(State.NewAdvertisement_AddContacts.getDescription());
-
-        KeyboardButton mainMenuButton = new KeyboardButton();
-        mainMenuButton.setText(State.MainMenu.getDescription());
-
-        KeyboardRow keyboardFirstRow = new KeyboardRow();
-        keyboardFirstRow.add(addContactsButton);
-        keyboardFirstRow.add(mainMenuButton);
-
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        keyboardRows.add(keyboardFirstRow);
-
-        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-        replyKeyboardMarkup.setKeyboard(keyboardRows);
-        replyKeyboardMarkup.setResizeKeyboard(true);
-
-        return replyKeyboardMarkup;
+        return getReplyKeyboard(List.of(State.NewAdvertisement_AddContacts.getDescription()));
     }
 }

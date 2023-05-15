@@ -4,7 +4,10 @@ import baraholkateam.util.State;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.bots.AbsSender;
+
+import java.util.List;
 
 @Component
 public class MainMenuCommand extends Command {
@@ -28,7 +31,17 @@ public class MainMenuCommand extends Command {
                         State.NewAdvertisement.getIdentifier(),
                         State.DeleteAdvertisement.getIdentifier(),
                         State.SearchAdvertisements.getIdentifier(),
-                        State.Help.getIdentifier()),
-                null);
+                        State.Help.getIdentifier()
+                ), getButtons());
+    }
+
+    private ReplyKeyboard getButtons() {
+        return getReplyKeyboard(List.of(
+                State.UserAdvertisements.getDescription(),
+                State.NewAdvertisement.getDescription(),
+                State.DeleteAdvertisement.getDescription(),
+                State.SearchAdvertisements.getDescription(),
+                State.Help.getDescription()
+        ));
     }
 }

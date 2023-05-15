@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 @Component
 public class NewAdvertisementAddDescription extends Command {
     private static final String ADD_DESCRIPTION_TEXT = """
-            Введите описание товара:""";
+            Введите краткое описание товара (не более 1024 символов):""";
 
     public NewAdvertisementAddDescription() {
         super(State.NewAdvertisement_AddDescription.getIdentifier(),

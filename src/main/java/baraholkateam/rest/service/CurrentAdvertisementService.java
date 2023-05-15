@@ -217,11 +217,35 @@ public class CurrentAdvertisementService {
         }
     }
 
+    public CurrentAdvertisement setSocials(Long chatId, List<String> socials) {
+        Optional<CurrentAdvertisement> currentAdvertisementOptional = currentAdvertisementRepository.findById(chatId);
+        if (currentAdvertisementOptional.isPresent()) {
+            CurrentAdvertisement advertisement = currentAdvertisementOptional.get();
+            advertisement.setSocials(socials);
+            return currentAdvertisementRepository.save(advertisement);
+        } else {
+            LOGGER.error(String.format("Cannot add social for chat %d!", chatId));
+            return null;
+        }
+    }
+
     public CurrentAdvertisement addPhoto(Long chatId, String photoId) {
         Optional<CurrentAdvertisement> currentAdvertisementOptional = currentAdvertisementRepository.findById(chatId);
         if (currentAdvertisementOptional.isPresent()) {
             CurrentAdvertisement advertisement = currentAdvertisementOptional.get();
             advertisement.addPhoto(photoId);
+            return currentAdvertisementRepository.save(advertisement);
+        } else {
+            LOGGER.error(String.format("Cannot add photo for chat %d!", chatId));
+            return null;
+        }
+    }
+
+    public CurrentAdvertisement setPhotoIds(Long chatId, List<String> photoIds) {
+        Optional<CurrentAdvertisement> currentAdvertisementOptional = currentAdvertisementRepository.findById(chatId);
+        if (currentAdvertisementOptional.isPresent()) {
+            CurrentAdvertisement advertisement = currentAdvertisementOptional.get();
+            advertisement.setPhotoIds(photoIds);
             return currentAdvertisementRepository.save(advertisement);
         } else {
             LOGGER.error(String.format("Cannot add photo for chat %d!", chatId));
