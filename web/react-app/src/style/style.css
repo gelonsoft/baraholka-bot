@@ -254,5 +254,33 @@ select {
     cursor: pointer;
 }
 
+.profile {
+    margin-left: 25px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.profile-info {
+    margin-left: 25px;
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.profile-photo {
+    width: 200px;
+    border-radius: 150px;
+}
+
+.user-name {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.user-login {
+    font-size: 18px;
+}
 
 

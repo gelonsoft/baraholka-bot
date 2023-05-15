@@ -139,7 +139,7 @@ class NewAd extends React.Component {
                 </label>
                 <div className="chosen-photos">
                     {this.state.chosenPhotos.map(function(photo) {
-                    return <img className="chosen-photo" alt="preview image" key="chosen-photo" src={URL.createObjectURL(photo).toString()}/>
+                    return <img className="chosen-photo" alt="preview image" src={URL.createObjectURL(photo).toString()}/>
                 })}
                 </div>
                 <div className="main__form-title">Добавить описание</div>
