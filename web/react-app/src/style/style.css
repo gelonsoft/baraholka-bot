@@ -225,7 +225,7 @@ select {
     padding-right: 20px;
     height: 40px;
     line-height: 40px;
-    width: 27%;
+    width: 20%;
 }
 
 .main__form-row {
@@ -240,7 +240,7 @@ select {
     margin-top: 10px;
     margin-bottom: 10px;
     border: solid 1px black;
-    color: #1d49a7;
+    color: #419FD9;
     border-radius: 10px;
     padding-left: 20px;
     padding-right: 20px;
@@ -250,53 +250,49 @@ select {
 
 .ad__form {
     margin-top: 10px;
-    margin-right: 2%;
 }
 
-.add__content {
-    width: 300px;
-    min-height: 400px;
+.add-content {
+    width: 400px;
+    height: 100%;
     margin-top: 10px;
-    margin-bottom: 10px;
-    border: solid 1px black;
-    border-radius: 10px;
-    padding-left: 5px;
-    padding-right: 5px;
-    padding-top: 5px;
-    height: fit-content;
+    padding-top: 10px;
+}
+
+.ad__photo{
+    height: 400px;
+    width: 100%;
+}
+.text__padding{
+    padding: 10px;
 }
 
 .ad-tags {
-    margin-top: 10px;
+    margin-top: 20px;
     margin-bottom: 10px;
-    color: #1d49a7;
+    color: #419FD9;
 }
 
 .ad-bottom-padding {
     margin-bottom: 10px;
 }
 
-.grid--4 {
-    display: flex;
-    flex-wrap: wrap;
-    margin-left: -20px;
+.grid {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-gap: 20px;
+
 }
 
-.grid__item {
-    flex-basis: 20%;
-    padding-left: 20px;
-}
-
-.ad__form-row {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: flex-start;
-    flex-wrap: wrap;
+.grid > div {
+    padding-bottom: 10px;
+    border: solid 1px black;
+    border-radius: 10px;
 }
 
 .ref-color {
-    color: #1d49a7;
+    color: #419FD9;
 }
 
 
