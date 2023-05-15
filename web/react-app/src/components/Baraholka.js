@@ -7,10 +7,10 @@ import Header from "./Header";
 class Baraholka extends React.Component {
     constructor(props) {
         super(props);
-        console.log(JSON.parse(localStorage.getItem('userData')));
     }
 
     render() {
+        console.log(localStorage.getItem('userData'));
         return (
             <div>
                 <Header/>
