@@ -250,5 +250,9 @@ select {
     border-radius: 10px;
 }
 
+.custom-checkbox:hover {
+    cursor: pointer;
+}
+
 
 

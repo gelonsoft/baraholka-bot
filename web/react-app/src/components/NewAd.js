@@ -1,16 +1,36 @@
 import React from 'react';
 import '../style/style.css';
+import axios from 'axios';
+import RequestService from '../services/RequestService';
 
 class NewAd extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {chosenPhotos: []};
+        this.state = {
+            chosenPhotos: [],
+            cityTags: [],
+            advertisementTypeTags: [],
+            categoriesTags: []
+        };
         this.createNewAd = this.createNewAd.bind(this);
         this.getBase64 = this.getBase64.bind(this);
         this.onPhotosChange = this.onPhotosChange.bind(this);
     }
 
     componentDidMount() {
+        // let userData = localStorage.getItem('userData');
+        let userData = {"auth_date":1684051188,"first_name":"Алиса","hash":"afc6a8181ae6eb8f494551c94c39a63fae2835470210428556f8db7f54b66603","id":538160964,"last_name":"Селецкая","photo_url":"https://t.me/i/userpic/320/Uim0VYUr3WRDc7ofnIj40wRzPe1L7t63Nv0FXKqydjM.jpg","username":"sealisaa"};
+        RequestService.getTags(userData).then((response) => {
+            if (response.data) {
+                this.setState({
+                    cityTags: response.data.city,
+                    advertisementTypeTags: response.data.advertisement_type,
+                    categoriesTags: response.data.product_categories
+                });
+            }
+        }).catch(err => {
+            console.log(err);
+        });
     }
 
     getBase64(file) {
@@ -20,19 +40,77 @@ class NewAd extends React.Component {
                 .replace('data:', '')
                 .replace(/^.+,/, '');
             console.log(base64String);
+            return base64String;
         };
-        console.log(reader.readAsDataURL(file));
+        reader.readAsDataURL(file);
     }
 
     createNewAd(e) {
+        console.log(e);
         e.preventDefault();
+        const NEW_AD_URL = "http://localhost:8080/api/add_advertisement";
         let userData = JSON.parse(localStorage.getItem('userData'));
+        userData = {"auth_date":1684051188,"first_name":"Алиса","hash":"afc6a8181ae6eb8f494551c94c39a63fae2835470210428556f8db7f54b66603","id":538160964,"last_name":"Селецкая","photo_url":"https://t.me/i/userpic/320/Uim0VYUr3WRDc7ofnIj40wRzPe1L7t63Nv0FXKqydjM.jpg","username":"sealisaa"};
         let photos = [];
         for (let i = 0; i < this.state.chosenPhotos.length; i++) {
-            this.getBase64(this.state.chosenPhotos[i])
-            // photos.push();
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result
+                    .replace('data:', '')
+                    .replace(/^.+,/, '');
+                photos.push(base64String)
+            };
+            reader.readAsDataURL(this.state.chosenPhotos[i]);
         }
-        console.log(photos);
+        let description = e.target[1].value;
+        let tags = [];
+        tags.push('#' + e.target[2].value);
+        let i = 3;
+        while (e.target[i].className === "type") {
+            if (e.target[i].checked) {
+                tags.push('#' + e.target[i].labels[0].innerText.toLowerCase().replaceAll(" ", "_"));
+            }
+            i++;
+        }
+        while (e.target[i].className === "category") {
+            if (e.target[i].checked) {
+                tags.push('#' + e.target[i].labels[0].innerText.toLowerCase().replaceAll(" ", "_"));
+            }
+            i++;
+        }
+        let price = e.target[i++].value;
+        let phone = e.target[i++].value;
+        let contacts = [];
+        contacts.push(e.target[i++].value);
+        let body = {
+            "id": userData.id,
+            "first_name": userData.first_name,
+            "last_name": userData.last_name,
+            "username": userData.username,
+            "photo_url": userData.photo_url,
+            "auth_date": userData.auth_date,
+            "hash": userData.hash,
+            "photos": photos,
+            "description": description,
+            "tags": tags,
+            "price": Number(price),
+            "phone": phone,
+            "contacts": contacts
+        };
+        console.log(body);
+        axios({
+            method: "post",
+            url: NEW_AD_URL,
+            data: body,
+            headers: { "Content-Type": "application/json" },
+        })
+        .then(function (response) {
+            alert("Объявление успешно добавлено");
+            location.reload();
+        })
+        .catch(function (response) {
+            console.log(response);
+        });
     }
 
     onPhotosChange(e) {
@@ -62,7 +140,7 @@ class NewAd extends React.Component {
                 </label>
                 <div className="chosen-photos">
                     {this.state.chosenPhotos.map(function(photo) {
-                    return <img className="chosen-photo" alt="preview image" src={URL.createObjectURL(photo).toString()}/>
+                    return <img className="chosen-photo" alt="preview image" key="chosen-photo" src={URL.createObjectURL(photo).toString()}/>
                 })}
                 </div>
                 <div className="main__form-title">Добавить описание</div>
@@ -72,104 +150,35 @@ class NewAd extends React.Component {
                 <div>Выберите город для публикации объявления.</div>
                 <select defaultValue="Не выбран">
                     <option>Не выбран</option>
+                    {this.state.cityTags.map(function(tag) {
+                        return (
+                            <option>{tag.substring(1).replaceAll("_", " ")}</option>
+                        )
+                    })}
                 </select>
                 <div className="main__form-title">Добавить тип объявления</div>
                 <div>Выберите тип объявления.</div>
                 <div className="main__form-row">
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Продажа
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Обмен
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Дар
-                        </label>
-                    </div>
+                    {this.state.advertisementTypeTags.map(function(tag) {
+                        return (
+                            <label className="custom-checkbox">
+                                <input className="type" type="checkbox" />
+                                {tag.substring(1).replaceAll("_", " ")}
+                            </label>
+                        )
+                    })}
                 </div>
                 <div className="main__form-title">Добавить категории</div>
                 <div>Выберите категории, наиболее подходящие для описания вашего товара.</div>
                 <div className="main__form-row">
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Одежда
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Обувь
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Книги
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Хобби
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Электроника
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Спорт
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Красота и здоровье
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Детские товары
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Бытовая техника
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Женское
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Мужское
-                        </label>
-                    </div>
-                    <div className="custom-checkbox">
-                        <label>
-                            <input type="checkbox" />
-                                Другое
-                        </label>
-                    </div>
+                    {this.state.categoriesTags.map(function(tag) {
+                        return (
+                            <label className="custom-checkbox">
+                                <input className="category" type="checkbox" />
+                                {tag.substring(1).replaceAll("_", " ")}
+                            </label>
+                        )
+                    })}
                 </div>
                 <div className="main__form-title">Добавить стоимость</div>
                 <div>Укажите стоимость товара в рублях, если она имеется (необязательно).</div>
