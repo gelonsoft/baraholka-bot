@@ -16,8 +16,7 @@ class MyAds extends React.Component {
     }
 
     componentDidMount() {
-        //TODO: Заменить на let userData = localStorage.getItem('userData');
-        let userData = {"auth_date":1684051188,"first_name":"Алиса","hash":"afc6a8181ae6eb8f494551c94c39a63fae2835470210428556f8db7f54b66603","id":538160964,"last_name":"Селецкая","photo_url":"https://t.me/i/userpic/320/Uim0VYUr3WRDc7ofnIj40wRzPe1L7t63Nv0FXKqydjM.jpg","username":"sealisaa"};
+        let userData = localStorage.getItem('userData');
         RequestService.getMyAds(userData).then((response) => {
             if (response.data) {
                 this.setState({
@@ -29,9 +28,9 @@ class MyAds extends React.Component {
             console.log(err);
         });
     }
+
     handleDeleteClick(val) {
-        //TODO: Заменить на let userData = localStorage.getItem('userData');
-        let userData = {"auth_date":1684051188,"first_name":"Алиса","hash":"afc6a8181ae6eb8f494551c94c39a63fae2835470210428556f8db7f54b66603","id":538160964,"last_name":"Селецкая","photo_url":"https://t.me/i/userpic/320/Uim0VYUr3WRDc7ofnIj40wRzPe1L7t63Nv0FXKqydjM.jpg","username":"sealisaa"};
+        let userData = localStorage.getItem('userData');
         RequestService.postDeleteAd(userData, val).then((response) => {
             if (response.data) {
                 let deleteAds = this.state.ads.find(ad => ad.id === val);
@@ -47,12 +46,12 @@ class MyAds extends React.Component {
 
 
     render() {
-        // const listOfAds = ads1?.map((ad) => <FoundAds key={ad.id} id={ad.id} username={ad.username} photos={ad.photos}
-            const listOfAds = this.state.ads?.map((ad) => <FoundAds key={ad.id} username={ad.username} photos={ad.photos}
-                                                          tags={ad.tags.toString().replaceAll(",", " ")}
-                                                          price={ad.price}
-                                                          description={ad.description} phone={ad.phone}
-                                                          contacts={ad.contacts} delete={this.handleDeleteClick}/>);
+        const listOfAds = this.state.ads?.map((ad) => <FoundAds key={ad.id} username={ad.username} photos={ad.photos}
+                                                                tags={ad.tags.toString().replaceAll(",", " ")}
+                                                                price={ad.price}
+                                                                description={ad.description} phone={ad.phone}
+                                                                contacts={ad.contacts}
+                                                                delete={this.handleDeleteClick}/>);
         return (<form>
             <div className="grid">
                 {listOfAds}
@@ -122,9 +121,15 @@ function Carousel(props) {
 
 
 class Photo extends React.Component {
+    type = this.props.photo.toString().at(0) === "/" ? "jpg" : "png"
     render() {
-        return <img src={`data:image/png;base64,${this.props.photo}`}/>
+        return <img src={`data:image/${this.type};base64,${this.props.photo}`} height="400"/>
     }
+
+    //TODO: заминить этим, если не работает
+    // render() {
+    //     return <img src={`data:image/png;base64,${this.props.photo}`} height="400"/>
+    // }
 }
 
 export default MyAds;
