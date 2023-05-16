@@ -1,11 +1,13 @@
 package baraholkateam.command;
 
 import baraholkateam.util.State;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 
 import java.util.List;
 
+@Component
 public class NonCommand {
     private static final String NO_CURRENT_STATE = """
             Ошибка в текущем состоянии бота.
@@ -17,13 +19,20 @@ public class NonCommand {
     private static final String CHOOSE_CITY = "Пожалуйста, выберите город для поиска.";
     private static final String CHOOSE_ADVERTISEMENT_TYPES = "Пожалуйста, выберите типы объявления.";
     private static final String CHOOSE_PRODUCT_CATEGORIES = "Пожалуйста, выберите категории объявлений.";
-    private static final String EMPTY_DESCRIPTION = "Описание пустое.";
-    private static final String INVALID_PHONE_NUMBER = "Номер телефона имеет неверный формат.";
-    private static final String INVALID_SOCIAL = "Ссылка на социальную сеть имеет неверный формат";
-    private static final String INVALID_PRICE = "Введенная цена имеет неверный формат.";
-
-    public NonCommand() {
-    }
+    private static final String EMPTY_DESCRIPTION = """
+            Длина описания превышает допустимый предел в 1024 символа.
+            Пожалуйста, введите описание еще раз.""";
+    private static final String INVALID_PHONE_NUMBER = """
+            Номер телефона имеет неверный формат.
+            Допустимый формат телефона: +7-xxx-xxx-xx-xx
+            Пожалуйста, введите номер телефона еще раз.""";
+    private static final String INVALID_SOCIAL = """
+            Ссылка на социальную сеть имеет неверный формат.
+            Пожалуйста, введите ссылку еще раз.""";
+    private static final String INVALID_PRICE = """
+            Введенная цена имеет неверный формат.
+            Цена должна состоять только из цифр и ее длина не должна превышать 18 символов.
+            Пожалуйста, введите цену еще раз.""";
 
     public List<AnswerPair> nonCommandExecute(Message msg, State currentState) {
         if (currentState == null) {
@@ -51,7 +60,6 @@ public class NonCommand {
         } else if (currentState.equals(State.SearchAdvertisements_ShowFoundAdvertisements)) {
             return List.of(new AnswerPair(UNKNOWN_COMMAND, true, null));
         }
-        // TODO добавить обработку всех возможных состояний и подсостояний
         return List.of(new AnswerPair(UNKNOWN_COMMAND, true, null));
     }
 

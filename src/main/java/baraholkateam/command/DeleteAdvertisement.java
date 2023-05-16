@@ -1,9 +1,11 @@
 package baraholkateam.command;
 
-import baraholkateam.database.SQLExecutor;
+import baraholkateam.rest.model.ActualAdvertisement;
+import baraholkateam.rest.service.ActualAdvertisementService;
 import baraholkateam.util.State;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -11,10 +13,10 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import static baraholkateam.util.Advertisement.DESCRIPTION_TEXT;
+import static baraholkateam.rest.model.ActualAdvertisement.DESCRIPTION_TEXT;
 
+@Component
 public class DeleteAdvertisement extends Command {
     public static final String NOT_ACTUAL_TEXT = "<b>НЕАКТУАЛЬНО</b>";
     public static final String USER_ACTUAL_ADS_TEXT = """
@@ -24,17 +26,18 @@ public class DeleteAdvertisement extends Command {
             Удалить выбранное объявление?""";
     private static final String NO_ADS_TO_DELETE = """
             У вас нет актуальных объявлений.""";
-    private final SQLExecutor sqlExecutor;
 
-    public DeleteAdvertisement(SQLExecutor sqlExecutor, Map<Long, Message> lastSentMessage) {
-        super(State.DeleteAdvertisement.getIdentifier(), State.DeleteAdvertisement.getDescription(), lastSentMessage);
-        this.sqlExecutor = sqlExecutor;
+    @Autowired
+    private ActualAdvertisementService actualAdvertisementService;
+
+    public DeleteAdvertisement() {
+        super(State.DeleteAdvertisement.getIdentifier(), State.DeleteAdvertisement.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         long chatId = chat.getId();
-        List<SQLExecutor.AdvertisementScheme> ads = sqlExecutor.userAds(chatId);
+        List<ActualAdvertisement> ads = actualAdvertisementService.getByChatId(chatId);
 
         if (ads == null || ads.isEmpty()) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(), NO_ADS_TO_DELETE,
@@ -45,13 +48,13 @@ public class DeleteAdvertisement extends Command {
         }
     }
 
-    public InlineKeyboardMarkup sendInlineKeyBoardMessage(List<SQLExecutor.AdvertisementScheme> ads) {
+    public InlineKeyboardMarkup sendInlineKeyBoardMessage(List<ActualAdvertisement> ads) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
 
         ads.forEach(ad -> {
             InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-            String description = ad.getAllText();
+            String description = ad.getAdvertisementText();
             int descIndex = description.indexOf(DESCRIPTION_TEXT);
             inlineKeyboardButton.setText(
                     description
