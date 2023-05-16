@@ -121,9 +121,15 @@ function Carousel(props) {
 
 
 class Photo extends React.Component {
+    type = this.props.photo.toString().at(0) === "/" ? "jpg" : "png"
     render() {
-        return <img src={`data:image/png;base64,${this.props.photo}`}/>
+        return <img src={`data:image/${this.type};base64,${this.props.photo}`} height="400"/>
     }
+
+    //TODO: заминить этим, если не работает
+    // render() {
+    //     return <img src={`data:image/png;base64,${this.props.photo}`} height="400"/>
+    // }
 }
 
 export default MyAds;
