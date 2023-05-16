@@ -29,18 +29,17 @@ class SearchAds extends React.Component {
 
     handleSelectChange = (event) => {
         let currentTags = this.state.choosenTags;
-        if (event.target.value !== "Не выбран"){
+        if (event.target.value !== "Не выбран") {
             currentTags = [...this.state.choosenTags, event.target.value];
         }
-            if (this.state.choosenTags.includes(this.state.currentCity)) {
-                currentTags = currentTags.filter(tag => tag !== this.state.currentCity);
-            }
-            this.setState({choosenTags: currentTags, currentCity: event.target.value});
+        if (this.state.choosenTags.includes(this.state.currentCity)) {
+            currentTags = currentTags.filter(tag => tag !== this.state.currentCity);
+        }
+        this.setState({choosenTags: currentTags, currentCity: event.target.value});
     };
 
     handleStartClick() {
-        //TODO: Заменить на let userData = localStorage.getItem('userData');
-        let userData = {"auth_date":1684051188,"first_name":"Алиса","hash":"afc6a8181ae6eb8f494551c94c39a63fae2835470210428556f8db7f54b66603","id":538160964,"last_name":"Селецкая","photo_url":"https://t.me/i/userpic/320/Uim0VYUr3WRDc7ofnIj40wRzPe1L7t63Nv0FXKqydjM.jpg","username":"sealisaa"};
+        let userData = localStorage.getItem('userData');
         RequestService.getSearchAds(userData, this.state.choosenTags).then((response) => {
             if (response.data) {
                 this.setState({
@@ -60,15 +59,18 @@ class SearchAds extends React.Component {
     render() {
         const isStarted = this.state.isStarted;
         if (isStarted) {
-            return <StartNewSearch ads={this.state.ads} choosenTags={this.state.choosenTags} new={this.handleNewClick}/>;
+            return <StartNewSearch ads={this.state.ads} choosenTags={this.state.choosenTags}
+                                   new={this.handleNewClick}/>;
         }
-        return <ChooseSearchTags change={this.handleCheckboxChange} start={this.handleStartClick} select={this.handleSelectChange}/>;
+        return <ChooseSearchTags change={this.handleCheckboxChange} start={this.handleStartClick}
+                                 select={this.handleSelectChange}/>;
     }
 }
 
 function ChooseSearchTags(props) {
     const listOfTypes = types.map((type, index) => <CheckBox key={index} lable={type} change={props.change}/>)
-    const listOfCategories = categories.map((category, index) => <CheckBox key={index} lable={category} change={props.change}/>)
+    const listOfCategories = categories.map((category, index) => <CheckBox key={index} lable={category}
+                                                                           change={props.change}/>)
     const listOfCities = cities.map((city, index) => <SelectItem key={index} lable={city}/>)
     return (<form>
         <div className="main__form-title">Город</div>
@@ -104,18 +106,17 @@ class CheckBox extends React.Component {
     }
 }
 
-function SelectItem(props){
-    return <option value={"#"+props.lable.toString()}>{props.lable}</option>
+function SelectItem(props) {
+    return <option value={"#" + props.lable.toString()}>{props.lable}</option>
 }
 
 
 function StartNewSearch(props) {
     const listOfAds = props.ads?.map((ad) => <FoundAds key={ad.id} username={ad.username} photos={ad.photos}
-    // const listOfAds = ads1?.map((ad) => <FoundAds key={ad.id} username={ad.username} photos={ad.photos}
-                                                  tags={ad.tags.toString().replaceAll(",", " ")}
-                                                  price={ad.price}
-                                                  description={ad.description} phone={ad.phone}
-                                                  contacts={ad.contacts}/>);
+                                                       tags={ad.tags.toString().replaceAll(",", " ")}
+                                                       price={ad.price}
+                                                       description={ad.description} phone={ad.phone}
+                                                       contacts={ad.contacts}/>);
     return (<form>
         <div className="main__form-title">Хэштеги</div>
         <div>Вы выбрали следующие хэштеги для выполнения поиска.</div>
