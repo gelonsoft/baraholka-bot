@@ -225,7 +225,7 @@ select {
     padding-right: 20px;
     height: 40px;
     line-height: 40px;
-    width: 27%;
+    width: 20%;
 }
 
 .main__form-row {
@@ -234,6 +234,65 @@ select {
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
+}
+
+.custom-text {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border: solid 1px black;
+    color: #419FD9;
+    border-radius: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 40px;
+    line-height: 40px;
+}
+
+.ad__form {
+    margin-top: 10px;
+}
+
+.add-content {
+    width: 400px;
+    height: 100%;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.ad__photo{
+    height: 400px;
+    width: 100%;
+}
+.text__padding{
+    padding: 10px;
+}
+
+.ad-tags {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #419FD9;
+}
+
+.ad-bottom-padding {
+    margin-bottom: 10px;
+}
+
+.grid {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-gap: 20px;
+
+}
+
+.grid > div {
+    padding-bottom: 10px;
+    border: solid 1px black;
+    border-radius: 10px;
+}
+
+.ref-color {
+    color: #419FD9;
 }
 
 .chosen-photos {
@@ -286,5 +345,14 @@ select {
 .help-link {
     color: #419FD9;
 }
+.del-btn{
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+}
+
 
 
