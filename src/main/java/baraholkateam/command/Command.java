@@ -118,6 +118,13 @@ public abstract class Command extends BotCommand {
         KeyboardRow next = new KeyboardRow();
         next.add(new KeyboardButton(NEXT_BUTTON_TEXT));
         nextList.add(next);
+
+        KeyboardButton back = new KeyboardButton();
+        back.setText(BACK_BUTTON);
+        KeyboardRow line = new KeyboardRow();
+        line.add(back);
+        nextList.add(line);
+
         rkm.setKeyboard(nextList);
         return rkm;
     }

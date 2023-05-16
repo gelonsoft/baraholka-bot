@@ -15,6 +15,7 @@ public enum Tag {
     Volgograd(TagType.City, "#Волгоград"),
     Kirov(TagType.City, "#Киров"),
     Khabarovsk(TagType.City, "#Хабаровск"),
+    OtherCity(TagType.City, "#другой_город"),
     Actual(TagType.Actuality, "#актуально"),
     Sale(TagType.AdvertisementType, "#продажа"),
     Exchange(TagType.AdvertisementType, "#обмен"),

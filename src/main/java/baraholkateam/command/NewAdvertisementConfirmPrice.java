@@ -9,14 +9,13 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class NewAdvertisementConfirmPrice extends Command {
     private static final String CONFIRM_PRICE_TEXT = """
             Цена вашего товара: %s руб.
-            Теперь необходимо добавить контакты для связи с вами.""";
+            Теперь необходимо добавить контакты для связи с Вами.""";
 
     @Autowired
     private CurrentAdvertisementService currentAdvertisementService;
