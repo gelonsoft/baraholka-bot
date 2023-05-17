@@ -138,14 +138,11 @@ function StartNewSearch(props) {
                                                        price={ad.price}
                                                        description={ad.description} phone={ad.phone}
                                                        contacts={ad.contacts}/>);
-    const showLoad = props.msg === "Поиск объявлений";
     return (<form>
         <div className="main__form-title">Хэштеги</div>
         <div>Вы выбрали следующие хэштеги для выполнения поиска.</div>
         <div className="custom-text">{props.choosenTags?.toString().replaceAll(",", " ")}</div>
         <input type="button" className="btn btn-dark ad__form" value="Выполнить новый поиск" onClick={props.new}/>
-        <div className="main__form-title mgs-margin">{props.msg}</div>
-        {showLoad ? <Example/> : null}
         <div className="grid">
             {listOfAds}
         </div>

@@ -285,6 +285,7 @@ select {
     grid-template-columns: repeat(auto-fit, minmax(400px, calc(100%/3 - 20px)));
     grid-auto-rows: 1fr;
     grid-gap: 20px;
+
 }
 
 .grid > div {
