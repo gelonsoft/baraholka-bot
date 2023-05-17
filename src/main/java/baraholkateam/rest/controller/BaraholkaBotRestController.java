@@ -10,12 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -35,8 +33,8 @@ public class BaraholkaBotRestController {
     private ActualAdvertisementService actualAdvertisementService;
 
     @RequestMapping(method = RequestMethod.POST, value = "/my_advertisements",
-            headers = {"content-type=multipart/form-data"})
-    public ResponseEntity<List<ActualAdvertisement>> getUserAdvertisements(@ModelAttribute TelegramUserInfo userInfo) {
+            headers = {"content-type=application/json"})
+    public ResponseEntity<List<ActualAdvertisement>> getUserAdvertisements(@RequestBody TelegramUserInfo userInfo) {
         Long userId = userInfo.getId();
 
         if (userId == null) {
@@ -81,8 +79,8 @@ public class BaraholkaBotRestController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/delete_advertisement/{message_id}",
-            headers = {"content-type=multipart/form-data"})
-    public ResponseEntity<HttpStatus> deleteAdvertisement(@ModelAttribute TelegramUserInfo userInfo,
+            headers = {"content-type=application/json"})
+    public ResponseEntity<HttpStatus> deleteAdvertisement(@RequestBody TelegramUserInfo userInfo,
                                                           @PathVariable("message_id") Long messageId) {
         Long userId = userInfo.getId();
 
@@ -108,12 +106,21 @@ public class BaraholkaBotRestController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/search_advertisements",
-            headers = {"content-type=multipart/form-data"})
-    public ResponseEntity<List<ActualAdvertisement>> searchAdvertisements(@ModelAttribute TelegramUserInfo userInfo,
-                                                                          @RequestParam String tags) {
+            headers = {"content-type=application/json"})
+    public ResponseEntity<List<ActualAdvertisement>> searchAdvertisements(@RequestBody JsonNode json) {
+        TelegramUserInfo userInfo;
+        List<String> tagsList;
+
+        try {
+            userInfo = controllerHelper.getUserInfo(json);
+            tagsList = controllerHelper.getTagsList(json);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         Long userId = userInfo.getId();
 
-        if (userId == null || tags == null) {
+        if (userId == null || tagsList.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -122,7 +129,7 @@ public class BaraholkaBotRestController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        String[] allTags = tags.split(" ");
+        String[] allTags = tagsList.toArray(String[]::new);
 
         List<ActualAdvertisement> advertisements = actualAdvertisementService.tagsSearch(allTags);
 
@@ -132,8 +139,8 @@ public class BaraholkaBotRestController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/all_tags",
-            headers = {"content-type=multipart/form-data"})
-    public ResponseEntity<AllTags> getAllTags(@ModelAttribute TelegramUserInfo userInfo) {
+            headers = {"content-type=application/json"})
+    public ResponseEntity<AllTags> getAllTags(@RequestBody TelegramUserInfo userInfo) {
         Long userId = userInfo.getId();
 
         if (userId == null) {

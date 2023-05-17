@@ -79,7 +79,7 @@ public class BaraholkaBotRestControllerHelper {
         this.tgFileLoader = tgFileLoader;
     }
 
-    public boolean checkUserRights(TelegramUserInfo userInfo) {
+    boolean checkUserRights(TelegramUserInfo userInfo) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] secretKeyBytes = md.digest(botToken.getBytes(StandardCharsets.UTF_8));
@@ -103,14 +103,14 @@ public class BaraholkaBotRestControllerHelper {
         }
     }
 
-    public boolean checkIsUserChannelMember(Long userId) {
+    boolean checkIsUserChannelMember(Long userId) {
         String userRole = telegramAPIRequests.getUserRole(userId);
         return Objects.equals(userRole, "creator")
                 || Objects.equals(userRole, "administrator")
                 || Objects.equals(userRole, "member");
     }
 
-    public void convertPhotoIdsToPhotoBase64Strings(List<ActualAdvertisement> advertisements) {
+    void convertPhotoIdsToPhotoBase64Strings(List<ActualAdvertisement> advertisements) {
         for (ActualAdvertisement advertisement : advertisements) {
             List<String> photos = new ArrayList<>();
             for (String photoId : advertisement.getPhotoIds()) {
@@ -127,7 +127,7 @@ public class BaraholkaBotRestControllerHelper {
         }
     }
 
-    public TelegramUserInfo getUserInfo(JsonNode json) {
+    TelegramUserInfo getUserInfo(JsonNode json) {
         Long userId = Long.parseLong(json.get("id").asText());
         String firstName = json.get("first_name").asText();
         String lastName = json.get("last_name").asText();
@@ -140,7 +140,7 @@ public class BaraholkaBotRestControllerHelper {
                 authDate, hash);
     }
 
-    public CurrentAdvertisement getCurrentAdvertisement(JsonNode json) {
+    CurrentAdvertisement getCurrentAdvertisement(JsonNode json) {
         Long userId = Long.parseLong(json.get("id").asText());
         String description = json.get("description").asText();
         Iterator<JsonNode> tagNodeIterator = json.withArray("tags").elements();
@@ -165,7 +165,16 @@ public class BaraholkaBotRestControllerHelper {
         return new CurrentAdvertisement(userId, description, tags, price, phone, contacts);
     }
 
-    public boolean addNewAdvertisement(CurrentAdvertisement currentAdvertisement, JsonNode json) {
+    List<String> getTagsList(JsonNode json) {
+        List<String> tagsList = new ArrayList<>();
+        Iterator<JsonNode> tagNodeIterator = json.withArray("tags").elements();
+        while (tagNodeIterator.hasNext()) {
+            tagsList.add(tagNodeIterator.next().asText());
+        }
+        return tagsList;
+    }
+
+    boolean addNewAdvertisement(CurrentAdvertisement currentAdvertisement, JsonNode json) {
         currentAdvertisementService.put(currentAdvertisement);
 
         Iterator<JsonNode> photosNodeIterator = json.withArray("photos").elements();
@@ -235,7 +244,7 @@ public class BaraholkaBotRestControllerHelper {
         return false;
     }
 
-    public void deleteMessage(Long messageId) throws TelegramApiException {
+    void deleteMessage(Long messageId) throws TelegramApiException {
         EditMessageCaption editMessage = new EditMessageCaption();
         String adText = actualAdvertisementService.adText(messageId)
                 .substring(Tag.Actual.getName().length() + 1);
@@ -248,7 +257,7 @@ public class BaraholkaBotRestControllerHelper {
         baraholkaBot.execute(editMessage);
     }
 
-    public boolean isUserMessageOwner(Long userId, Long messageId) {
+    boolean isUserMessageOwner(Long userId, Long messageId) {
         ActualAdvertisement advertisement = actualAdvertisementService.get(messageId);
         return advertisement != null && Objects.equals(advertisement.getOwnerChatId(), userId);
     }
