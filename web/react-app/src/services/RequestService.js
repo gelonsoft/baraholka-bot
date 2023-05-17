@@ -15,6 +15,7 @@ class RequestService {
         bodyFormData.append('photo_url', userData.photo_url);
         bodyFormData.append('auth_date', userData.auth_date);
         bodyFormData.append('hash', userData.hash);
+        console.log(bodyFormData);
         try {
             return axios({
                 method: "post",

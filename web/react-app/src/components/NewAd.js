@@ -19,8 +19,8 @@ class NewAd extends React.Component {
 
     componentDidMount() {
         // TODO: раскомментить первую строку и убрать вторую
-        //let userData = localStorage.getItem('userData');
-        let userData = {"auth_date":1684051188,"first_name":"Алиса","hash":"afc6a8181ae6eb8f494551c94c39a63fae2835470210428556f8db7f54b66603","id":538160964,"last_name":"Селецкая","photo_url":"https://t.me/i/userpic/320/Uim0VYUr3WRDc7ofnIj40wRzPe1L7t63Nv0FXKqydjM.jpg","username":"sealisaa"};
+        let userData = localStorage.getItem('userData');
+        //let userData = {"auth_date":1684051188,"first_name":"Алиса","hash":"afc6a8181ae6eb8f494551c94c39a63fae2835470210428556f8db7f54b66603","id":538160964,"last_name":"Селецкая","photo_url":"https://t.me/i/userpic/320/Uim0VYUr3WRDc7ofnIj40wRzPe1L7t63Nv0FXKqydjM.jpg","username":"sealisaa"};
         RequestService.getTags(userData).then((response) => {
             if (response.data) {
                 this.setState({
@@ -48,10 +48,10 @@ class NewAd extends React.Component {
     createNewAd(e) {
         console.log(e);
         e.preventDefault();
-        // TODO: раскомментить первую строку и убрать вторую
         const NEW_AD_URL = "http://localhost:8080/api/add_advertisement";
-        //let userData = JSON.parse(localStorage.getItem('userData'));
-        let userData = {"auth_date":1684051188,"first_name":"Алиса","hash":"afc6a8181ae6eb8f494551c94c39a63fae2835470210428556f8db7f54b66603","id":538160964,"last_name":"Селецкая","photo_url":"https://t.me/i/userpic/320/Uim0VYUr3WRDc7ofnIj40wRzPe1L7t63Nv0FXKqydjM.jpg","username":"sealisaa"};
+        // TODO: раскомментить первую строку и убрать вторую
+        let userData = JSON.parse(localStorage.getItem('userData'));
+        //let userData = {"auth_date":1684051188,"first_name":"Алиса","hash":"afc6a8181ae6eb8f494551c94c39a63fae2835470210428556f8db7f54b66603","id":538160964,"last_name":"Селецкая","photo_url":"https://t.me/i/userpic/320/Uim0VYUr3WRDc7ofnIj40wRzPe1L7t63Nv0FXKqydjM.jpg","username":"sealisaa"};
         let photos = [];
         for (let i = 0; i < this.state.chosenPhotos.length; i++) {
             const reader = new FileReader();

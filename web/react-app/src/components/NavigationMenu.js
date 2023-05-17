@@ -5,7 +5,6 @@ import {Link, useLocation} from "react-router-dom";
 const NavigationMenu = () => {
     const location = useLocation();
     React.useEffect(() => {
-        console.log(location);
     }, [location]);
     return (
         <div className="main__menu">
