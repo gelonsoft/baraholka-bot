@@ -151,8 +151,7 @@ class FoundAds extends React.Component {
                     <span style={{display: this.checkPrice}}
                           className="ad-bottom-padding">Цена: {this.props.price} руб.</span>
                     <div className="ad-bottom-padding">Описание: {this.props.description}</div>
-                    <div className="ad-bottom-padding">--------------------------------------------------------
-                    </div>
+                    <span className="ad-bottom-padding" style={{display: this.checkLine}}>--------------------------------------------------------</span>
                     <ReactSpoiler blur={10} hoverBlur={8}>
                         <span style={{display: this.checkPhone}}>Номер телефона: {this.props.phone}</span>
                         <span style={{display: this.checkContacts}}>Контакты:</span>

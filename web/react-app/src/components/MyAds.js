@@ -11,21 +11,28 @@ class MyAds extends React.Component {
         super(props);
         this.handleDeleteClick = this.handleDeleteClick.bind(this);
         this.state = {
-            ads: []
+            ads: [],
+            error : false
         };
     }
 
     componentDidMount() {
         let userData = localStorage.getItem('userData');
+       // let userData = {"auth_date":1684270687,"first_name":"Valeria","hash":"1155ef8296632b5a507bdc602c3f920896f5a26d4602fbab62d5258cc1399266","id":654017127,"last_name":"Lyashenko","photo_url":"https://t.me/i/userpic/320/nq9IaEKOIkhrECFMvSDkNrde4NL2J9QZozdni9dxttw.jpg","username":"leovaldez00"}
+
         RequestService.getMyAds(userData).then((response) => {
             if (response.data) {
                 this.setState({
-                    ads: response.data
+                    ads: response.data,
+                    error : false
                 });
                 console.log("My ads", response.data);
             }
         }).catch(err => {
             console.log(err);
+            this.setState({
+                error : true
+            });
         });
     }
 
@@ -52,7 +59,10 @@ class MyAds extends React.Component {
                                                                 description={ad.description} phone={ad.phone}
                                                                 contacts={ad.contacts}
                                                                 delete={this.handleDeleteClick}/>);
+        const msg = this.state.error ? "Ошибка при получении данных" : listOfAds.length === 0 ? "У вас нет новых объявлений" : "Ваши объявления"
+
         return (<form>
+            <div className="main__form-title">{msg}</div>
             <div className="grid">
                 {listOfAds}
             </div>
@@ -70,6 +80,7 @@ class FoundAds extends React.Component {
     checkPrice = this.props.price == null ? "none" : "block";
     checkPhone = this.props.phone == null ? "none" : "block";
     checkContacts = this.listOfRef.length === 0 ? "none" : "block";
+    checkLine = this.checkPhone === "none" && this.checkContacts === "none"? "none" : "block";
 
     render() {
         return (<div className="ad__form">
@@ -89,8 +100,7 @@ class FoundAds extends React.Component {
                     <span style={{display: this.checkPrice}}
                           className="ad-bottom-padding">Цена: {this.props.price} руб.</span>
                     <div className="ad-bottom-padding">Описание: {this.props.description}</div>
-                    <div className="ad-bottom-padding">--------------------------------------------------------
-                    </div>
+                    <span className="ad-bottom-padding" style={{display: this.checkLine}}>--------------------------------------------------------</span>
                     <ReactSpoiler blur={10} hoverBlur={8}>
                         <span style={{display: this.checkPhone}}>Номер телефона: {this.props.phone}</span>
                         <span style={{display: this.checkContacts}}>Контакты:</span>
@@ -121,15 +131,9 @@ function Carousel(props) {
 
 
 class Photo extends React.Component {
-    type = this.props.photo.toString().at(0) === "/" ? "jpg" : "png"
     render() {
-        return <img src={`data:image/${this.type};base64,${this.props.photo}`} height="400"/>
+        return <img src={`data:image/png;base64,${this.props.photo}`} height="400"/>
     }
-
-    //TODO: заминить этим, если не работает
-    // render() {
-    //     return <img src={`data:image/png;base64,${this.props.photo}`} height="400"/>
-    // }
 }
 
 export default MyAds;
