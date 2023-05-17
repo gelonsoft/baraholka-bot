@@ -98,17 +98,11 @@ class NewAd extends React.Component {
             "phone": phone,
             "contacts": contacts
         };
-        console.log(body);
-        axios.post(
-            NEW_AD_URL,
-            body
-        )
-        .then(function (response) {
+        RequestService.newAd(body).then((response) => {
             alert("Объявление успешно добавлено");
             document.getElementById("new-ad-form").reset();
-        })
-        .catch(function (response) {
-            console.log(response);
+        }).catch(err => {
+            console.log(err);
         });
     }
 
