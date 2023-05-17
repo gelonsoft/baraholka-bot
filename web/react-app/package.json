@@ -12,6 +12,7 @@
     "react-flickity-component": "^4.0.5",
     "react-router-dom": "^6.11.1",
     "react-scripts": "5.0.1",
+    "react-spoiler": "^0.4.3",
     "react-telegram-login": "^1.1.2",
     "web-vitals": "^2.1.4"
   },

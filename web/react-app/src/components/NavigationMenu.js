@@ -2,12 +2,11 @@ import React from 'react';
 import '../style/style.css';
 import {Link, useLocation} from "react-router-dom";
 
-const NavigationMenu = props => {
+const NavigationMenu = () => {
     const location = useLocation();
     React.useEffect(() => {
         console.log(location);
     }, [location]);
-    let currentTab = location.pathname;
     return (
         <div className="main__menu">
             <Link to="/baraholka/profile">

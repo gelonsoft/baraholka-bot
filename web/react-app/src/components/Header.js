@@ -29,7 +29,7 @@ class Header extends React.Component {
                         baraholka-bot
                     </div>
                 </div>
-                <button className="header__exit-btn">
+                <button onClick={this.logout} className="header__exit-btn">
                     Выйти
                 </button>
             </header>
