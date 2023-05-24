@@ -43,6 +43,7 @@ public class NotificationExecutor {
             Через %s часов объявление будет автоматически удалено, если не подтвердить его актуальность.""";
     private static final String ASK_NEXT_UPDATE = """
             Является ли данное объявление актуальным?""";
+    private static final String CANNOT_FORWARD_MESSAGE = "Невозможно переслать объявление из канала.";
 
     /**
      * Период времени до первого уведомления пользователя о подтверждении актуальности объявления.
@@ -107,6 +108,11 @@ public class NotificationExecutor {
                 actualAdvertisementService.setUpdateAttempt(messageId, attemptNum + 1);
                 Long forwardedMessageId =
                         telegramAPIRequests.forwardMessage(channelUsername, String.valueOf(chatId), messageId);
+
+                if (forwardedMessageId == null) {
+                    LOGGER.error(CANNOT_FORWARD_MESSAGE);
+                    break;
+                }
 
                 if (attemptNum == 2) {
                     deleteMessages(sender, chatId, messageId);
