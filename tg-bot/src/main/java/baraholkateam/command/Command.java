@@ -69,7 +69,7 @@ public abstract class Command extends BotCommand {
             Пожалуйста, вернитесь в главное меню /%s и попробуйте снова.""";
     static final String NO_HASHTAGS = "➖";
     static final String CHOSEN_HASHTAGS = "Текущие выбранные хэштеги: %s";
-    private final Logger logger = LoggerFactory.getLogger(Command.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Command.class);
 
     @Autowired
     private LastSentMessageService lastSentMessageService;
@@ -104,7 +104,7 @@ public abstract class Command extends BotCommand {
             Message sentMessage = absSender.execute(message);
             lastSentMessageService.put(chatId, sentMessage);
         } catch (TelegramApiException e) {
-            logger.error(String.format("Cannot execute command %s of user %s: %s", commandName, userName,
+            LOGGER.error(String.format("Cannot execute command %s of user %s: %s", commandName, userName,
                     e.getMessage()));
         }
     }
@@ -165,7 +165,6 @@ public abstract class Command extends BotCommand {
     }
 
     ReplyKeyboardMarkup getReplyKeyboard(List<String> buttons) {
-        ReplyKeyboardMarkup rkm = new ReplyKeyboardMarkup();
         List<KeyboardRow> lines = new ArrayList<>(1);
         KeyboardRow line = new KeyboardRow();
 
@@ -193,6 +192,8 @@ public abstract class Command extends BotCommand {
         line = new KeyboardRow();
         line.add(back);
         lines.add(line);
+
+        ReplyKeyboardMarkup rkm = new ReplyKeyboardMarkup();
         rkm.setKeyboard(lines);
         rkm.setResizeKeyboard(true);
         return rkm;

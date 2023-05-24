@@ -278,7 +278,6 @@ public class ActualAdvertisement implements Serializable {
         }
 
         Long price = this.getPrice();
-        String description = this.getDescription();
 
         StringBuilder sb = new StringBuilder();
 
@@ -287,6 +286,7 @@ public class ActualAdvertisement implements Serializable {
         if (price != null) {
             sb.append(String.format(PRICE_TEXT, price)).append("\n\n");
         }
+        String description = this.getDescription();
         sb.append(DESCRIPTION_TEXT).append(description);
         sb.append("\n");
 

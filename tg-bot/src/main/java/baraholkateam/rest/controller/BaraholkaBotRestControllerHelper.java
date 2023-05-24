@@ -141,14 +141,11 @@ public class BaraholkaBotRestControllerHelper {
     }
 
     CurrentAdvertisement getCurrentAdvertisement(JsonNode json) {
-        Long userId = Long.parseLong(json.get("id").asText());
-        String description = json.get("description").asText();
         Iterator<JsonNode> tagNodeIterator = json.withArray("tags").elements();
         List<Tag> tags = new ArrayList<>();
         while (tagNodeIterator.hasNext()) {
             tags.add(Tag.getTagByName(tagNodeIterator.next().asText()));
         }
-        Long price = Long.parseLong(json.get("price").asText());
         String phone = json.get("phone").asText();
         if (Objects.equals(phone, "null")) {
             phone = null;
@@ -161,6 +158,9 @@ public class BaraholkaBotRestControllerHelper {
         if (contacts.isEmpty()) {
             contacts = new ArrayList<>();
         }
+        Long userId = Long.parseLong(json.get("id").asText());
+        String description = json.get("description").asText();
+        Long price = Long.parseLong(json.get("price").asText());
 
         return new CurrentAdvertisement(userId, description, tags, price, phone, contacts);
     }
@@ -175,6 +175,11 @@ public class BaraholkaBotRestControllerHelper {
     }
 
     boolean addNewAdvertisement(CurrentAdvertisement currentAdvertisement, JsonNode json) {
+        if (currentAdvertisement.getContacts().size() == 0 && currentAdvertisement.getPhone() == null) {
+            currentAdvertisement.setSocials(List.of("@"
+                    + telegramAPIRequests.getUser(currentAdvertisement.getChatId()).username()));
+        }
+
         currentAdvertisementService.put(currentAdvertisement);
 
         Iterator<JsonNode> photosNodeIterator = json.withArray("photos").elements();

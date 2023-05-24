@@ -668,6 +668,12 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
             case CONFIRM_AD_CALLBACK_DATA -> {
                 deleteLastMessage(msg.getChatId());
                 if (Objects.equals(dataParts[1], "yes")) {
+                    if (currentAdvertisementService.getContacts(msg.getChatId()).size() == 0
+                            && currentAdvertisementService.getPhone(msg.getChatId()) == null) {
+                        currentAdvertisementService.setSocials(msg.getChatId(),
+                                List.of("@" + telegramAPIRequests.getUser(msg.getChatId()).username()));
+                    }
+
                     Message sentAd;
                     if (Objects.equals(dataParts[2], "0")) {
                         sentAd = newAdvertisementConfirm.sendPhotoMessage(
