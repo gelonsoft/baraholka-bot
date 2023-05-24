@@ -1,7 +1,6 @@
 .idea
 target
-src/main/resources/
-/src/main/java/baraholkateam/secure_constants/
+application.properties
 /node_modules/
 /web/react-app/build/
 /web/react-app/node_modules/
