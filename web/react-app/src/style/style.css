@@ -259,11 +259,12 @@ select {
     padding-top: 10px;
 }
 
-.ad__photo{
+.ad__photo {
     height: 400px;
     width: 100%;
 }
-.text__padding{
+
+.text__padding {
     padding: 10px;
 }
 
@@ -280,9 +281,8 @@ select {
 .grid {
     margin-top: 10px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 500px));
+    grid-template-columns: repeat(auto-fit, minmax(400px, calc(100%/3 - 20px)));
     grid-gap: 20px;
-
 }
 
 .grid > div {
@@ -345,7 +345,8 @@ select {
 .help-link {
     color: #419FD9;
 }
-.del-btn{
+
+.del-btn {
     background-color: transparent;
     background-repeat: no-repeat;
     border: none;
@@ -353,6 +354,29 @@ select {
     overflow: hidden;
     outline: none;
 }
+
+.read-more-button {
+    display: inline-block;
+    margin-left: 3px;
+    color: #419FD9;
+    cursor: pointer;
+}
+
+.btn-dialog {
+    border-radius: 10px;
+    color: white;
+    border: none;
+    width: 190px;
+}
+
+.btn-dark-color{
+    background-color: #293A4C;
+}
+
+.btn-light-color{
+    background-color: #419FD9;
+}
+
 
 
 

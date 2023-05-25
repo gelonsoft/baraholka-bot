@@ -20,7 +20,7 @@ class RequestService {
                 method: "post",
                 url: GET_TAGS_URL,
                 data: bodyFormData,
-                headers: { "Content-Type": "multipart/form-data" },
+                headers: { "Content-Type": "application/json" },
             });
         } catch (e) {
             console.error(e);
@@ -42,7 +42,7 @@ class RequestService {
                 method: "post",
                 url: GET_SEARCH_ADS_URL,
                 data: bodyFormData,
-                headers: { "Content-Type": "multipart/form-data" },
+                headers: { "Content-Type": "application/json" },
             });
         } catch (e) {
             console.error(e);
@@ -64,7 +64,7 @@ class RequestService {
                 method: "post",
                 url: GET_MY_ADS_URL,
                 data: bodyFormData,
-                headers: { "Content-Type": "multipart/form-data" },
+                headers: { "Content-Type": "application/json" },
             });
         } catch (e) {
             console.error(e);
@@ -80,13 +80,13 @@ class RequestService {
         bodyFormData.append('photo_url', userData.photo_url);
         bodyFormData.append('auth_date', userData.auth_date);
         bodyFormData.append('hash', userData.hash);
-        console.log(bodyFormData.values());
+        console.log("DELETE", mess_id);
         try {
             return axios({
                 method: "post",
                 url: POST_DEL_AD_URL+mess_id,
                 data: bodyFormData,
-                headers: { "Content-Type": "multipart/form-data" },
+                headers: { "Content-Type": "application/json" },
             });
         } catch (e) {
             console.error(e);
