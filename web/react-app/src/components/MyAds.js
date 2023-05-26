@@ -1,12 +1,14 @@
 import React from 'react';
-import Flickity from "react-flickity-component";
 import '../style/style.css';
-import '../style/flickity.css';
 import ReactSpoiler from "react-spoiler";
 import RequestService from "../services/RequestService";
 import ReadMoreReact from 'read-more-react';
 import Rodal from 'rodal';
 import '../style/rodal.css';
+import AliceCarousel from "react-alice-carousel";
+import ReactLoading from "react-loading";
+import Contact from "../services/Contact";
+import Photo from "../services/Photo";
 
 
 class MyAds extends React.Component {
@@ -61,18 +63,15 @@ class MyAds extends React.Component {
                                                                 description={ad.description} phone={ad.phone}
                                                                 contacts={ad.contacts}
                                                                 delete={(id) => this.handleDeleteClick(id)}/>);
-
+        const showLoad = this.state.msg === "Загрузка данных";
         return (<form>
             <div className="main__form-title">{this.state.msg}</div>
+            { showLoad ? <Example /> : null }
             <div className="grid">
                 {listOfAds}
             </div>
         </form>)
     }
-}
-
-const flickityOptions = {
-    setGallerySize: false
 }
 
 class FoundAds extends React.Component {
@@ -113,30 +112,16 @@ class FoundAds extends React.Component {
     }
 }
 
-
-class Contact extends React.Component {
-    render() {
-        return <a className="ref-color" href={this.props.contact}>{this.props.contact}</a>
-    }
-}
-
-
 function Carousel(props) {
     const listOfPhotos = props.photos
-    return (<Flickity
-        className={'carousel'}
-        options={flickityOptions}
-    >
-        {listOfPhotos}
-    </Flickity>);
+    return (
+        <AliceCarousel autoWidth={false} mouseTracking items={listOfPhotos}/>
+    );
 }
 
-
-class Photo extends React.Component {
-    render() {
-        return <img src={`data:image/png;base64,${this.props.photo}`} height="400"/>
-    }
-}
+const Example = () => (
+    <ReactLoading className="ad__form" type="spin" color="#419FD9" height={40} width={40}/>
+);
 
 class Dialog extends React.Component {
     constructor(props) {

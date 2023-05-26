@@ -1,13 +1,13 @@
-import React, {useState} from 'react';
-import Flickity from "react-flickity-component";
+import React from 'react';
 import '../style/style.css';
-import '../style/flickity.css';
 import ReactSpoiler from "react-spoiler";
 import RequestService from '../services/RequestService';
-
-const types = ['#продажа', '#обмен', '#дар', '#торг_уместен', '#срочно']
-const categories = ['#одежда', '#обувь', '#детские_товары', '#красота_и_здоровье', '#книги', '#хобби', '#домашняя_техника', '#электроника', '#спорт', '#другое', '#мужское', '#женское']
-const cities = ['Москва', 'СПб', 'Екатеринбург', 'Челябинск', 'Ульяновск', 'Омск', 'Белгород', 'Петропавловск', 'Пермь', 'Волгоград', 'Киров', 'Хабаровск']
+import ReadMoreReact from 'read-more-react';
+import AliceCarousel from 'react-alice-carousel';
+import '../style/alice-carousel.css';
+import ReactLoading from 'react-loading';
+import Contact from '../services/Contact';
+import Photo from '../services/Photo';
 
 class SearchAds extends React.Component {
     constructor(props) {
@@ -15,8 +15,30 @@ class SearchAds extends React.Component {
         this.handleStartClick = this.handleStartClick.bind(this);
         this.handleNewClick = this.handleNewClick.bind(this);
         this.state = {
-            isStarted: false, choosenTags: [], ads: [], currentCity: 'Не выбран'
+            isStarted: false,
+            choosenTags: [],
+            ads: [],
+            currentCity: 'Не выбран',
+            msg: "Поиск объявлений",
+            cityTags: ['#Москва', '#СПб', '#Екатеринбург', '#Челябинск', '#Ульяновск', '#Омск', '#Белгород', '#Петропавловск', '#Пермь', '#Волгоград', '#Киров', '#Хабаровск'],
+            advertisementTypeTags: ['#продажа', '#обмен', '#дар', '#торг_уместен', '#срочно'],
+            categoriesTags: ['#одежда', '#обувь', '#детские_товары', '#красота_и_здоровье', '#книги', '#хобби', '#домашняя_техника', '#электроника', '#спорт', '#другое', '#мужское', '#женское'],
         };
+    }
+
+    componentDidMount() {
+        let userData = localStorage.getItem('userData');
+        RequestService.getTags(userData).then((response) => {
+            if (response.data) {
+                this.setState({
+                    cityTags: response.data.city,
+                    advertisementTypeTags: response.data.advertisement_type,
+                    categoriesTags: response.data.product_categories
+                });
+            }
+        }).catch(err => {
+            console.log(err);
+        });
     }
 
     handleCheckboxChange = (event) => {
@@ -43,73 +65,76 @@ class SearchAds extends React.Component {
         RequestService.getSearchAds(userData, this.state.choosenTags).then((response) => {
             if (response.data) {
                 this.setState({
-                    ads: response.data
+                    ads: response.data,
+                    msg: response.data.length === 0 ? "По вашему запросу ничего не нашлось" : "Найденные объявления"
                 });
             }
         }).catch(err => {
             console.log(err);
+            this.setState({
+                msg: "Ошибка при получении данных. " + err
+            });
         });
         this.setState({isStarted: true});
     }
 
     handleNewClick() {
-        this.setState({isStarted: false, choosenTags: [], ads: []});
+        this.setState({isStarted: false, choosenTags: [], ads: [], msg: "Поиск объявлений"});
     }
 
     render() {
         const isStarted = this.state.isStarted;
         if (isStarted) {
-            return <StartNewSearch ads={this.state.ads} choosenTags={this.state.choosenTags}
+            return <StartNewSearch ads={this.state.ads} msg={this.state.msg} choosenTags={this.state.choosenTags}
                                    new={this.handleNewClick}/>;
         }
-        return <ChooseSearchTags change={this.handleCheckboxChange} start={this.handleStartClick}
+        return <ChooseSearchTags cities={this.state.cityTags} types={this.state.advertisementTypeTags}
+                                 categories={this.state.categoriesTags}
+                                 change={this.handleCheckboxChange} start={this.handleStartClick}
                                  select={this.handleSelectChange}/>;
     }
 }
 
 function ChooseSearchTags(props) {
-    const listOfTypes = types.map((type, index) => <CheckBox key={index} lable={type} change={props.change}/>)
-    const listOfCategories = categories.map((category, index) => <CheckBox key={index} lable={category}
-                                                                           change={props.change}/>)
-    const listOfCities = cities.map((city, index) => <SelectItem key={index} lable={city}/>)
+
     return (<form>
         <div className="main__form-title">Город</div>
         <div>Выберите город, по которому хотите выполнить поиск.</div>
-        <select onChange={props.select}>
-            <option selected value="Не выбран">Не выбран</option>
-            {listOfCities}
+        <select defaultValue="Не выбран" onChange={props.select}>
+            <option value="Не выбран">Не выбран</option>
+            {props.cities.map(function (tag) {
+                return (
+                    <option value={tag.toString()}>{tag.substring(1).replaceAll("_", " ")}</option>
+                )
+            })}
         </select>
         <div className="main__form-title">Тип объявления</div>
         <div>Выберите типы объявления, по которым хотите выполнить поиск.</div>
         <div className="main__form-row">
-            {listOfTypes}
+            {props.types.map(function (tag) {
+                return (
+                    <label className="custom-checkbox">
+                        <input className="type" type="checkbox" value={tag.toString()} onChange={props.change}/>
+                        {tag.substring(1).replaceAll("_", " ")}
+                    </label>
+                )
+            })}
         </div>
         <div className="main__form-title">Категории</div>
         <div>Выберите категории, по которым хотите выполнить поиск.</div>
         <div className="main__form-row">
-            {listOfCategories}
+            {props.categories.map(function (tag) {
+                return (
+                    <label className="custom-checkbox">
+                        <input className="type" type="checkbox" value={tag.toString()} onChange={props.change}/>
+                        {tag.substring(1).replaceAll("_", " ")}
+                    </label>
+                )
+            })}
         </div>
         <input type="button" className="btn btn-dark ad__form" value="Искать" onClick={props.start}/>
     </form>)
 }
-
-class CheckBox extends React.Component {
-    render() {
-        return (
-            <div className="custom-checkbox">
-                <label>
-                    <input type="checkbox" value={this.props.lable} onChange={this.props.change}/>
-                    {this.props.lable}
-                </label>
-            </div>
-        )
-    }
-}
-
-function SelectItem(props) {
-    return <option value={"#" + props.lable.toString()}>{props.lable}</option>
-}
-
 
 function StartNewSearch(props) {
     const listOfAds = props.ads?.map((ad) => <FoundAds key={ad.id} username={ad.username} photos={ad.photos}
@@ -117,31 +142,30 @@ function StartNewSearch(props) {
                                                        price={ad.price}
                                                        description={ad.description} phone={ad.phone}
                                                        contacts={ad.contacts}/>);
+    const showLoad = props.msg === "Поиск объявлений";
     return (<form>
         <div className="main__form-title">Хэштеги</div>
         <div>Вы выбрали следующие хэштеги для выполнения поиска.</div>
         <div className="custom-text">{props.choosenTags?.toString().replaceAll(",", " ")}</div>
         <input type="button" className="btn btn-dark ad__form" value="Выполнить новый поиск" onClick={props.new}/>
+        <div className="main__form-title mgs-margin">{props.msg}</div>
+        { showLoad ? <Example /> : null }
         <div className="grid">
             {listOfAds}
         </div>
     </form>)
 }
 
-const flickityOptions = {
-    setGallerySize: false
-}
 
 class FoundAds extends React.Component {
     listOfRef = this.props.contacts.map((contact, index) => <Contact key={index} contact={contact}/>)
     listOfPhotos = this.props.photos.map((photo, index) => <Photo key={index} photo={photo}/>)
     checkPrice = this.props.price == null ? "none" : "block";
     checkPhone = this.props.phone == null ? "none" : "block";
-    checkContacts = this.listOfRef.length === 0 ? "none" : "block";
 
     render() {
         return (<div className="ad__form">
-            <div className="text__padding">{this.props.username}</div>
+            <div className="text__padding"></div>
             <div className="add__content">
                 <div className="ad__photo">
                     <Carousel photos={this.listOfPhotos}/>
@@ -150,11 +174,15 @@ class FoundAds extends React.Component {
                     <div className="ad-tags">{this.props.tags}</div>
                     <span style={{display: this.checkPrice}}
                           className="ad-bottom-padding">Цена: {this.props.price} руб.</span>
-                    <div className="ad-bottom-padding">Описание: {this.props.description}</div>
-                    <span className="ad-bottom-padding" style={{display: this.checkLine}}>--------------------------------------------------------</span>
+                    <ReadMoreReact text={`Описание: ${this.props.description}`}
+                                   min={150}
+                                   ideal={150}
+                                   max={200}
+                                   readMoreText="Подробнее"/>
+                    <div>--------------------------------------------------------</div>
                     <ReactSpoiler blur={10} hoverBlur={8}>
                         <span style={{display: this.checkPhone}}>Номер телефона: {this.props.phone}</span>
-                        <span style={{display: this.checkContacts}}>Контакты:</span>
+                        <div>Контакты:</div>
                         {this.listOfRef}
                     </ReactSpoiler>
                 </div>
@@ -163,28 +191,16 @@ class FoundAds extends React.Component {
     }
 }
 
-class Contact extends React.Component {
-    render() {
-        return <a className="ref-color" href={this.props.contact}>{this.props.contact}</a>
-    }
-}
-
-
 function Carousel(props) {
     const listOfPhotos = props.photos
-    return (<Flickity
-        className={'carousel'}
-        options={flickityOptions}
-    >
-        {listOfPhotos}
-    </Flickity>);
+    return (
+        <AliceCarousel autoWidth={false} mouseTracking items={listOfPhotos}/>
+    );
 }
 
 
-class Photo extends React.Component {
-    render() {
-        return <img src={`data:image/png;base64,${this.props.photo}`} height="400"/>
-    }
-}
+const Example = () => (
+    <ReactLoading className="ad__form" type="spin" color="#419FD9" height={40} width={40}/>
+);
 
 export default SearchAds;
