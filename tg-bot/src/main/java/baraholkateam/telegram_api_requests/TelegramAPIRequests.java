@@ -213,8 +213,6 @@ public class TelegramAPIRequests {
                 return null;
             }
 
-            Integer uid = user.getInt(ID_FIELD);
-
             if (!user.has(FIRST_NAME_FIELD)) {
                 logErrorNoField(request, response, FIRST_NAME_FIELD);
                 return null;
@@ -234,6 +232,7 @@ public class TelegramAPIRequests {
                 return null;
             }
 
+            Integer uid = user.getInt(ID_FIELD);
             String username = user.getString(USERNAME_FIELD);
 
             return new TelegramUser(uid, firstName, lastName, username);

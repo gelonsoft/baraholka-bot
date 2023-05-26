@@ -49,10 +49,10 @@ public class ActualAdvertisementService {
         }
     }
 
-    public List<String> getPhotoIds(Long messageId) {
+    public List<String> getPhotos(Long messageId) {
         Optional<ActualAdvertisement> actualAdvertisementOptional = actualAdvertisementRepository.findById(messageId);
         if (actualAdvertisementOptional.isPresent()) {
-            return actualAdvertisementOptional.get().getPhotoIds();
+            return actualAdvertisementOptional.get().getPhotos();
         } else {
             LOGGER.error(String.format("Actual advertisement's photo ids for message id %d not found!", messageId));
             return null;
@@ -234,11 +234,11 @@ public class ActualAdvertisementService {
         }
     }
 
-    public ActualAdvertisement addPhoto(Long messageId, String photoId) {
+    public ActualAdvertisement addPhoto(Long messageId, String photo) {
         Optional<ActualAdvertisement> actualAdvertisementOptional = actualAdvertisementRepository.findById(messageId);
         if (actualAdvertisementOptional.isPresent()) {
             ActualAdvertisement advertisement = actualAdvertisementOptional.get();
-            advertisement.addPhotoIds(photoId);
+            advertisement.addPhotos(photo);
             return actualAdvertisementRepository.save(advertisement);
         } else {
             LOGGER.error(String.format("Cannot add photo for message id %d!", messageId));
@@ -246,11 +246,11 @@ public class ActualAdvertisementService {
         }
     }
 
-    public ActualAdvertisement setPhotos(Long messageId, List<String> photoIds) {
+    public ActualAdvertisement setPhotos(Long messageId, List<String> photos) {
         Optional<ActualAdvertisement> actualAdvertisementOptional = actualAdvertisementRepository.findById(messageId);
         if (actualAdvertisementOptional.isPresent()) {
             ActualAdvertisement advertisement = actualAdvertisementOptional.get();
-            advertisement.setPhotos(photoIds);
+            advertisement.setPhotos(photos);
             return actualAdvertisementRepository.save(advertisement);
         } else {
             LOGGER.error(String.format("Cannot add photo for message id %d!", messageId));
@@ -321,7 +321,7 @@ public class ActualAdvertisementService {
     public void insertNewAdvertisement(CurrentAdvertisement currentAdvertisement) {
         ActualAdvertisement actualAdvertisement = new ActualAdvertisement(currentAdvertisement.getChatId())
                 .setMessageId(currentAdvertisement.getMessageId())
-                .setPhotoIds(currentAdvertisement.getPhotoIds())
+                .setPhotos(currentAdvertisement.getPhotos())
                 .setDescription(currentAdvertisement.getDescription())
                 .setPrice(currentAdvertisement.getPrice())
                 .addTags(currentAdvertisement.getTags())

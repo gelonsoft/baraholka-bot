@@ -48,8 +48,6 @@ public class BaraholkaBotRestController {
 
         List<ActualAdvertisement> advertisements = actualAdvertisementService.getByChatId(userId);
 
-        controllerHelper.convertPhotoIdsToPhotoBase64Strings(advertisements);
-
         return new ResponseEntity<>(advertisements, HttpStatus.OK);
     }
 
@@ -132,8 +130,6 @@ public class BaraholkaBotRestController {
         String[] allTags = tagsList.toArray(String[]::new);
 
         List<ActualAdvertisement> advertisements = actualAdvertisementService.tagsSearch(allTags);
-
-        controllerHelper.convertPhotoIdsToPhotoBase64Strings(advertisements);
 
         return new ResponseEntity<>(advertisements, HttpStatus.OK);
     }

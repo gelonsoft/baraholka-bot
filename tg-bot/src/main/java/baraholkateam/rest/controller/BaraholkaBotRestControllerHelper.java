@@ -1,7 +1,6 @@
 package baraholkateam.rest.controller;
 
 import baraholkateam.bot.BaraholkaBot;
-import baraholkateam.bot.TgFileLoader;
 import baraholkateam.command.NewAdvertisementConfirm;
 import baraholkateam.rest.model.ActualAdvertisement;
 import baraholkateam.rest.model.CurrentAdvertisement;
@@ -12,13 +11,10 @@ import baraholkateam.util.Tag;
 import baraholkateam.util.TelegramUserInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageCaption;
@@ -69,14 +65,11 @@ public class BaraholkaBotRestControllerHelper {
     @Value("${channel.chat_id}")
     private String channelChatId;
 
-    private final TgFileLoader tgFileLoader;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(BaraholkaBotRestControllerHelper.class);
 
-    @Lazy
     @Autowired
-    public BaraholkaBotRestControllerHelper(@Qualifier("BaraholkaBot") TgFileLoader tgFileLoader) {
-        this.tgFileLoader = tgFileLoader;
+    public BaraholkaBotRestControllerHelper() {
+
     }
 
     boolean checkUserRights(TelegramUserInfo userInfo) {
@@ -108,23 +101,6 @@ public class BaraholkaBotRestControllerHelper {
         return Objects.equals(userRole, "creator")
                 || Objects.equals(userRole, "administrator")
                 || Objects.equals(userRole, "member");
-    }
-
-    void convertPhotoIdsToPhotoBase64Strings(List<ActualAdvertisement> advertisements) {
-        for (ActualAdvertisement advertisement : advertisements) {
-            List<String> photos = new ArrayList<>();
-            for (String photoId : advertisement.getPhotoIds()) {
-                String filePath = telegramAPIRequests.getFilePath(photoId);
-
-                try {
-                    File photo = tgFileLoader.downloadFileByFilePath(filePath);
-                    photos.add(Base64.getEncoder().encodeToString(FileUtils.readFileToByteArray(photo)));
-                } catch (TelegramApiException | IOException e) {
-                    LOGGER.error("Cannot download photo", e);
-                }
-            }
-            advertisement.setPhotos(photos);
-        }
     }
 
     TelegramUserInfo getUserInfo(JsonNode json) {
@@ -199,8 +175,6 @@ public class BaraholkaBotRestControllerHelper {
                         photoFile,
                         currentAdvertisementService.getAdvertisementText(currentAdvertisement.getChatId())
                 );
-                currentAdvertisementService.addPhoto(currentAdvertisement.getChatId(),
-                        sentAd.getPhoto().get(0).getFileId());
             } catch (IOException e) {
                 LOGGER.error("Cannot send photo", e);
                 return false;
@@ -219,20 +193,17 @@ public class BaraholkaBotRestControllerHelper {
                 }
             }
 
-             List<Message> messages = newAdvertisementConfirm.sendPhotoMediaGroup(baraholkaBot,
+            List<Message> messages = newAdvertisementConfirm.sendPhotoMediaGroup(baraholkaBot,
                     Long.parseLong(channelChatId),
                     photoFiles,
                     currentAdvertisementService.getAdvertisementText(currentAdvertisement.getChatId()));
-            for (Message message : messages) {
-                currentAdvertisementService.addPhoto(currentAdvertisement.getChatId(),
-                        message.getPhoto().get(0).getFileId());
-            }
             sentAd = messages.get(0);
         }
 
         if (sentAd != null) {
             currentAdvertisement
                     .setMessageId(Long.parseLong(String.valueOf(sentAd.getMessageId())))
+                    .setPhotos(photos)
                     .setCreationTime(System.currentTimeMillis())
                     .setNextUpdateTime(
                             System.currentTimeMillis()

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,18 +42,12 @@ public class CurrentAdvertisement implements Serializable {
     private Long messageId;
 
     /**
-     * Список фотографий в виде file_id (в Телеграме).
-     */
-    @Column(name = "photos", length = 1024)
-    @JsonIgnore
-    private List<String> photoIds = new ArrayList<>();
-
-    /**
      * Список фотографий в виде Base64 строк.
      */
-    @Column(insertable = false, updatable = false)
+    @Lob
+    @Column(name = "photos", length = Integer.MAX_VALUE)
     @JsonProperty("photos")
-    private List<String> photos;
+    private List<String> photos = new ArrayList<>();
 
     @Column(name = "description", length = 1024)
     @JsonProperty("description")
@@ -118,13 +113,6 @@ public class CurrentAdvertisement implements Serializable {
             LOGGER.error("Field 'messageId' of the current advertisement is null!");
         }
         return messageId;
-    }
-
-    public List<String> getPhotoIds() {
-        if (photoIds.isEmpty()) {
-            LOGGER.error("Field 'photoIds' of the current advertisement is null!");
-        }
-        return photoIds;
     }
 
     public String getDescription() {
@@ -223,13 +211,13 @@ public class CurrentAdvertisement implements Serializable {
         return this;
     }
 
-    public CurrentAdvertisement addPhoto(String photoId) {
-        this.photoIds.add(photoId);
+    public CurrentAdvertisement addPhoto(String photo) {
+        this.photos.add(photo);
         return this;
     }
 
-    public CurrentAdvertisement setPhotoIds(List<String> photoIds) {
-        this.photoIds = photoIds;
+    public CurrentAdvertisement setPhotos(List<String> photos) {
+        this.photos = photos;
         return this;
     }
 
@@ -255,11 +243,6 @@ public class CurrentAdvertisement implements Serializable {
 
     public CurrentAdvertisement setUpdateAttempt(Integer updateAttempt) {
         this.updateAttempt = updateAttempt;
-        return this;
-    }
-
-    public CurrentAdvertisement setPhotos(List<String> photos) {
-        this.photos = photos;
         return this;
     }
 

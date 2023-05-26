@@ -46,10 +46,10 @@ public class CurrentAdvertisementService {
         }
     }
 
-    public List<String> getPhotoIds(Long chatId) {
+    public List<String> getPhotos(Long chatId) {
         Optional<CurrentAdvertisement> currentAdvertisementOptional = currentAdvertisementRepository.findById(chatId);
         if (currentAdvertisementOptional.isPresent()) {
-            return currentAdvertisementOptional.get().getPhotoIds();
+            return currentAdvertisementOptional.get().getPhotos();
         } else {
             LOGGER.error(String.format("Current advertisement's photo ids for chat %d not found!", chatId));
             return null;
@@ -229,11 +229,11 @@ public class CurrentAdvertisementService {
         }
     }
 
-    public CurrentAdvertisement addPhoto(Long chatId, String photoId) {
+    public CurrentAdvertisement addPhoto(Long chatId, String photo) {
         Optional<CurrentAdvertisement> currentAdvertisementOptional = currentAdvertisementRepository.findById(chatId);
         if (currentAdvertisementOptional.isPresent()) {
             CurrentAdvertisement advertisement = currentAdvertisementOptional.get();
-            advertisement.addPhoto(photoId);
+            advertisement.addPhoto(photo);
             return currentAdvertisementRepository.save(advertisement);
         } else {
             LOGGER.error(String.format("Cannot add photo for chat %d!", chatId));
@@ -241,11 +241,11 @@ public class CurrentAdvertisementService {
         }
     }
 
-    public CurrentAdvertisement setPhotoIds(Long chatId, List<String> photoIds) {
+    public CurrentAdvertisement setPhotos(Long chatId, List<String> photos) {
         Optional<CurrentAdvertisement> currentAdvertisementOptional = currentAdvertisementRepository.findById(chatId);
         if (currentAdvertisementOptional.isPresent()) {
             CurrentAdvertisement advertisement = currentAdvertisementOptional.get();
-            advertisement.setPhotoIds(photoIds);
+            advertisement.setPhotos(photos);
             return currentAdvertisementRepository.save(advertisement);
         } else {
             LOGGER.error(String.format("Cannot add photo for chat %d!", chatId));

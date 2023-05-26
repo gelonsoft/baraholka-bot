@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,18 +41,12 @@ public class ActualAdvertisement implements Serializable {
     private Long ownerChatId;
 
     /**
-     * Список фотографий в виде file_id (в Телеграме).
-     */
-    @Column(name = "photos", length = 1024)
-    @JsonIgnore
-    private List<String> photoIds = new ArrayList<>();
-
-    /**
      * Список фотографий в виде Base64 строк.
      */
-    @Column(insertable = false, updatable = false)
+    @Lob
+    @Column(name = "photos", length = Integer.MAX_VALUE)
     @JsonProperty("photos")
-    private List<String> photos;
+    private List<String> photos = new ArrayList<>();
 
     @Column(name = "description", length = 1024)
     @JsonProperty("description")
@@ -93,10 +88,10 @@ public class ActualAdvertisement implements Serializable {
         this.ownerChatId = ownerChatId;
     }
 
-    public ActualAdvertisement(List<String> photoIds, String description, List<Tag> tags, Long price, String phone,
+    public ActualAdvertisement(List<String> photos, String description, List<Tag> tags, Long price, String phone,
                                List<String> contacts) {
         this.tags.add(Tag.Actual.getName());
-        this.photoIds = photoIds;
+        this.photos = photos;
         this.description = description;
         this.tags.addAll(tags.stream().map(Tag::getName).toList());
         this.price = price;
@@ -118,11 +113,11 @@ public class ActualAdvertisement implements Serializable {
         return messageId;
     }
 
-    public List<String> getPhotoIds() {
-        if (photoIds == null || photoIds.isEmpty()) {
+    public List<String> getPhotos() {
+        if (photos == null || photos.isEmpty()) {
             LOGGER.warn("Field 'photos' of the actual advertisement is null!");
         }
-        return photoIds;
+        return photos;
     }
 
     public String getDescription() {
@@ -187,10 +182,6 @@ public class ActualAdvertisement implements Serializable {
         return updateAttempt;
     }
 
-    public List<String> getPhotos() {
-        return photos;
-    }
-
     public ActualAdvertisement setOwnerChatId(Long ownerChatId) {
         this.ownerChatId = ownerChatId;
         return this;
@@ -221,13 +212,13 @@ public class ActualAdvertisement implements Serializable {
         return this;
     }
 
-    public ActualAdvertisement addPhotoIds(String photoId) {
-        this.photoIds.add(photoId);
+    public ActualAdvertisement addPhotos(String photo) {
+        this.photos.add(photo);
         return this;
     }
 
-    public ActualAdvertisement setPhotoIds(List<String> photoIds) {
-        this.photoIds = photoIds;
+    public ActualAdvertisement setPhotos(List<String> photos) {
+        this.photos = photos;
         return this;
     }
 
@@ -258,11 +249,6 @@ public class ActualAdvertisement implements Serializable {
 
     public ActualAdvertisement setUpdateAttempt(Integer updateAttempt) {
         this.updateAttempt = updateAttempt;
-        return this;
-    }
-
-    public ActualAdvertisement setPhotos(List<String> photos) {
-        this.photos = photos;
         return this;
     }
 

@@ -1,15 +1,13 @@
 package baraholkateam.command;
 
-import baraholkateam.bot.TgFileLoader;
 import baraholkateam.rest.model.CurrentAdvertisement;
 import baraholkateam.rest.service.CurrentAdvertisementService;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
+import baraholkateam.util.Converter;
 import baraholkateam.util.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
@@ -48,13 +46,9 @@ public class NewAdvertisementConfirm extends Command {
     @Autowired
     private TelegramAPIRequests telegramAPIRequests;
 
-    private final TgFileLoader tgFileLoader;
-
-    @Lazy
     @Autowired
-    public NewAdvertisementConfirm(@Qualifier("BaraholkaBot") TgFileLoader tgFileLoader) {
+    public NewAdvertisementConfirm() {
         super(State.NewAdvertisement_Confirm.getIdentifier(), State.NewAdvertisement_Confirm.getDescription());
-        this.tgFileLoader = tgFileLoader;
     }
 
     @Override
@@ -63,25 +57,25 @@ public class NewAdvertisementConfirm extends Command {
 
         String text = ad.getAdvertisementText();
 
-        List<String> photoIds = ad.getPhotoIds();
+        List<String> photos = ad.getPhotos();
 
         if (ad.getContacts() != null && !ad.getContacts().isEmpty()) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                     String.format(CONTACTS_LIST_TEXT, String.join("\n", ad.getContacts())), null);
         }
 
-        if (photoIds.size() == 1) {
-            sendPhotoMessage(absSender, chat.getId(), downloadPhoto(photoIds.get(0)), text);
-        } else if (photoIds.size() > 1) {
+        if (photos.size() == 1) {
+            sendPhotoMessage(absSender, chat.getId(), Converter.convertBase64StringToPhoto(photos.get(0)), text);
+        } else if (photos.size() > 1) {
             List<File> photoFiles = new ArrayList<>();
-            for (String photoId : photoIds) {
-                photoFiles.add(Objects.requireNonNull(downloadPhoto(photoId)));
+            for (String photo : photos) {
+                photoFiles.add(Objects.requireNonNull(Converter.convertBase64StringToPhoto(photo)));
             }
             sendPhotoMediaGroup(absSender, chat.getId(), photoFiles, text);
         }
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                CONFIRM_AD_TEXT, getConfirmAdvertisement(photoIds));
+                CONFIRM_AD_TEXT, getConfirmAdvertisement(photos));
     }
 
     public Message sendPhotoMessage(AbsSender absSender, long chatId, File photoFile, String text) {
@@ -133,22 +127,11 @@ public class NewAdvertisementConfirm extends Command {
         }
     }
 
-    public File downloadPhoto(String photoId) {
-        String filePath = telegramAPIRequests.getFilePath(photoId);
-
-        try {
-            return tgFileLoader.downloadFileByFilePath(filePath);
-        } catch (TelegramApiException e) {
-            LOGGER.error("Cannot download photo", e);
-            return null;
-        }
-    }
-
-    private InlineKeyboardMarkup getConfirmAdvertisement(List<String> photoIds) {
+    private InlineKeyboardMarkup getConfirmAdvertisement(List<String> photos) {
         InlineKeyboardButton yesButton = new InlineKeyboardButton();
         yesButton.setText("Да");
         String yesCallbackData = String.format("%s %s %d", CONFIRM_AD_CALLBACK_DATA, "yes",
-                photoIds.size() == 1 ? 0 : 1);
+                photos.size() == 1 ? 0 : 1);
         yesButton.setCallbackData(yesCallbackData);
 
         InlineKeyboardButton noButton = new InlineKeyboardButton();

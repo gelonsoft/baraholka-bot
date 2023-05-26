@@ -33,6 +33,7 @@ import baraholkateam.rest.service.CurrentStateService;
 import baraholkateam.rest.service.LastSentMessageService;
 import baraholkateam.rest.service.PreviousStateService;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
+import baraholkateam.util.Converter;
 import baraholkateam.util.State;
 import baraholkateam.util.Tag;
 import org.slf4j.Logger;
@@ -343,7 +344,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         // Случай удаления всех фотографий по кнопке
         if (msg.hasText() && Objects.equals(msg.getText(), DELETE_ALL_PHOTOS)
                 && currentStateService.get(chatId) == State.NewAdvertisement_ConfirmPhoto) {
-            currentAdvertisementService.setPhotoIds(msg.getChatId(), new ArrayList<>());
+            currentAdvertisementService.setPhotos(msg.getChatId(), new ArrayList<>());
             sendAnswer(chatId, PHOTOS_DELETE, null);
             currentStateService.put(chatId, State.NewAdvertisement_AddPhotos);
             getRegisteredCommand(State.NewAdvertisement_AddPhotos.getIdentifier()).processMessage(this, msg, null);
@@ -459,7 +460,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         if (currentState == State.NewAdvertisement_AddPhotos || currentState == State.NewAdvertisement_ConfirmPhoto) {
 
             AtomicInteger canAddPhotosCount =
-                    new AtomicInteger(10 - currentAdvertisementService.getPhotoIds(msg.getChatId()).size());
+                    new AtomicInteger(10 - currentAdvertisementService.getPhotos(msg.getChatId()).size());
             AtomicBoolean isCanAdd = new AtomicBoolean(true);
 
             Map<String, TreeSet<PhotoSize>> photos = msg.getPhoto().stream()
@@ -485,7 +486,12 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                     sendAnswer(msg.getChatId(), NO_MORE_PHOTOS_ADD, null);
                     return;
                 }
-                currentAdvertisementService.addPhoto(msg.getChatId(), photo.last().getFileId());
+                currentAdvertisementService.addPhoto(
+                        msg.getChatId(),
+                        Converter.convertPhotoToBase64String(
+                                downloadFileByFilePath(telegramAPIRequests.getFilePath(photo.last().getFileId()))
+                        )
+                );
             });
 
             if (isCanAdd.get()) {
@@ -679,15 +685,15 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                         sentAd = newAdvertisementConfirm.sendPhotoMessage(
                                 this,
                                 Long.parseLong(channelChatId),
-                                newAdvertisementConfirm.downloadPhoto(
-                                        currentAdvertisementService.getPhotoIds(msg.getChatId()).get(0)
+                                Converter.convertBase64StringToPhoto(
+                                        currentAdvertisementService.getPhotos(msg.getChatId()).get(0)
                                 ),
                                 currentAdvertisementService.getAdvertisementText(msg.getChatId())
                         );
                     } else {
                         List<File> photoFiles = new ArrayList<>();
-                        for (String photoId : currentAdvertisementService.getPhotoIds(msg.getChatId())) {
-                            photoFiles.add(Objects.requireNonNull(newAdvertisementConfirm.downloadPhoto(photoId)));
+                        for (String photo : currentAdvertisementService.getPhotos(msg.getChatId())) {
+                            photoFiles.add(Objects.requireNonNull(Converter.convertBase64StringToPhoto(photo)));
                         }
                         sentAd = newAdvertisementConfirm.sendPhotoMediaGroup(this,
                                 Long.parseLong(channelChatId),
@@ -822,7 +828,12 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
     }
 
     @Override
-    public File downloadFileByFilePath(String filePath) throws TelegramApiException {
-        return downloadFile(filePath);
+    public File downloadFileByFilePath(String filePath) {
+        try {
+            return downloadFile(filePath);
+        } catch (TelegramApiException e) {
+            LOGGER.error(String.format("Cannot download file %s", filePath), e);
+            return null;
+        }
     }
 }

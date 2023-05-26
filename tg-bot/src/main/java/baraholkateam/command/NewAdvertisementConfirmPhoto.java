@@ -42,7 +42,7 @@ public class NewAdvertisementConfirmPhoto extends Command {
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        int addedPhotosCount = currentAdvertisementService.getPhotoIds(chat.getId()).size();
+        int addedPhotosCount = currentAdvertisementService.getPhotos(chat.getId()).size();
 
         Message lastSentMessage = lastSentMessageService.get(chat.getId());
         if (lastSentMessage.getText().substring(0, 20).equals(CONFIRM_PHOTOS_TEXT.substring(0, 20))) {
