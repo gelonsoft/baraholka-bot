@@ -318,6 +318,9 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         if (msg.hasText() && Objects.equals(msg.getText(), BACK_BUTTON)) {
             State backState = State.previousState(currentStateService.get(chatId));
             if (backState != null) {
+                if (lastSentMessageService.get(chatId).hasReplyMarkup()) {
+                    deleteLastMessage(chatId);
+                }
                 currentStateService.put(chatId, backState);
                 getRegisteredCommand(backState.getIdentifier()).processMessage(this, msg, null);
                 return;

@@ -193,6 +193,18 @@ public class CurrentAdvertisementService {
         }
     }
 
+    public CurrentAdvertisement setTags(Long chatId, List<String> tags) {
+        Optional<CurrentAdvertisement> currentAdvertisementOptional = currentAdvertisementRepository.findById(chatId);
+        if (currentAdvertisementOptional.isPresent()) {
+            CurrentAdvertisement advertisement = currentAdvertisementOptional.get();
+            advertisement.setTags(tags);
+            return currentAdvertisementRepository.save(advertisement);
+        } else {
+            LOGGER.error(String.format("Cannot set price for chat %d!", chatId));
+            return null;
+        }
+    }
+
     public CurrentAdvertisement setPhone(Long chatId, String phone) {
         Optional<CurrentAdvertisement> currentAdvertisementOptional = currentAdvertisementRepository.findById(chatId);
         if (currentAdvertisementOptional.isPresent()) {

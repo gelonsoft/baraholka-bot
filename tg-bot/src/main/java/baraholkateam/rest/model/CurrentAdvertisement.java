@@ -55,7 +55,7 @@ public class CurrentAdvertisement implements Serializable {
 
     @Column(name = "tags", length = 1024)
     @JsonProperty("tags")
-    private final List<String> tags = new ArrayList<>();
+    private List<String> tags = new ArrayList<>();
 
     @Column(name = "price")
     @JsonProperty("price")
@@ -193,6 +193,11 @@ public class CurrentAdvertisement implements Serializable {
 
     public CurrentAdvertisement setPrice(Long price) {
         this.price = price;
+        return this;
+    }
+
+    public CurrentAdvertisement setTags(List<String> tags) {
+        this.tags = tags;
         return this;
     }
 

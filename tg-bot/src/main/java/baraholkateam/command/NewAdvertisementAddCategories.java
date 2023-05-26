@@ -9,6 +9,8 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
+import java.util.Objects;
+
 @Component
 public class NewAdvertisementAddCategories extends Command {
     private static final String CHOSEN_ADVERTISEMENT_TYPES = """
@@ -26,6 +28,11 @@ public class NewAdvertisementAddCategories extends Command {
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
+        String chosenAdvertisementTypeTags = currentAdvertisementService.get(chat.getId())
+                .getTagsOfType(TagType.AdvertisementType);
+        if (Objects.equals(chosenAdvertisementTypeTags, "")) {
+            chosenAdvertisementTypeTags = NO_HASHTAGS;
+        }
         sendAnswer(
                 absSender,
                 chat.getId(),
@@ -33,8 +40,7 @@ public class NewAdvertisementAddCategories extends Command {
                 user.getUserName(),
                 String.format(
                         CHOSEN_ADVERTISEMENT_TYPES,
-                        currentAdvertisementService.get(chat.getId())
-                        .getTagsOfType(TagType.AdvertisementType)
+                        chosenAdvertisementTypeTags
                 ),
                 showNextButton()
         );
