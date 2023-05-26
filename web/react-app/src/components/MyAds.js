@@ -7,7 +7,6 @@ import Rodal from 'rodal';
 import '../style/rodal.css';
 import AliceCarousel from "react-alice-carousel";
 import ReactLoading from "react-loading";
-import Contact from "../services/Contact";
 import Photo from "../services/Photo";
 
 
@@ -22,7 +21,7 @@ class MyAds extends React.Component {
     }
 
     componentDidMount() {
-        let userData = localStorage.getItem('userData');
+        let userData = JSON.parse(localStorage.getItem('userData'));
         RequestService.getMyAds(userData).then((response) => {
             if (response.data) {
                 this.setState({
@@ -40,7 +39,7 @@ class MyAds extends React.Component {
     }
 
     handleDeleteClick(val) {
-        let userData = localStorage.getItem('userData');
+        let userData = JSON.parse(localStorage.getItem('userData'));
         RequestService.postDeleteAd(userData, val).then((response) => {
             if (response.status === 200) {
                 let deleteAds = this.state.ads.find(ad => ad.message_id === val);
@@ -55,9 +54,9 @@ class MyAds extends React.Component {
         });
     }
 
-
     render() {
-        const listOfAds = this.state.ads?.map((ad) => <FoundAds key={ad.message_id} id={ad.message_id} photos={ad.photos}
+        const listOfAds = this.state.ads?.map((ad) => <FoundAds key={ad.message_id} id={ad.message_id}
+                                                                photos={ad.photos}
                                                                 tags={ad.tags.toString().replaceAll(",", " ")}
                                                                 price={ad.price}
                                                                 description={ad.description} phone={ad.phone}
@@ -66,7 +65,7 @@ class MyAds extends React.Component {
         const showLoad = this.state.msg === "Загрузка данных";
         return (<form>
             <div className="main__form-title">{this.state.msg}</div>
-            { showLoad ? <Example /> : null }
+            {showLoad ? <Example/> : null}
             <div className="grid">
                 {listOfAds}
             </div>
@@ -75,10 +74,19 @@ class MyAds extends React.Component {
 }
 
 class FoundAds extends React.Component {
-    listOfRef = this.props.contacts.map((contact, index) => <Contact key={index} contact={contact}/>)
+    constructor(props) {
+        super(props);
+        this.handleBlurClick = this.handleBlurClick.bind(this);
+        this.state = {clickable: false};
+    }
     listOfPhotos = this.props.photos.map((photo, index) => <Photo key={index} photo={photo}/>)
     checkPrice = this.props.price == null ? "none" : "block";
     checkPhone = this.props.phone == null ? "none" : "block";
+
+    handleBlurClick() {
+        const currentClickable = this.state.clickable;
+        this.setState({clickable: !currentClickable});
+    }
 
     render() {
         return (<div className="ad__form">
@@ -101,10 +109,14 @@ class FoundAds extends React.Component {
                                    max={200}
                                    readMoreText="Подробнее"/>
                     <div>--------------------------------------------------------</div>
-                    <ReactSpoiler blur={10} hoverBlur={8}>
+                    <ReactSpoiler blur={10} hoverBlur={8} onClick={this.handleBlurClick}>
                         <span style={{display: this.checkPhone}}>Номер телефона: {this.props.phone}</span>
                         <div>Контакты:</div>
-                        {this.listOfRef}
+                        {this.props.contacts.map((contact) => {
+                            const ref = contact.at(0) === "@" ? "https://t.me/"+contact.substring(1) : contact
+                            return <a className={this.state.clickable ? "enabled ref-color" : "disabled"}
+                                      href={ref}>{contact}</a>
+                        })}
                     </ReactSpoiler>
                 </div>
             </div>

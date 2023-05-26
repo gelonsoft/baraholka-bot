@@ -403,6 +403,12 @@ select {
     object-fit:cover;
 }
 
+a.disabled {
+    pointer-events: none;
+    cursor: default;
+    color: #419FD9;
+}
+
 
 
 

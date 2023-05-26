@@ -6,7 +6,6 @@ import ReadMoreReact from 'read-more-react';
 import AliceCarousel from 'react-alice-carousel';
 import '../style/alice-carousel.css';
 import ReactLoading from 'react-loading';
-import Contact from '../services/Contact';
 import Photo from '../services/Photo';
 
 class SearchAds extends React.Component {
@@ -27,7 +26,7 @@ class SearchAds extends React.Component {
     }
 
     componentDidMount() {
-        let userData = localStorage.getItem('userData');
+        let userData = JSON.parse(localStorage.getItem('userData'));
         RequestService.getTags(userData).then((response) => {
             if (response.data) {
                 this.setState({
@@ -61,7 +60,7 @@ class SearchAds extends React.Component {
     };
 
     handleStartClick() {
-        let userData = localStorage.getItem('userData');
+        let userData = JSON.parse(localStorage.getItem('userData'));
         RequestService.getSearchAds(userData, this.state.choosenTags).then((response) => {
             if (response.data) {
                 this.setState({
@@ -149,7 +148,7 @@ function StartNewSearch(props) {
         <div className="custom-text">{props.choosenTags?.toString().replaceAll(",", " ")}</div>
         <input type="button" className="btn btn-dark ad__form" value="Выполнить новый поиск" onClick={props.new}/>
         <div className="main__form-title mgs-margin">{props.msg}</div>
-        { showLoad ? <Example /> : null }
+        {showLoad ? <Example/> : null}
         <div className="grid">
             {listOfAds}
         </div>
@@ -158,10 +157,20 @@ function StartNewSearch(props) {
 
 
 class FoundAds extends React.Component {
-    listOfRef = this.props.contacts.map((contact, index) => <Contact key={index} contact={contact}/>)
+    constructor(props) {
+        super(props);
+        this.handleBlurClick = this.handleBlurClick.bind(this);
+        this.state = {clickable: false};
+    }
+
     listOfPhotos = this.props.photos.map((photo, index) => <Photo key={index} photo={photo}/>)
     checkPrice = this.props.price == null ? "none" : "block";
     checkPhone = this.props.phone == null ? "none" : "block";
+
+    handleBlurClick() {
+        const currentClickable = this.state.clickable;
+        this.setState({clickable: !currentClickable});
+    }
 
     render() {
         return (<div className="ad__form">
@@ -180,10 +189,14 @@ class FoundAds extends React.Component {
                                    max={200}
                                    readMoreText="Подробнее"/>
                     <div>--------------------------------------------------------</div>
-                    <ReactSpoiler blur={10} hoverBlur={8}>
+                    <ReactSpoiler blur={10} hoverBlur={8} onClick={this.handleBlurClick}>
                         <span style={{display: this.checkPhone}}>Номер телефона: {this.props.phone}</span>
                         <div>Контакты:</div>
-                        {this.listOfRef}
+                        {this.props.contacts.map((contact) => {
+                            const ref = contact.at(0) === "@" ? "https://t.me/" + contact.substring(1) : contact
+                            return <a className={this.state.clickable ? "enabled ref-color" : "disabled"}
+                                      href={ref}>{contact}</a>
+                        })}
                     </ReactSpoiler>
                 </div>
             </div>
