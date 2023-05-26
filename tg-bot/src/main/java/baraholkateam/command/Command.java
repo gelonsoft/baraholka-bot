@@ -64,11 +64,11 @@ public abstract class Command extends BotCommand {
     public static final String AD_SWEAR_WORD_DETECTED = """
             Возможно, Ваше описание содержало ненормативную лексику.
             Пожалуйста, введите измененный текст""";
+    public static final String CHOSEN_HASHTAGS = "Текущие выбранные хэштеги: %s";
     static final String INCORRECT_PREVIOUS_STATE = """
             Невозможно выполнить текущую команду.
             Пожалуйста, вернитесь в главное меню /%s и попробуйте снова.""";
     static final String NO_HASHTAGS = "➖";
-    static final String CHOSEN_HASHTAGS = "Текущие выбранные хэштеги: %s";
     private static final Logger LOGGER = LoggerFactory.getLogger(Command.class);
 
     @Autowired

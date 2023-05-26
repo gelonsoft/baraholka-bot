@@ -75,6 +75,7 @@ import static baraholkateam.command.Command.ADVERTISEMENT_SUCCESSFUL_DELETE;
 import static baraholkateam.command.Command.ADVERTISEMENT_SUCCESSFUL_UPDATE;
 import static baraholkateam.command.Command.AD_SWEAR_WORD_DETECTED;
 import static baraholkateam.command.Command.BACK_BUTTON;
+import static baraholkateam.command.Command.CHOSEN_HASHTAGS;
 import static baraholkateam.command.Command.CHOSEN_TAG;
 import static baraholkateam.command.Command.CONFIRM_AD_CALLBACK_DATA;
 import static baraholkateam.command.Command.DELETE_AD_CALLBACK_TEXT;
@@ -361,29 +362,40 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
             return;
         }
 
-        // Случай нажатия на кнопку с продолжением во множественном выборе хэштегов
+        // Случай нажатия на кнопку "Продолжить" во множественном выборе хэштегов
         if (msg.hasText() && Objects.equals(msg.getText(), NEXT_BUTTON_TEXT)) {
-            if (State.nextState(currentStateService.get(msg.getChatId())) == State.NewAdvertisement_AddPrice) {
-                List<String> tags = currentAdvertisementService.getTags(msg.getChatId());
+            addChosenTags(lastSentMessageService.get(chatId));
+
+            if (chosenTagsService.get(chatId) != null
+                    && State.nextState(currentStateService.get(msg.getChatId())) == State.NewAdvertisement_AddPrice) {
+                List<String> tags = chosenTagsService.get(chatId).stream()
+                        .map(Tag::getName)
+                        .toList();
+                // Если нужно пропустить добавление цены товара
                 if (!tags.contains(Tag.Sale.getName()) && !tags.contains(Tag.Bargaining.getName())) {
+                    currentAdvertisementService.addTags(chatId, tags);
                     currentStateService.put(msg.getChatId(), State.NewAdvertisement_AddContacts);
+                    sendAnswer(
+                            chatId,
+                            String.format(
+                                    CHOSEN_HASHTAGS,
+                                    String.join(" ", currentAdvertisementService.getTags(chatId))
+                            ),
+                            null);
                     getRegisteredCommand(State.NewAdvertisement_AddContacts.getIdentifier())
                             .processMessage(this, msg, null);
                     return;
                 }
             }
 
-            addChosenTags(lastSentMessageService.get(chatId));
-
-            if (currentStateService.get(msg.getChatId()) == State.NewAdvertisement_AddAdvertisementTypes
-                    || currentStateService.get(msg.getChatId()) == State.NewAdvertisement_AddCategories) {
-                if (chosenTagsService.get(chatId) != null) {
-                    List<String> tags = chosenTagsService.get(chatId).stream()
-                            .map(Tag::getName)
-                            .toList();
-                    currentAdvertisementService.addTags(chatId, tags);
-                    chosenTagsService.delete(chatId);
-                }
+            if (chosenTagsService.get(chatId) != null
+                    && (currentStateService.get(msg.getChatId()) == State.NewAdvertisement_AddAdvertisementTypes
+                    || currentStateService.get(msg.getChatId()) == State.NewAdvertisement_AddCategories)) {
+                List<String> tags = chosenTagsService.get(chatId).stream()
+                        .map(Tag::getName)
+                        .toList();
+                currentAdvertisementService.addTags(chatId, tags);
+                chosenTagsService.delete(chatId);
             }
 
             deleteLastMessage(msg.getChatId());
