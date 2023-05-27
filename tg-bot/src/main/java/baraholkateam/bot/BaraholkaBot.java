@@ -420,7 +420,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         State state = currentStateService.get(msg.getChatId());
         String text = msg.getText();
         if (state == State.NewAdvertisement_AddDescription) {
-            if (text == null || text.length() > 1024) {
+            if (text == null || text.length() > 800) {
                 return false;
             }
             Pattern filter = Pattern.compile(SWEAR_WORD_DETECTOR, Pattern.CASE_INSENSITIVE);

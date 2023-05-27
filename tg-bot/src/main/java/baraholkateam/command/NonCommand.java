@@ -20,7 +20,7 @@ public class NonCommand {
     private static final String CHOOSE_ADVERTISEMENT_TYPES = "Пожалуйста, выберите типы объявления.";
     private static final String CHOOSE_PRODUCT_CATEGORIES = "Пожалуйста, выберите категории объявлений.";
     private static final String EMPTY_DESCRIPTION = """
-            Длина описания превышает допустимый предел в 1024 символа или был произведен ввод в некорректной форме.
+            Длина описания превышает допустимый предел в 800 символов или был произведен ввод в некорректной форме.
             Пожалуйста, введите описание еще раз.""";
     private static final String INVALID_PHONE_NUMBER = """
             Номер телефона имеет неверный формат.
