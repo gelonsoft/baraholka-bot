@@ -418,8 +418,8 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
 
     private boolean newAdvertisementUpdateData(Message msg) {
         State state = currentStateService.get(msg.getChatId());
+        String text = msg.getText();
         if (state == State.NewAdvertisement_AddDescription) {
-            String text = msg.getText();
             if (text == null || text.length() > 1024) {
                 return false;
             }
@@ -435,11 +435,11 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         }
 
         if (state == State.NewAdvertisement_AddPrice) {
-            if (!msg.getText().matches("\\d{1,18}")) {
+            if (!text.matches("\\d{1,18}")) {
                 return false;
             }
             try {
-                currentAdvertisementService.setPrice(msg.getChatId(), Long.parseLong(msg.getText()));
+                currentAdvertisementService.setPrice(msg.getChatId(), Long.parseLong(text));
             } catch (Exception e) {
                 LOGGER.error("Invalid input from user");
             }
@@ -448,19 +448,19 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         }
 
         if (state == State.NewAdvertisement_AddPhone) {
-            if (!msg.getText().matches("\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}")) {
+            if (!text.matches("\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}")) {
                 return false;
             }
-            currentAdvertisementService.setPhone(msg.getChatId(), msg.getText());
+            currentAdvertisementService.setPhone(msg.getChatId(), text);
             updateStateOnTextData(msg);
             return true;
         }
 
         if (state == State.NewAdvertisement_AddSocial) {
-            if (!msg.getText().matches("https://.+/.+")) {
+            if (!text.matches("https://.+/.+")) {
                 return false;
             }
-            currentAdvertisementService.addSocial(msg.getChatId(), msg.getText());
+            currentAdvertisementService.addSocial(msg.getChatId(), text);
             previousStateService.put(msg.getChatId(), State.NewAdvertisement_AddSocial);
             currentStateService.put(msg.getChatId(), State.NewAdvertisement_ConfirmPhone);
             getRegisteredCommand(State.NewAdvertisement_ConfirmPhone.getIdentifier())

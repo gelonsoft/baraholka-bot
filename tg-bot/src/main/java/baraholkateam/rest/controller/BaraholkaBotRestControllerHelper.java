@@ -131,12 +131,13 @@ public class BaraholkaBotRestControllerHelper {
         while (contactsNodeIterator.hasNext()) {
             contacts.add(contactsNodeIterator.next().asText());
         }
-        if (contacts.isEmpty()) {
-            contacts = new ArrayList<>();
-        }
         Long userId = Long.parseLong(json.get("id").asText());
         String description = json.get("description").asText();
-        Long price = Long.parseLong(json.get("price").asText());
+        String priceString = json.get("price").asText();
+        Long price = null;
+        if (!Objects.equals(priceString, "null")) {
+            price = Long.parseLong(priceString);
+        }
 
         return new CurrentAdvertisement(userId, description, tags, price, phone, contacts);
     }
