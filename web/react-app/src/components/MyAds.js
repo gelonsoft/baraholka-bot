@@ -115,7 +115,7 @@ class FoundAds extends React.Component {
                         {this.props.contacts.map((contact) => {
                             const ref = contact.at(0) === "@" ? "https://t.me/"+contact.substring(1) : contact
                             return <a className={this.state.clickable ? "enabled ref-color" : "disabled"}
-                                      href={ref}>{contact}</a>
+                                      href={ref}>{contact}<br/></a>
                         })}
                     </ReactSpoiler>
                 </div>
