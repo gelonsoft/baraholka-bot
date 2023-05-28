@@ -322,10 +322,10 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                 if (lastSentMessageService.get(chatId).hasReplyMarkup()) {
                     deleteLastMessage(chatId);
                 }
-                if (currentState == State.NewAdvertisement_AddSocial) {
+                currentStateService.put(chatId, backState);
+                if (backState == State.NewAdvertisement_AddContacts) {
                     currentAdvertisementService.setSocials(chatId, new ArrayList<>());
                 }
-                currentStateService.put(chatId, backState);
                 getRegisteredCommand(backState.getIdentifier()).processMessage(this, msg, null);
                 return;
             }
