@@ -265,7 +265,7 @@ class NewAd extends React.Component {
                 <div className="main__form-title">Добавить социальные сети</div>
                 <div>Добавьте ссылки на ваши социальные сети (необязательно).</div>
                 <input type="tel" pattern="https://.+/.+" placeholder="https://vk.com/useruser"/>
-                <button className="btn btn-light">Добавить социальную сеть</button><br />
+                {/*<button className="btn btn-light">Добавить социальную сеть</button><br />*/}
                 <input type="submit" className="btn btn-dark" value="Опубликовать" />
             </form>
         )
