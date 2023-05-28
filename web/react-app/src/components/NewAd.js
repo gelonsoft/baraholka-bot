@@ -13,7 +13,7 @@ class NewAd extends React.Component {
             advertisementTypeTags: ['#продажа', '#обмен', '#дар', '#торг_уместен', '#срочно'],
             categoriesTags: ['#одежда', '#обувь', '#детские_товары', '#красота_и_здоровье', '#книги', '#хобби', '#домашняя_техника', '#электроника', '#спорт', '#другое', '#мужское', '#женское'],
             update: false,
-            showPrice: true
+            showPrice: false
         };
         this.createNewAd = this.createNewAd.bind(this);
         this.getBase64 = this.getBase64.bind(this);
@@ -34,6 +34,12 @@ class NewAd extends React.Component {
             }
         }).catch(err => {
             console.log(err);
+        });
+        const textarea = document.querySelector("textarea");
+        textarea.addEventListener("keyup", e =>{
+            textarea.style.height = "60px";
+            let scHeight = e.target.scrollHeight;
+            textarea.style.height = `${scHeight}px`;
         });
     }
 
@@ -70,6 +76,7 @@ class NewAd extends React.Component {
 
         const sendNewAd = () => {
             let userData = JSON.parse(localStorage.getItem('userData'));
+            console.log(e.target[1].value);
             let description = e.target[1].value;
             let tags = [];
             tags.push('#' + e.target[2].value);
@@ -118,14 +125,11 @@ class NewAd extends React.Component {
             .then(base64Strings => {
                 let photosStrings = [];
                 base64Strings.forEach(base64String => {
-                    console.log(base64String);
                     photosStrings.push(base64String.replace('data:', '').replace(/^.+,/, ''));
                 });
-                console.log(photosStrings);
                 this.setState({
                     chosenPhotosStrings : photosStrings
                 }, () => {
-                    console.log(this.state.chosenPhotosStrings);
                     sendNewAd();
                 });
             });
@@ -185,7 +189,7 @@ class NewAd extends React.Component {
                 </div>
                 <div className="main__form-title">Добавить описание</div>
                 <div>Добавьте краткое описание товара.</div>
-                <input type="text" placeholder="Описание"/>
+                <textarea id="descriptionTextarea" placeholder="Описание"></textarea>
                 <div className="main__form-title">Добавить город</div>
                 <div>Выберите город для публикации объявления.</div>
                 <select defaultValue="Не выбран">

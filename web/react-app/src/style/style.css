@@ -361,6 +361,7 @@ select {
 .help-link {
     color: #419FD9;
 }
+
 .del-btn{
     background-color: transparent;
     background-repeat: no-repeat;
@@ -370,5 +371,23 @@ select {
     outline: none;
 }
 
+textarea{
+    width: 100%;
+    resize: none;
+    height: 60px;
+    outline: none;
+    padding: 20px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: solid 1px black;
+    border-radius: 10px;
+}
+
+textarea::-webkit-scrollbar{
+    width: 0;
+}
 
 
