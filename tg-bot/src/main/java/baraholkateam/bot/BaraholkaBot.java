@@ -739,6 +739,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                 } else if (Objects.equals(dataParts[1], "no")) {
                     sendAnswer(msg.getChatId(), ADVERTISEMENT_CANCELLED_TEXT, null);
                 }
+                currentStateService.put(msg.getChatId(), State.MainMenu);
                 getRegisteredCommand(State.MainMenu.getIdentifier())
                         .processMessage(this, msg, null);
             }
@@ -773,6 +774,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                     sendAnswer(msg.getChatId(), SUCCESS_DELETE_AD_TEXT, null);
                 } else {
                     sendAnswer(msg.getChatId(), UNSUCCESS_DELETE_AD_TEXT, null);
+                    currentStateService.put(msg.getChatId(), State.DeleteAdvertisement);
                     getRegisteredCommand(State.DeleteAdvertisement.getIdentifier())
                             .processMessage(this, msg, null);
                 }
