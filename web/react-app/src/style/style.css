@@ -304,9 +304,25 @@ select {
 
 .chosen-photo {
     height: 150px;
-    margin-right: 10px;
-    margin-bottom: 10px;
     border-radius: 10px;
+}
+
+.delete-pic-btn {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    top: -12px;
+    right: -12px;
+}
+
+.delete-pic-btn:hover {
+    cursor: pointer;
+}
+
+.chosen-photo-container {
+    position: relative;
+    margin-right: 24px;
+    margin-bottom: 24px;
 }
 
 .custom-checkbox:hover {
