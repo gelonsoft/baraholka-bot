@@ -12,12 +12,14 @@ class NewAd extends React.Component {
             cityTags: ['#Москва', '#СПб', '#Екатеринбург', '#Челябинск', '#Ульяновск', '#Омск', '#Белгород', '#Петропавловск', '#Пермь', '#Волгоград', '#Киров', '#Хабаровск'],
             advertisementTypeTags: ['#продажа', '#обмен', '#дар', '#торг_уместен', '#срочно'],
             categoriesTags: ['#одежда', '#обувь', '#детские_товары', '#красота_и_здоровье', '#книги', '#хобби', '#домашняя_техника', '#электроника', '#спорт', '#другое', '#мужское', '#женское'],
-            update: false
+            update: false,
+            showPrice: true
         };
         this.createNewAd = this.createNewAd.bind(this);
         this.getBase64 = this.getBase64.bind(this);
         this.onPhotosChange = this.onPhotosChange.bind(this);
         this.deletePhoto = this.deletePhoto.bind(this);
+        this.updatePriceForm = this.updatePriceForm.bind(this);
     }
 
     componentDidMount() {
@@ -145,12 +147,20 @@ class NewAd extends React.Component {
         this.setState({chosenPhotos: photos});
     }
 
-    deletePhoto(event, index) {
+    deletePhoto(e, index) {
         let input = document.getElementById('photosInput');
         input.value = "";
         this.state.chosenPhotos.splice(index, 1);
         this.state.chosenPhotosStrings.splice(index, 1);
         this.setState({update: true});
+    }
+
+    updatePriceForm(e, tag) {
+        console.log(e);
+        console.log(tag);
+        if (tag === "#продажа") {
+            this.setState({showPrice: e.target.checked});
+        }
     }
 
     render() {
@@ -189,10 +199,10 @@ class NewAd extends React.Component {
                 <div className="main__form-title">Добавить тип объявления</div>
                 <div>Выберите тип объявления.</div>
                 <div className="main__form-row">
-                    {this.state.advertisementTypeTags.map(function(tag) {
+                    {this.state.advertisementTypeTags.map((tag) => {
                         return (
                             <label className="custom-checkbox">
-                                <input className="type" type="checkbox" />
+                                <input onChange={(event) => this.updatePriceForm(event, tag)} className="type" type="checkbox" />
                                 {tag.substring(1).replaceAll("_", " ")}
                             </label>
                         )
@@ -210,9 +220,15 @@ class NewAd extends React.Component {
                         )
                     })}
                 </div>
-                <div className="main__form-title">Добавить стоимость</div>
-                <div>Укажите стоимость товара в рублях, если она имеется (необязательно).</div>
-                <input type="text" placeholder="1000"/>
+                {
+                    this.state.showPrice ?
+                        <div>
+                            <div className="main__form-title">Добавить стоимость</div>
+                            <div>Укажите стоимость товара в рублях, если она имеется (необязательно).</div>
+                            <input type="text" placeholder="1000"/>
+                        </div>
+                    : null
+                }
                 <div className="main__form-title">Добавить номер телефона</div>
                 <div>Добавьте номер телефона (необязательно).</div>
                 <input type="tel" pattern="+7-[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}" placeholder="+7-900-000-00-00" />

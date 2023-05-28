@@ -311,8 +311,8 @@ select {
     width: 24px;
     height: 24px;
     position: absolute;
-    top: -12px;
-    right: -12px;
+    top: -10px;
+    right: -10px;
 }
 
 .delete-pic-btn:hover {
