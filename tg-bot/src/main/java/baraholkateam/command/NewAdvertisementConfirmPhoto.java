@@ -71,12 +71,12 @@ public class NewAdvertisementConfirmPhoto extends Command {
                     State.NewAdvertisement_AddPhotos.getDescription(),
                     State.NewAdvertisement_AddDescription.getDescription(),
                     DELETE_ALL_PHOTOS
-            ));
+            ), true);
         }
 
         return getReplyKeyboard(List.of(
                 State.NewAdvertisement_AddDescription.getDescription(),
                 DELETE_ALL_PHOTOS
-        ));
+        ), true);
     }
 }

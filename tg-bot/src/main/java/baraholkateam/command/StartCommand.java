@@ -41,6 +41,6 @@ public class StartCommand extends Command {
                 State.UserAdvertisements.getDescription(),
                 State.MainMenu.getDescription(),
                 State.Help.getDescription()
-        ));
+        ), false);
     }
 }

@@ -42,6 +42,6 @@ public class NewAdvertisementCommand extends Command {
     }
 
     private ReplyKeyboardMarkup getAddReplyKeyboard() {
-        return getReplyKeyboard(List.of(State.NewAdvertisement_AddPhotos.getDescription()));
+        return getReplyKeyboard(List.of(State.NewAdvertisement_AddPhotos.getDescription()), false);
     }
 }

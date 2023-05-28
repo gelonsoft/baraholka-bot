@@ -42,6 +42,6 @@ public class MainMenuCommand extends Command {
                 State.SearchAdvertisements.getDescription(),
                 State.UserAdvertisements.getDescription(),
                 State.Help.getDescription()
-        ));
+        ), false);
     }
 }

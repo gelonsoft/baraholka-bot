@@ -9,11 +9,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
 public class NewAdvertisementAddContacts extends Command {
     private static final String ADD_CONTACTS_TEXT = """
+            Вы можете указать свои контактные данные.""";
+    private static final String ADD_CONTACTS_QUESTION = """
             Желаете указать ваш номер телефона?""";
 
     public NewAdvertisementAddContacts() {
@@ -23,7 +26,9 @@ public class NewAdvertisementAddContacts extends Command {
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                ADD_CONTACTS_TEXT, getAddPhone());
+                ADD_CONTACTS_TEXT, getReplyKeyboard(Collections.emptyList(), true));
+        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                ADD_CONTACTS_QUESTION, getAddPhone());
     }
 
     private InlineKeyboardMarkup getAddPhone() {

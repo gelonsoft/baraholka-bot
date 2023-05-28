@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -37,7 +38,7 @@ public class NewAdvertisementAddCity extends Command {
         currentAdvertisementService.setTags(chat.getId(), List.of(Tag.Actual.getName()));
         chosenTagsService.put(chat.getId(), new ArrayList<>());
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                ADD_HASHTAGS_TEXT, null);
+                ADD_HASHTAGS_TEXT, getReplyKeyboard(Collections.emptyList(), true));
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                 ADD_CITY_TEXT, getTags(TagType.City, false));
     }

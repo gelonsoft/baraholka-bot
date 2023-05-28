@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
+import java.util.Collections;
 import java.util.Objects;
 
 @Component
@@ -45,6 +46,6 @@ public class NewAdvertisementAddPrice extends Command {
                 null
         );
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                ADD_PRICE_TEXT, null);
+                ADD_PRICE_TEXT, getReplyKeyboard(Collections.emptyList(), true));
     }
 }

@@ -371,13 +371,16 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
 
             if (chosenTagsService.get(chatId) != null
                     && State.nextState(currentStateService.get(msg.getChatId())) == State.NewAdvertisement_AddPrice) {
-                List<String> tags = chosenTagsService.get(chatId).stream()
-                        .map(Tag::getName)
-                        .toList();
+                List<String> addedTags = currentAdvertisementService.getTags(chatId);
                 // Если нужно пропустить добавление цены товара
-                if (!tags.contains(Tag.Sale.getName()) && !tags.contains(Tag.Bargaining.getName())) {
+                if (!addedTags.contains(Tag.Sale.getName()) && !addedTags.contains(Tag.Bargaining.getName())) {
+                    List<String> tags = chosenTagsService.get(chatId).stream()
+                            .map(Tag::getName)
+                            .toList();
+                    previousStateService.put(chatId, currentStateService.get(msg.getChatId()));
                     currentAdvertisementService.addTags(chatId, tags);
                     currentStateService.put(msg.getChatId(), State.NewAdvertisement_AddContacts);
+                    deleteLastMessage(msg.getChatId());
                     sendAnswer(
                             chatId,
                             String.format(

@@ -1,6 +1,7 @@
 package baraholkateam.command;
 
 import baraholkateam.rest.service.LastSentMessageService;
+import baraholkateam.util.State;
 import baraholkateam.util.Tag;
 import baraholkateam.util.TagType;
 import org.slf4j.Logger;
@@ -125,6 +126,12 @@ public abstract class Command extends BotCommand {
         line.add(back);
         nextList.add(line);
 
+        KeyboardButton menu = new KeyboardButton();
+        menu.setText(State.MainMenu.getDescription());
+        KeyboardRow menuLine = new KeyboardRow();
+        menuLine.add(menu);
+        nextList.add(menuLine);
+
         rkm.setKeyboard(nextList);
         return rkm;
     }
@@ -164,7 +171,24 @@ public abstract class Command extends BotCommand {
         return ikm;
     }
 
-    ReplyKeyboardMarkup getReplyKeyboard(List<String> buttons) {
+    ReplyKeyboardMarkup getReplyKeyboard(List<String> buttons, boolean isAddMenuButton) {
+        List<KeyboardRow> lines = getLines(buttons);
+
+        if (isAddMenuButton) {
+            KeyboardButton menu = new KeyboardButton();
+            menu.setText(State.MainMenu.getDescription());
+            KeyboardRow menuLine = new KeyboardRow();
+            menuLine.add(menu);
+            lines.add(menuLine);
+        }
+
+        ReplyKeyboardMarkup rkm = new ReplyKeyboardMarkup();
+        rkm.setKeyboard(lines);
+        rkm.setResizeKeyboard(true);
+        return rkm;
+    }
+
+    private List<KeyboardRow> getLines(List<String> buttons) {
         List<KeyboardRow> lines = new ArrayList<>(1);
         KeyboardRow line = new KeyboardRow();
 
@@ -193,9 +217,6 @@ public abstract class Command extends BotCommand {
         line.add(back);
         lines.add(line);
 
-        ReplyKeyboardMarkup rkm = new ReplyKeyboardMarkup();
-        rkm.setKeyboard(lines);
-        rkm.setResizeKeyboard(true);
-        return rkm;
+        return lines;
     }
 }

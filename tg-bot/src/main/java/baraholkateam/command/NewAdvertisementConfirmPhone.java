@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -41,7 +42,7 @@ public class NewAdvertisementConfirmPhone extends Command {
         List<String> socials = currentAdvertisement.getContacts();
         if (phone != null && previousStateService.get(chat.getId()) != State.NewAdvertisement_AddSocial) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                    String.format(PHONE_TEXT, phone), null);
+                    String.format(PHONE_TEXT, phone), getReplyKeyboard(Collections.emptyList(), true));
         } else if (!socials.isEmpty()) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                     String.format(SOCIAL_TEXT, socials.get(socials.size() - 1)), getDeleteButton());
@@ -76,6 +77,6 @@ public class NewAdvertisementConfirmPhone extends Command {
     }
 
     private ReplyKeyboardMarkup getDeleteButton() {
-        return getReplyKeyboard(List.of(DELETE_ALL_SOCIALS));
+        return getReplyKeyboard(List.of(DELETE_ALL_SOCIALS), true);
     }
 }

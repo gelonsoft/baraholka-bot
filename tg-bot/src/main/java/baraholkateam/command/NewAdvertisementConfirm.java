@@ -24,10 +24,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -36,6 +33,8 @@ public class NewAdvertisementConfirm extends Command {
     private static final String CONTACTS_LIST_TEXT = """
             Добавлены ссылки на следующие социальные сети:
             %s""";
+    private static final String FORMED_ADVERTISEMENT = """
+            Сформировано следующее объявление:""";
     private static final String CONFIRM_AD_TEXT = """
             Желаете опубликовать ваше объявление в канале?""";
     private static final Logger LOGGER = LoggerFactory.getLogger(NewAdvertisementConfirm.class);
@@ -63,6 +62,9 @@ public class NewAdvertisementConfirm extends Command {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                     String.format(CONTACTS_LIST_TEXT, String.join("\n", ad.getContacts())), null);
         }
+
+        sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
+                FORMED_ADVERTISEMENT, getReplyKeyboard(Collections.emptyList(), true));
 
         if (photos.size() == 1) {
             sendPhotoMessage(absSender, chat.getId(), Converter.convertBase64StringToPhoto(photos.get(0)), text);

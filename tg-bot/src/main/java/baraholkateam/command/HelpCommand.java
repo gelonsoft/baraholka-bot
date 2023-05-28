@@ -15,10 +15,10 @@ public class HelpCommand extends Command {
             %s""";
     private static final List<State> AVAILABLE_STATES = List.of(
             State.MainMenu,
-            State.UserAdvertisements,
             State.NewAdvertisement,
+            State.DeleteAdvertisement,
             State.SearchAdvertisements,
-            State.DeleteAdvertisement
+            State.UserAdvertisements
     );
 
     public HelpCommand() {

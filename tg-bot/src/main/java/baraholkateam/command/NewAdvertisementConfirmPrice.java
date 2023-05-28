@@ -33,6 +33,6 @@ public class NewAdvertisementConfirmPrice extends Command {
     }
 
     private ReplyKeyboardMarkup getAddReplyKeyboard() {
-        return getReplyKeyboard(List.of(State.NewAdvertisement_AddContacts.getDescription()));
+        return getReplyKeyboard(List.of(State.NewAdvertisement_AddContacts.getDescription()), true);
     }
 }
