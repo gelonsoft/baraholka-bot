@@ -214,7 +214,7 @@ class NewAd extends React.Component {
                 })}
                 </div>
                 <div className="main__form-title">Добавить описание</div>
-                <div>Добавьте краткое описание товара.</div>
+                <div>Добавьте краткое описание товара (до 800 символов).</div>
                 <textarea id="descriptionTextarea" placeholder="Описание" maxLength='800'></textarea>
                 <div className="main__form-title">Добавить город</div>
                 <div>Выберите город для публикации объявления.</div>
