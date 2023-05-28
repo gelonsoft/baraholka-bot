@@ -54,9 +54,15 @@ class NewAd extends React.Component {
     }
 
     createNewAd(e) {
-        console.log(e);
         e.preventDefault();
-
+        if (!e.target.checkValidity()) {
+            alert("Кажется, вы заполнили не все поля");
+            return;
+        }
+        if (this.state.chosenPhotos.length === 0) {
+            alert("Кажется, вы заполнили не все поля");
+            return;
+        }
         const convertToBase64 = (file) => {
             return new Promise((resolve, reject) => {
                 const fileReader = new FileReader();
@@ -76,9 +82,16 @@ class NewAd extends React.Component {
 
         const sendNewAd = () => {
             let userData = JSON.parse(localStorage.getItem('userData'));
-            console.log(e.target[1].value);
+            if (e.target[1] === "") {
+                alert("Кажется, вы заполнили не все поля");
+                return;
+            }
             let description = e.target[1].value;
             let tags = [];
+            if (e.target[2] === "Не выбран") {
+                alert("Кажется, вы заполнили не все поля");
+                return;
+            }
             tags.push('#' + e.target[2].value);
             let i = 3;
             while (e.target[i].className === "type") {
@@ -94,10 +107,23 @@ class NewAd extends React.Component {
                 i++;
             }
             let price = e.target[i++].value;
+            if (price === 0 || price === "") {
+                price = null;
+            }
             let phone = e.target[i++].value;
+            const phoneRegex = /\+7-\d{3}-\d{3}-\d{2}-\d{2}/;
+            if (!phoneRegex.test(phone)) {
+                alert("Пожалуйста, проверьте корректность введенных данных (телефон)");
+                return;
+            }
+            if (phone === "") {
+                phone = null;
+            }
             let contacts = [];
-            contacts.push(e.target[i++].value);
-            console.log(this.state.chosenPhotosStrings);
+            let contact = e.target[i++].value;
+            if (contact !== "") {
+                contacts.push(contact);
+            }
             let body = {
                 "id": userData.id,
                 "first_name": userData.first_name,
