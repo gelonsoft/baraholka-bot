@@ -316,10 +316,14 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
 
         // Случай нажатия на кнопку "Назад"
         if (msg.hasText() && Objects.equals(msg.getText(), BACK_BUTTON)) {
-            State backState = State.previousState(currentStateService.get(chatId));
+            State currentState = currentStateService.get(chatId);
+            State backState = State.previousState(currentState);
             if (backState != null) {
                 if (lastSentMessageService.get(chatId).hasReplyMarkup()) {
                     deleteLastMessage(chatId);
+                }
+                if (currentState == State.NewAdvertisement_AddSocial) {
+                    currentAdvertisementService.setSocials(chatId, new ArrayList<>());
                 }
                 currentStateService.put(chatId, backState);
                 getRegisteredCommand(backState.getIdentifier()).processMessage(this, msg, null);
