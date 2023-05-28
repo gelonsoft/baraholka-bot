@@ -278,14 +278,14 @@ public class ActualAdvertisement implements Serializable {
 
         String phone = this.getPhone();
         if (phone != null) {
-            sb.append("-".repeat(70));
+            sb.append("-".repeat(50));
             sb.append("\n").append(String.format(PHONE_NUMBER, phone));
         }
 
         List<String> contacts = this.getContacts();
         if (contacts.size() > 0) {
             if (phone == null) {
-                sb.append("-".repeat(70));
+                sb.append("-".repeat(50));
             }
 
             sb.append("\n").append(CONTACTS);
