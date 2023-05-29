@@ -10,15 +10,23 @@ class Baraholka extends React.Component {
     }
 
     render() {
-        console.log(localStorage.getItem('userData'));
-        return (
-            <div>
-                <Header/>
-                <div className="baraholka">
-                    <NavigationMenu/>
-                    <div className="main">
-                        <Outlet></Outlet>
+        let userData = localStorage.getItem('userData');
+        if (userData) {
+            return (
+                <div>
+                    <Header/>
+                    <div className="baraholka">
+                        <NavigationMenu/>
+                        <div className="main">
+                            <Outlet></Outlet>
+                        </div>
                     </div>
+                </div>
+            )
+        } else return (
+            <div className="login-container">
+                <div className="login">
+                    Чтобы иметь доступ к контенту, необходимо авторизоваться
                 </div>
             </div>
         )
