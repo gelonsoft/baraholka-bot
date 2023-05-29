@@ -226,6 +226,7 @@ select {
     height: 40px;
     line-height: 40px;
     width: 20%;
+    min-width: 160px;
 }
 
 .main__form-row {
@@ -259,11 +260,12 @@ select {
     padding-top: 10px;
 }
 
-.ad__photo{
+.ad__photo {
     height: 400px;
     width: 100%;
 }
-.text__padding{
+
+.text__padding {
     padding: 10px;
 }
 
@@ -280,15 +282,16 @@ select {
 .grid {
     margin-top: 10px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(400px, calc(100%/3 - 20px)));
+    grid-auto-rows: 1fr;
     grid-gap: 20px;
-
 }
 
 .grid > div {
     padding-bottom: 10px;
     border: solid 1px black;
     border-radius: 10px;
+    min-height: 600px;
 }
 
 .ref-color {
@@ -371,6 +374,59 @@ select {
     outline: none;
 }
 
+.read-more-button {
+    display: inline-block;
+    margin-left: 3px;
+    color: #419FD9;
+    cursor: pointer;
+}
+
+.btn-dialog {
+    border-radius: 10px;
+    color: white;
+    border: none;
+    width: 190px;
+}
+
+.btn-dark-color{
+    background-color: #293A4C;
+}
+
+.btn-light-color{
+    background-color: #419FD9;
+}
+
+.mgs-margin{
+    margin-top: 20px;
+}
+
+.box {
+    position:relative;
+    overflow:hidden;
+    width:100%;
+    height:400px;
+}
+.box img {
+    position: absolute;
+    top:50%;
+    left:50%;
+    -webkit-transform:translate(-50%,-50%);
+    -ms-transform:translate(-50%,-50%);
+    transform:translate(-50%,-50%);
+    max-width:100%;
+    max-height:400px;
+    width:auto;
+    height:auto;
+    -o-object-fit:cover;
+    object-fit:cover;
+}
+
+a.disabled {
+    pointer-events: none;
+    cursor: default;
+    color: #419FD9;
+}
+
 textarea{
     width: 100%;
     resize: none;
@@ -389,5 +445,6 @@ textarea{
 textarea::-webkit-scrollbar{
     width: 0;
 }
+
 
 

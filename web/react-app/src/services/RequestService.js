@@ -34,22 +34,22 @@ class RequestService {
     }
 
     getSearchAds(userData, tags) {
-        const bodyJSON = {
-            "id": userData.id,
-            "first_name": userData.first_name,
-            "last_name": userData.last_name,
-            "username": userData.username,
-            "photo_url": userData.photo_url,
-            "auth_date": userData.auth_date,
-            "hash": userData.hash,
-            "tags": tags
-        }
+        const bodyFormData = new FormData();
+        bodyFormData.append('id', userData.id);
+        bodyFormData.append('first_name', userData.first_name);
+        bodyFormData.append('last_name', userData.last_name);
+        bodyFormData.append('username', userData.username);
+        bodyFormData.append('photo_url', userData.photo_url);
+        bodyFormData.append('auth_date', userData.auth_date);
+        bodyFormData.append('hash', userData.hash);
+        if (tags.length !== 0) tags.forEach(tag => bodyFormData.append('tags[]', tag))
+        else bodyFormData.append('tags[]', '')
         try {
             return axios({
                 method: "post",
                 url: GET_SEARCH_ADS_URL,
-                data: bodyJSON,
-                headers: { "Content-Type": "application/json" },
+                data: bodyFormData,
+                headers: {"Content-Type": "application/json"},
             });
         } catch (e) {
             console.error(e);
@@ -57,12 +57,20 @@ class RequestService {
     }
 
     getMyAds(userData) {
+        const bodyFormData = new FormData();
+        bodyFormData.append('id', userData.id);
+        bodyFormData.append('first_name', userData.first_name);
+        bodyFormData.append('last_name', userData.last_name);
+        bodyFormData.append('username', userData.username);
+        bodyFormData.append('photo_url', userData.photo_url);
+        bodyFormData.append('auth_date', userData.auth_date);
+        bodyFormData.append('hash', userData.hash);
         try {
             return axios({
                 method: "post",
                 url: GET_MY_ADS_URL,
-                data: userData,
-                headers: { "Content-Type": "application/json" },
+                data: bodyFormData,
+                headers: {"Content-Type": "application/json"},
             });
         } catch (e) {
             console.error(e);
@@ -70,12 +78,20 @@ class RequestService {
     }
 
     postDeleteAd(userData, mess_id) {
+        const bodyFormData = new FormData();
+        bodyFormData.append('id', userData.id);
+        bodyFormData.append('first_name', userData.first_name);
+        bodyFormData.append('last_name', userData.last_name);
+        bodyFormData.append('username', userData.username);
+        bodyFormData.append('photo_url', userData.photo_url);
+        bodyFormData.append('auth_date', userData.auth_date);
+        bodyFormData.append('hash', userData.hash);
         try {
             return axios({
                 method: "post",
-                url: POST_DEL_AD_URL+mess_id,
-                data: userData,
-                headers: { "Content-Type": "application/json" },
+                url: POST_DEL_AD_URL + mess_id,
+                data: bodyFormData,
+                headers: {"Content-Type": "application/json"},
             });
         } catch (e) {
             console.error(e);

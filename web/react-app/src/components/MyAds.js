@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
-import Flickity from "react-flickity-component";
+import React from 'react';
 import '../style/style.css';
-import '../style/flickity.css';
-import ReactSpoiler from "react-spoiler";
 import RequestService from "../services/RequestService";
+import Rodal from 'rodal';
+import '../style/rodal.css';
+import ReactLoading from "react-loading";
+import Ad from "../services/Ad";
 
 
 class MyAds extends React.Component {
@@ -11,48 +12,57 @@ class MyAds extends React.Component {
         super(props);
         this.handleDeleteClick = this.handleDeleteClick.bind(this);
         this.state = {
-            ads: []
+            ads: [],
+            msg: "Загрузка данных"
         };
     }
 
     componentDidMount() {
-        let userData = localStorage.getItem('userData');
+        let userData = JSON.parse(localStorage.getItem('userData'));
         RequestService.getMyAds(userData).then((response) => {
             if (response.data) {
                 this.setState({
-                    ads: response.data
+                    ads: response.data,
+                    msg: response.data.length === 0 ? "У вас нет новых объявлений" : "Ваши актуальные объявления"
                 });
                 console.log("My ads", response.data);
             }
         }).catch(err => {
             console.log(err);
+            this.setState({
+                msg: "Ошибка при получении данных. " + err
+            });
         });
     }
 
     handleDeleteClick(val) {
-        let userData = localStorage.getItem('userData');
+        let userData = JSON.parse(localStorage.getItem('userData'));
         RequestService.postDeleteAd(userData, val).then((response) => {
-            if (response.data) {
-                let deleteAds = this.state.ads.find(ad => ad.id === val);
+            if (response.status === 200) {
+                let deleteAds = this.state.ads.find(ad => ad.message_id === val);
+                let adsSize = this.state.ads.length - 1;
                 this.setState({
-                    ads: this.state.ads.filter(ad => ad !== deleteAds)
+                    ads: this.state.ads.filter(ad => ad !== deleteAds),
+                    msg: adsSize === 0 ? "У вас нет новых объявлений" : "Ваши актуальные объявления"
                 });
-                console.log("Del ads", response.data);
             }
         }).catch(err => {
             console.log(err);
         });
     }
 
-
     render() {
-        const listOfAds = this.state.ads?.map((ad) => <FoundAds key={ad.id} username={ad.username} photos={ad.photos}
+        const listOfAds = this.state.ads?.map((ad) => <FoundAds key={ad.message_id} id={ad.message_id}
+                                                                photos={ad.photos}
                                                                 tags={ad.tags.toString().replaceAll(",", " ")}
                                                                 price={ad.price}
                                                                 description={ad.description} phone={ad.phone}
                                                                 contacts={ad.contacts}
-                                                                delete={this.handleDeleteClick}/>);
+                                                                delete={(id) => this.handleDeleteClick(id)}/>);
+        const showLoad = this.state.msg === "Загрузка данных";
         return (<form>
+            <div className="main__form-title">{this.state.msg}</div>
+            {showLoad ? <Example/> : null}
             <div className="grid">
                 {listOfAds}
             </div>
@@ -60,76 +70,64 @@ class MyAds extends React.Component {
     }
 }
 
-const flickityOptions = {
-    setGallerySize: false
-}
-
 class FoundAds extends React.Component {
-    listOfRef = this.props.contacts.map((contact, index) => <Contact key={index} contact={contact}/>)
-    listOfPhotos = this.props.photos.map((photo, index) => <Photo key={index} photo={photo}/>)
-    checkPrice = this.props.price == null ? "none" : "block";
-    checkPhone = this.props.phone == null ? "none" : "block";
-    checkContacts = this.listOfRef.length === 0 ? "none" : "block";
-
     render() {
         return (<div className="ad__form">
             <div className="main__form-row">
-                <div className="text__padding">{this.props.username}</div>
-                <button type="button" className="del-btn" onClick={() => this.props.delete(this.props.id)}>
-                    <img src={require('../img/del_ad.png')} height="20"/>
-                </button>
+                <div className="text__padding"></div>
+                <Dialog id={this.props.id} delete={(id) => this.props.delete(id)}></Dialog>
             </div>
 
-            <div className="add__content">
-                <div className="ad__photo">
-                    <Carousel photos={this.listOfPhotos}/>
-                </div>
-                <div className="text__padding">
-                    <div className="ad-tags">{this.props.tags}</div>
-                    <span style={{display: this.checkPrice}}
-                          className="ad-bottom-padding">Цена: {this.props.price} руб.</span>
-                    <div className="ad-bottom-padding">Описание: {this.props.description}</div>
-                    <div className="ad-bottom-padding">--------------------------------------------------------
-                    </div>
-                    <ReactSpoiler blur={10} hoverBlur={8}>
-                        <span style={{display: this.checkPhone}}>Номер телефона: {this.props.phone}</span>
-                        <span style={{display: this.checkContacts}}>Контакты:</span>
-                        {this.listOfRef}
-                    </ReactSpoiler>
-                </div>
-            </div>
+            <Ad key={this.props.key} id={this.props.id}
+                photos={this.props.photos}
+                tags={this.props.tags}
+                price={this.props.price}
+                description={this.props.description} phone={this.props.phone}
+                contacts={this.props.contacts}
+            ></Ad>
         </div>);
     }
 }
 
-class Contact extends React.Component {
-    render() {
-        return <a className="ref-color" href={this.props.contact}>{this.props.contact}</a>
-    }
-}
+const Example = () => (
+    <ReactLoading className="ad__form" type="spin" color="#419FD9" height={40} width={40}/>
+);
 
-
-function Carousel(props) {
-    const listOfPhotos = props.photos
-    return (<Flickity
-        className={'carousel'}
-        options={flickityOptions}
-    >
-        {listOfPhotos}
-    </Flickity>);
-}
-
-
-class Photo extends React.Component {
-    type = this.props.photo.toString().at(0) === "/" ? "jpg" : "png"
-    render() {
-        return <img src={`data:image/${this.type};base64,${this.props.photo}`} height="400"/>
+class Dialog extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {visible: false};
     }
 
-    //TODO: заминить этим, если не работает
-    // render() {
-    //     return <img src={`data:image/png;base64,${this.props.photo}`} height="400"/>
-    // }
+    show() {
+        this.setState({visible: true});
+    }
+
+    hide() {
+        this.setState({visible: false});
+    }
+
+    render() {
+        return (
+            <div>
+                <button type="button" className="del-btn" onClick={this.show.bind(this)}>
+                    <img src={require('../img/del_ad.png')} height="20"/>
+                </button>
+                <Rodal visible={this.state.visible} animation="fade" height="100" onClose={this.hide.bind(this)}>
+                    <div className="main__form-title">Удалить объявление</div>
+                    <div>Вы желаете удалить выбранное объявление?</div>
+                    <div className="main__form-row ad__form">
+                        <input type="button" className="btn btn-dialog btn-light-color" value="Да" onClick={() => {
+                            this.props.delete(this.props.id);
+                            this.setState({visible: false});
+                        }}/>
+                        <input type="button" className="btn btn-dialog btn-dark-color" value="Нет"
+                               onClick={this.hide.bind(this)}/>
+                    </div>
+                </Rodal>
+            </div>
+        );
+    }
 }
 
 export default MyAds;
