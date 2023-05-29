@@ -304,9 +304,25 @@ select {
 
 .chosen-photo {
     height: 150px;
-    margin-right: 10px;
-    margin-bottom: 10px;
     border-radius: 10px;
+}
+
+.delete-pic-btn {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    top: -10px;
+    right: -10px;
+}
+
+.delete-pic-btn:hover {
+    cursor: pointer;
+}
+
+.chosen-photo-container {
+    position: relative;
+    margin-right: 24px;
+    margin-bottom: 24px;
 }
 
 .custom-checkbox:hover {
@@ -345,6 +361,7 @@ select {
 .help-link {
     color: #419FD9;
 }
+
 .del-btn{
     background-color: transparent;
     background-repeat: no-repeat;
@@ -354,5 +371,23 @@ select {
     outline: none;
 }
 
+textarea{
+    width: 100%;
+    resize: none;
+    height: 60px;
+    outline: none;
+    padding: 20px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    border: solid 1px black;
+    border-radius: 10px;
+}
+
+textarea::-webkit-scrollbar{
+    width: 0;
+}
 
 
