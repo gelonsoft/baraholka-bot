@@ -92,7 +92,7 @@ class NewAd extends React.Component {
                 alert("Кажется, вы заполнили не все поля");
                 return;
             }
-            tags.push('#' + e.target[2].value);
+            tags.push('#' + e.target[2].labels[0].innerText.toLowerCase().replaceAll(" ", "_"));
             let i = 3;
             while (e.target[i].className === "type") {
                 if (e.target[i].checked) {
@@ -113,7 +113,7 @@ class NewAd extends React.Component {
             let phone = e.target[i++].value;
             const phoneRegex = /\+7-\d{3}-\d{3}-\d{2}-\d{2}/;
             if (!phoneRegex.test(phone)) {
-                alert("Пожалуйста, проверьте корректность введенных данных (телефон)");
+                alert("Пожалуйста, проверьте корректность введенных данных");
                 return;
             }
             if (phone === "") {
