@@ -92,7 +92,7 @@ class NewAd extends React.Component {
                 alert("Кажется, вы заполнили не все поля");
                 return;
             }
-            tags.push('#' + e.target[2].labels[0].innerText.toLowerCase().replaceAll(" ", "_"));
+            tags.push('#' + e.target[2].toLowerCase().replaceAll(" ", "_"));
             let i = 3;
             while (e.target[i].className === "type") {
                 if (e.target[i].checked) {
