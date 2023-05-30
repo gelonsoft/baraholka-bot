@@ -88,11 +88,11 @@ class NewAd extends React.Component {
             }
             let description = e.target[1].value;
             let tags = [];
-            if (e.target[2] === "Не выбран") {
+            if (e.target[2].value === "Не выбран") {
                 alert("Кажется, вы заполнили не все поля");
                 return;
             }
-            tags.push('#' + e.target[2].toLowerCase().replaceAll(" ", "_"));
+            tags.push('#' + e.target[2].value.toLowerCase().replaceAll(" ", "_"));
             let i = 3;
             while (e.target[i].className === "type") {
                 if (e.target[i].checked) {
