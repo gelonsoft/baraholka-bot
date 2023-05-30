@@ -1,0 +1,2 @@
+CREATE DATABASE "BaraholkaBot";
+GRANT ALL PRIVILEGES ON DATABASE "BaraholkaBot" TO root;
