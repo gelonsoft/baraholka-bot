@@ -352,6 +352,15 @@ select {
     border-radius: 150px;
 }
 
+
+.profile-photo-container {
+    width: 200px;
+    height: 200px;
+    background-image: url("../img/avatar.svg");
+    background-size: cover;
+    background-position: center;
+}
+
 .user-name {
     font-size: 20px;
     font-weight: 600;
