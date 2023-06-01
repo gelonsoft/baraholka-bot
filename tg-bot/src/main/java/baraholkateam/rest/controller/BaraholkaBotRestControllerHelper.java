@@ -138,9 +138,6 @@ public class BaraholkaBotRestControllerHelper {
         if (!Objects.equals(priceString, "null")) {
             price = Long.parseLong(priceString);
         }
-        Long userId = Long.parseLong(json.get("id").asText());
-        String description = json.get("description").asText();
-        Long price = Long.parseLong(json.get("price").asText());
 
         return new CurrentAdvertisement(userId, description, tags, price, phone, contacts);
     }
