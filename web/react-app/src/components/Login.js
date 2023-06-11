@@ -13,7 +13,6 @@ class Login extends React.Component {
     }
 
     handleTelegramResponse(response) {
-        console.log(response);
         let userData = {
             auth_date: response.auth_date,
             first_name: response.first_name,

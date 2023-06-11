@@ -186,8 +186,6 @@ class NewAd extends React.Component {
     }
 
     updatePriceForm(e, tag) {
-        console.log(e);
-        console.log(tag);
         if (tag === "#продажа") {
             this.setState({showPrice: e.target.checked});
         }
