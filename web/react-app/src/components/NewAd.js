@@ -63,6 +63,19 @@ class NewAd extends React.Component {
             alert("Кажется, вы заполнили не все поля");
             return;
         }
+        if (this.state.chosenPhotos.length > 10) {
+            alert("Кажется, вы добавили слишком много фотографий");
+            return;
+        }
+        if (e.target[1].value.trim() === "") {
+            alert("Кажется, вы заполнили не все поля");
+            return;
+        }
+        if (e.target[2].value === "Не выбран") {
+            alert("Кажется, вы заполнили не все поля");
+            return;
+        }
+
         const convertToBase64 = (file) => {
             return new Promise((resolve, reject) => {
                 const fileReader = new FileReader();
@@ -82,37 +95,51 @@ class NewAd extends React.Component {
 
         const sendNewAd = () => {
             let userData = JSON.parse(localStorage.getItem('userData'));
-            if (e.target[1] === "") {
-                alert("Кажется, вы заполнили не все поля");
-                return;
-            }
             let description = e.target[1].value;
             let tags = [];
-            if (e.target[2].value === "Не выбран") {
-                alert("Кажется, вы заполнили не все поля");
-                return;
-            }
             tags.push('#' + e.target[2].value.toLowerCase().replaceAll(" ", "_"));
             let i = 3;
+            let typeCount = 0;
             while (e.target[i].className === "type") {
                 if (e.target[i].checked) {
                     tags.push('#' + e.target[i].labels[0].innerText.toLowerCase().replaceAll(" ", "_"));
+                    typeCount++;
                 }
                 i++;
             }
+            if (typeCount === 0) {
+                alert("Кажется, вы заполнили не все поля");
+                return;
+            }
+            let categoryCount = 0;
             while (e.target[i].className === "category") {
                 if (e.target[i].checked) {
                     tags.push('#' + e.target[i].labels[0].innerText.toLowerCase().replaceAll(" ", "_"));
+                    categoryCount++;
                 }
                 i++;
             }
-            let price = e.target[i++].value;
+            if (categoryCount === 0) {
+                alert("Кажется, вы заполнили не все поля");
+                return;
+            }
+            let price = e.target[i++].value.trim();
+            if (this.state.showPrice && price === "") {
+                alert("Кажется, вы заполнили не все поля");
+                return;
+            }
+            if (isNaN(price) || price < 0) {
+                alert("Пожалуйста, проверьте корректность введенных данных");
+                return;
+            } else {
+                price = Number(price);
+            }
             if (price === 0 || price === "") {
                 price = null;
             }
-            let phone = e.target[i++].value;
+            let phone = e.target[i++].value.trim();
             const phoneRegex = /\+7-\d{3}-\d{3}-\d{2}-\d{2}/;
-            if (!phoneRegex.test(phone)) {
+            if (phone !== "" && !phoneRegex.test(phone)) {
                 alert("Пожалуйста, проверьте корректность введенных данных");
                 return;
             }
@@ -135,7 +162,7 @@ class NewAd extends React.Component {
                 "photos": this.state.chosenPhotosStrings,
                 "description": description,
                 "tags": tags,
-                "price": Number(price),
+                "price": price,
                 "phone": phone,
                 "contacts": contacts
             };
@@ -186,8 +213,6 @@ class NewAd extends React.Component {
     }
 
     updatePriceForm(e, tag) {
-        console.log(e);
-        console.log(tag);
         if (tag === "#продажа") {
             this.setState({showPrice: e.target.checked});
         }
@@ -199,7 +224,7 @@ class NewAd extends React.Component {
                 <div className="main__form-title">Добавить фотографии</div>
                 <div>Добавьте от 1 до 10 фотографий к вашему объявлению. Рекомендуемое число - 5.</div>
                 <label className="btn btn-light file-btn">
-                    <input type="file" id="photosInput" onChange={this.onPhotosChange} multiple />
+                    <input type="file" accept="image/*" id="photosInput" onChange={this.onPhotosChange} multiple />
                     Выбрать файл
                 </label>
                 <div className="chosen-photos">
