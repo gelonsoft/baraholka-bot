@@ -97,7 +97,7 @@ class NewAd extends React.Component {
             let userData = JSON.parse(localStorage.getItem('userData'));
             let description = e.target[1].value;
             let tags = [];
-            tags.push('#' + e.target[2].value.toLowerCase().replaceAll(" ", "_"));
+            tags.push('#' + e.target[2].value.replaceAll(" ", "_"));
             let i = 3;
             let typeCount = 0;
             while (e.target[i].className === "type") {
@@ -123,19 +123,22 @@ class NewAd extends React.Component {
                 alert("Кажется, вы заполнили не все поля");
                 return;
             }
-            let price = e.target[i++].value.trim();
-            if (this.state.showPrice && price === "") {
-                alert("Кажется, вы заполнили не все поля");
-                return;
-            }
-            if (isNaN(price) || price < 0) {
-                alert("Пожалуйста, проверьте корректность введенных данных");
-                return;
-            } else {
-                price = Number(price);
-            }
-            if (price === 0 || price === "") {
-                price = null;
+            let price = null;
+            if (this.state.showPrice) {
+                price = e.target[i++].value.trim();
+                if (price === "") {
+                    alert("Кажется, вы заполнили не все поля");
+                    return;
+                }
+                if (isNaN(price) || price < 0) {
+                    alert("Пожалуйста, проверьте корректность введенных данных");
+                    return;
+                } else {
+                    price = Number(price);
+                }
+                if (price === 0) {
+                    price = null;
+                }
             }
             let phone = e.target[i++].value.trim();
             const phoneRegex = /\+7-\d{3}-\d{3}-\d{2}-\d{2}/;
