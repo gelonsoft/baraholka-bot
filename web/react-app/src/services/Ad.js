@@ -1,14 +1,32 @@
-import React from 'react';
+import React, {useState} from "react";
 import '../style/style.css';
 import ReactSpoiler from "react-spoiler";
-import ReadMoreReact from 'read-more-react';
 import AliceCarousel from "react-alice-carousel";
+
+const ReadMore = ({children}) => {
+    const text = children;
+    const [isReadMore, setIsReadMore] = useState(true);
+    const toggleReadMore = () => {
+        setIsReadMore(!isReadMore);
+    };
+
+    const checkLength = children.length <= 150 ? "none" : "block";
+    return (
+        <p className="new-line">
+            {isReadMore ? text.slice(0, 150) : text}
+            <span style={{display: checkLength}} onClick={toggleReadMore} className="ref-color">
+        {isReadMore ? "...Подробнее" : " Скрыть"}
+      </span>
+        </p>
+    );
+};
 export default class Ad extends React.Component {
     constructor(props) {
         super(props);
         this.handleBlurClick = this.handleBlurClick.bind(this);
         this.state = {clickable: false};
     }
+
     listOfPhotos = this.props.photos.map((photo, index) => <Photo key={index} photo={photo}/>)
     checkPrice = this.props.price == null ? "none" : "block";
     checkPhone = this.props.phone == null ? "none" : "block";
@@ -28,17 +46,13 @@ export default class Ad extends React.Component {
                     <div className="ad-tags">{this.props.tags}</div>
                     <span style={{display: this.checkPrice}}
                           className="ad-bottom-padding">Цена: {this.props.price} руб.</span>
-                    <ReadMoreReact text={`Описание: ${this.props.description}`}
-                                   min={150}
-                                   ideal={150}
-                                   max={200}
-                                   readMoreText="Подробнее"/>
+                    <ReadMore children={`Описание: ${this.props.description.trim()}`}/>
                     <div>--------------------------------------------------------</div>
                     <ReactSpoiler blur={10} hoverBlur={8} onClick={this.handleBlurClick}>
                         <span style={{display: this.checkPhone}}>Номер телефона: {this.props.phone}</span>
                         <div>Контакты:</div>
                         {this.props.contacts.map((contact) => {
-                            const ref = contact.at(0) === "@" ? "https://t.me/"+contact.substring(1) : contact
+                            const ref = contact.at(0) === "@" ? "https://t.me/" + contact.substring(1) : contact
                             return <a className={this.state.clickable ? "enabled ref-color" : "disabled"}
                                       href={ref}>{contact}<br/></a>
                         })}
