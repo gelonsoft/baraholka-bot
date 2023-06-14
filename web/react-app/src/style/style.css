@@ -455,5 +455,8 @@ textarea::-webkit-scrollbar{
     width: 0;
 }
 
+.new-line{
+    white-space: pre-line;
+}
 
 
