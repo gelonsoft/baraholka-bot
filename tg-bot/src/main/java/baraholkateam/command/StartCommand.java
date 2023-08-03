@@ -27,18 +27,18 @@ public class StartCommand extends Command {
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                 String.format(START_ANSWER,
-                        State.NewAdvertisement.getIdentifier(),
-                        State.SearchAdvertisements.getIdentifier(),
-                        State.UserAdvertisements.getIdentifier(),
+                        State.NewObyavleniye.getIdentifier(),
+                        State.SearchObyavleniyes.getIdentifier(),
+                        State.UserObyavleniyes.getIdentifier(),
                         State.MainMenu.getIdentifier(),
                         State.Help.getIdentifier()), getButtons());
     }
 
     private ReplyKeyboardMarkup getButtons() {
         return getReplyKeyboard(List.of(
-                State.NewAdvertisement.getDescription(),
-                State.SearchAdvertisements.getDescription(),
-                State.UserAdvertisements.getDescription(),
+                State.NewObyavleniye.getDescription(),
+                State.SearchObyavleniyes.getDescription(),
+                State.UserObyavleniyes.getDescription(),
                 State.MainMenu.getDescription(),
                 State.Help.getDescription()
         ), false);

@@ -1,6 +1,6 @@
 package baraholkateam.command;
 
-import baraholkateam.rest.service.CurrentAdvertisementService;
+import baraholkateam.rest.service.CurrentObyavleniyeService;
 import baraholkateam.util.State;
 import baraholkateam.util.TagType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.Objects;
 
 @Component
-public class NewAdvertisementAddPrice extends Command {
+public class NewObyavleniyeAddPrice extends Command {
     private static final String CHOSEN_CATEGORIES = """
             Выбраны категории товаров: %s""";
     private static final String ADD_PRICE_TEXT = """
@@ -21,15 +21,15 @@ public class NewAdvertisementAddPrice extends Command {
             Цена должна состоять только из цифр и ее длина не должна превышать 18 цифр.""";
 
     @Autowired
-    private CurrentAdvertisementService currentAdvertisementService;
+    private CurrentObyavleniyeService currentObyavleniyeService;
 
-    public NewAdvertisementAddPrice() {
-        super(State.NewAdvertisement_AddPrice.getIdentifier(), State.NewAdvertisement_AddPrice.getDescription());
+    public NewObyavleniyeAddPrice() {
+        super(State.NewObyavleniye_AddPrice.getIdentifier(), State.NewObyavleniye_AddPrice.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        String chosenCategoriesTags = currentAdvertisementService.get(chat.getId())
+        String chosenCategoriesTags = currentObyavleniyeService.get(chat.getId())
                 .getTagsOfType(TagType.ProductCategories);
         if (Objects.equals(chosenCategoriesTags, "")) {
             chosenCategoriesTags = NO_HASHTAGS;

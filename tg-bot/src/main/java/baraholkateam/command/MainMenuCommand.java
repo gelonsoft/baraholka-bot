@@ -27,20 +27,20 @@ public class MainMenuCommand extends Command {
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                 String.format(MAIN_MENU,
-                        State.NewAdvertisement.getIdentifier(),
-                        State.DeleteAdvertisement.getIdentifier(),
-                        State.SearchAdvertisements.getIdentifier(),
-                        State.UserAdvertisements.getIdentifier(),
+                        State.NewObyavleniye.getIdentifier(),
+                        State.DeleteObyavleniye.getIdentifier(),
+                        State.SearchObyavleniyes.getIdentifier(),
+                        State.UserObyavleniyes.getIdentifier(),
                         State.Help.getIdentifier()
                 ), getButtons());
     }
 
     private ReplyKeyboard getButtons() {
         return getReplyKeyboard(List.of(
-                State.NewAdvertisement.getDescription(),
-                State.DeleteAdvertisement.getDescription(),
-                State.SearchAdvertisements.getDescription(),
-                State.UserAdvertisements.getDescription(),
+                State.NewObyavleniye.getDescription(),
+                State.DeleteObyavleniye.getDescription(),
+                State.SearchObyavleniyes.getDescription(),
+                State.UserObyavleniyes.getDescription(),
                 State.Help.getDescription()
         ), false);
     }

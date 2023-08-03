@@ -9,17 +9,18 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import java.util.Collections;
 
 @Component
-public class NewAdvertisementAddPhotos extends Command {
-    private static final String ADD_PHOTOS_TEXT = """
-            Добавьте от 1 до 10 фотографий к вашему объявлению. Рекомендуемое число - 5.""";
+public class NewObyavleniyeAddPhone extends Command {
+    private static final String ADD_PHONE_TEXT = """
+            Введите ваш номер в формате
+            +7-xxx-xxx-xx-xx""";
 
-    public NewAdvertisementAddPhotos() {
-        super(State.NewAdvertisement_AddPhotos.getIdentifier(), State.NewAdvertisement_AddPhotos.getDescription());
+    public NewObyavleniyeAddPhone() {
+        super(State.NewObyavleniye_AddPhone.getIdentifier(), State.NewObyavleniye_AddPhone.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                ADD_PHOTOS_TEXT, getReplyKeyboard(Collections.emptyList(), true));
+                ADD_PHONE_TEXT, getReplyKeyboard(Collections.emptyList(), true));
     }
 }

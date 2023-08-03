@@ -15,8 +15,8 @@ public class AllTags implements Serializable {
     @JsonProperty("actuality")
     private final List<String> actuality;
 
-    @JsonProperty("advertisement_type")
-    private final List<String> advertisementType;
+    @JsonProperty("obyavleniye_type")
+    private final List<String> obyavleniyeType;
 
     @JsonProperty("product_categories")
     private final List<String> productCategories;
@@ -30,8 +30,8 @@ public class AllTags implements Serializable {
                 .filter(tag -> tag.getTagType() == TagType.Actuality)
                 .map(Tag::getName)
                 .toList());
-        advertisementType = new ArrayList<>(Arrays.stream(Tag.values())
-                .filter(tag -> tag.getTagType() == TagType.AdvertisementType)
+        obyavleniyeType = new ArrayList<>(Arrays.stream(Tag.values())
+                .filter(tag -> tag.getTagType() == TagType.ObyavleniyeType)
                 .map(Tag::getName)
                 .toList());
         productCategories = new ArrayList<>(Arrays.stream(Tag.values())

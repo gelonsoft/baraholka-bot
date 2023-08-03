@@ -1,7 +1,7 @@
 package baraholkateam.command;
 
 import baraholkateam.rest.service.ChosenTagsService;
-import baraholkateam.rest.service.CurrentAdvertisementService;
+import baraholkateam.rest.service.CurrentObyavleniyeService;
 import baraholkateam.util.State;
 import baraholkateam.util.Tag;
 import baraholkateam.util.TagType;
@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class NewAdvertisementAddCity extends Command {
+public class NewObyavleniyeAddCity extends Command {
     private static final String ADD_HASHTAGS_TEXT = """
             Описание успешно добавлено.
             Теперь необходимо добавить хэштеги.""";
@@ -24,18 +24,18 @@ public class NewAdvertisementAddCity extends Command {
             Выберите город, который хотите добавить:""";
 
     @Autowired
-    private CurrentAdvertisementService currentAdvertisementService;
+    private CurrentObyavleniyeService currentObyavleniyeService;
 
     @Autowired
     private ChosenTagsService chosenTagsService;
 
-    public NewAdvertisementAddCity() {
-        super(State.NewAdvertisement_AddCity.getIdentifier(), State.NewAdvertisement_AddCity.getDescription());
+    public NewObyavleniyeAddCity() {
+        super(State.NewObyavleniye_AddCity.getIdentifier(), State.NewObyavleniye_AddCity.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        currentAdvertisementService.setTags(chat.getId(), List.of(Tag.Actual.getName()));
+        currentObyavleniyeService.setTags(chat.getId(), List.of(Tag.Actual.getName()));
         chosenTagsService.put(chat.getId(), new ArrayList<>());
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                 ADD_HASHTAGS_TEXT, getReplyKeyboard(Collections.emptyList(), true));

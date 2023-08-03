@@ -10,7 +10,7 @@ class NewObjav extends React.Component {
             chosenPhotos: [],
             chosenPhotosStrings: [],
             cityTags: ['#Москва', '#СПб', '#Екатеринбург', '#Челябинск', '#Ульяновск', '#Омск', '#Белгород', '#Петропавловск', '#Пермь', '#Волгоград', '#Киров', '#Хабаровск'],
-            advertisementTypeTags: ['#продажа', '#обмен', '#дар', '#торг_уместен', '#срочно'],
+            obyavleniyeTypeTags: ['#продажа', '#обмен', '#дар', '#торг_уместен', '#срочно'],
             categoriesTags: ['#одежда', '#обувь', '#детские_товары', '#красота_и_здоровье', '#книги', '#хобби', '#домашняя_техника', '#электроника', '#спорт', '#другое', '#мужское', '#женское'],
             update: false,
             showPrice: false
@@ -28,7 +28,7 @@ class NewObjav extends React.Component {
             if (response.data) {
                 this.setState({
                     cityTags: response.data.city,
-                    advertisementTypeTags: response.data.advertisement_type,
+                    obyavleniyeTypeTags: response.data.obyavleniye_type,
                     categoriesTags: response.data.product_categories
                 });
             }
@@ -257,7 +257,7 @@ class NewObjav extends React.Component {
                 <div className="main__form-title">Добавить тип объявления</div>
                 <div>Выберите тип объявления.</div>
                 <div className="main__form-row">
-                    {this.state.advertisementTypeTags.map((tag) => {
+                    {this.state.obyavleniyeTypeTags.map((tag) => {
                         return (
                             <label className="custom-checkbox">
                                 <input onChange={(event) => this.updatePriceForm(event, tag)} className="type" type="checkbox" />

@@ -3,6 +3,6 @@ package baraholkateam.util;
 public enum TagType {
     City,
     Actuality,
-    AdvertisementType,
+    ObyavleniyeType,
     ProductCategories
 }

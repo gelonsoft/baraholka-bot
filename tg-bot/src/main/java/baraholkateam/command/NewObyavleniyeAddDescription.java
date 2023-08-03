@@ -9,13 +9,13 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import java.util.Collections;
 
 @Component
-public class NewAdvertisementAddDescription extends Command {
+public class NewObyavleniyeAddDescription extends Command {
     private static final String ADD_DESCRIPTION_TEXT = """
             Введите краткое описание товара (не более 800 символов):""";
 
-    public NewAdvertisementAddDescription() {
-        super(State.NewAdvertisement_AddDescription.getIdentifier(),
-                State.NewAdvertisement_AddDescription.getDescription());
+    public NewObyavleniyeAddDescription() {
+        super(State.NewObyavleniye_AddDescription.getIdentifier(),
+                State.NewObyavleniye_AddDescription.getDescription());
     }
 
     @Override

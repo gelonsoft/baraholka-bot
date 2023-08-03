@@ -10,8 +10,8 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
 @Component
-public class SearchAdvertisements extends Command {
-    private static final String SEARCH_ADVERTISEMENTS = """
+public class SearchObyavleniyes extends Command {
+    private static final String SEARCH_OBYAVLENIYES = """
             Команда /%s позволяет искать объявления по одному или нескольким хэштегам.""";
     private static final String CHOOSE_CITY = """
             Выберите город.
@@ -21,15 +21,15 @@ public class SearchAdvertisements extends Command {
     @Autowired
     private ChosenTagsService chosenTagsService;
 
-    public SearchAdvertisements() {
-        super(State.SearchAdvertisements.getIdentifier(), State.SearchAdvertisements.getDescription());
+    public SearchObyavleniyes() {
+        super(State.SearchObyavleniyes.getIdentifier(), State.SearchObyavleniyes.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         chosenTagsService.delete(chat.getId());
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                String.format(SEARCH_ADVERTISEMENTS, this.getCommandIdentifier()), showNextButton());
+                String.format(SEARCH_OBYAVLENIYES, this.getCommandIdentifier()), showNextButton());
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                 String.format(CHOOSE_CITY, NEXT_BUTTON_TEXT), getTags(TagType.City, false));
     }

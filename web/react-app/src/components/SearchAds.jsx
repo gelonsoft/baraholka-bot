@@ -17,7 +17,7 @@ class SearchAds extends React.Component {
             currentCity: 'Не выбран',
             msg: "Поиск объявлений",
             cityTags: ['#Москва', '#СПб', '#Екатеринбург', '#Челябинск', '#Ульяновск', '#Омск', '#Белгород', '#Петропавловск', '#Пермь', '#Волгоград', '#Киров', '#Хабаровск'],
-            advertisementTypeTags: ['#продажа', '#обмен', '#дар', '#торг_уместен', '#срочно'],
+            obyavleniyeTypeTags: ['#продажа', '#обмен', '#дар', '#торг_уместен', '#срочно'],
             categoriesTags: ['#одежда', '#обувь', '#детские_товары', '#красота_и_здоровье', '#книги', '#хобби', '#домашняя_техника', '#электроника', '#спорт', '#другое', '#мужское', '#женское'],
         };
     }
@@ -28,7 +28,7 @@ class SearchAds extends React.Component {
             if (response.data) {
                 this.setState({
                     cityTags: response.data.city,
-                    advertisementTypeTags: response.data.advertisement_type,
+                    obyavleniyeTypeTags: response.data.obyavleniye_type,
                     categoriesTags: response.data.product_categories
                 });
             }
@@ -84,7 +84,7 @@ class SearchAds extends React.Component {
             return <StartNewSearch ads={this.state.ads} msg={this.state.msg} choosenTags={this.state.choosenTags}
                                    new={this.handleNewClick}/>;
         }
-        return <ChooseSearchTags cities={this.state.cityTags} types={this.state.advertisementTypeTags}
+        return <ChooseSearchTags cities={this.state.cityTags} types={this.state.obyavleniyeTypeTags}
                                  categories={this.state.categoriesTags}
                                  change={this.handleCheckboxChange} start={this.handleStartClick}
                                  select={this.handleSelectChange}/>;

@@ -18,27 +18,28 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Опубликованное актуальное объявление.
+ * Текущее создаваемое объявление.
  */
 @Entity
-@Table(name = "actual_advertisement")
-public class ActualAdvertisement implements Serializable {
+@Table(name = "current_obyavleniye")
+public class CurrentObyavleniye implements Serializable {
 
     public static final String DESCRIPTION_TEXT = "Описание: ";
     private static final String PRICE_TEXT = "Цена: %s руб.";
     private static final String PHONE_NUMBER = "Номер телефона: <span class=\"tg-spoiler\">%s</span>";
     private static final String CONTACTS = "Контакты: ";
     private static final String CONTACT = "<span class=\"tg-spoiler\">%s</span>";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ActualAdvertisement.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CurrentObyavleniye.class);
 
     @Id
-    @Column(name = "message_id")
-    @JsonProperty("message_id")
-    private Long messageId;
+    @Column(name = "chat_id")
+    @JsonProperty("user_id")
+    private Long chatId;
 
-    @Column(name = "owner_chat_id")
+    @Column(name = "message_id")
     @JsonIgnore
-    private Long ownerChatId;
+    private Long messageId;
 
     /**
      * Список фотографий в виде Base64 строк.
@@ -54,7 +55,7 @@ public class ActualAdvertisement implements Serializable {
 
     @Column(name = "tags", length = 1024)
     @JsonProperty("tags")
-    private final List<String> tags = new ArrayList<>();
+    private List<String> tags = new ArrayList<>();
 
     @Column(name = "price")
     @JsonProperty("price")
@@ -80,18 +81,19 @@ public class ActualAdvertisement implements Serializable {
     @JsonIgnore
     private Integer updateAttempt;
 
-    public ActualAdvertisement() {
+    public CurrentObyavleniye() {
 
     }
 
-    public ActualAdvertisement(Long ownerChatId) {
-        this.ownerChatId = ownerChatId;
-    }
-
-    public ActualAdvertisement(List<String> photos, String description, List<Tag> tags, Long price, String phone,
-                               List<String> contacts) {
+    public CurrentObyavleniye(Long chatId) {
         this.tags.add(Tag.Actual.getName());
-        this.photos = photos;
+        this.chatId = chatId;
+    }
+
+    public CurrentObyavleniye(Long chatId, String description, List<Tag> tags, Long price,
+                                String phone, List<String> contacts) {
+        this.tags.add(Tag.Actual.getName());
+        this.chatId = chatId;
         this.description = description;
         this.tags.addAll(tags.stream().map(Tag::getName).toList());
         this.price = price;
@@ -99,37 +101,30 @@ public class ActualAdvertisement implements Serializable {
         this.contacts = contacts;
     }
 
-    public Long getOwnerChatId() {
-        if (ownerChatId == null) {
-            LOGGER.warn("Field 'chatId' of the actual advertisement is null!");
+    public Long getChatId() {
+        if (chatId == null) {
+            LOGGER.error("Field 'chatId' of the current obyavleniye is null!");
         }
-        return ownerChatId;
+        return chatId;
     }
 
     public Long getMessageId() {
         if (messageId == null) {
-            LOGGER.warn("Field 'messageId' of the actual advertisement is null!");
+            LOGGER.error("Field 'messageId' of the current obyavleniye is null!");
         }
         return messageId;
     }
 
-    public List<String> getPhotos() {
-        if (photos == null || photos.isEmpty()) {
-            LOGGER.warn("Field 'photos' of the actual advertisement is null!");
-        }
-        return photos;
-    }
-
     public String getDescription() {
         if (description == null) {
-            LOGGER.warn("Field 'description' of the actual advertisement is null!");
+            LOGGER.error("Field 'description' of the current obyavleniye is null!");
         }
         return description;
     }
 
     public List<String> getTags() {
         if (tags.isEmpty()) {
-            LOGGER.warn("Field 'tags' of the actual advertisement is null!");
+            LOGGER.error("Field 'tags' of the current obyavleniye is null!");
         }
         return tags;
     }
@@ -163,97 +158,100 @@ public class ActualAdvertisement implements Serializable {
 
     public Long getCreationTime() {
         if (creationTime == null) {
-            LOGGER.warn("Field 'creationTime' of the actual advertisement is null!");
+            LOGGER.error("Field 'creationTime' of the current obyavleniye is null!");
         }
         return creationTime;
     }
 
     public Long getNextUpdateTime() {
         if (nextUpdateTime == null) {
-            LOGGER.warn("Field 'nextUpdateTime' of the actual advertisement is null!");
+            LOGGER.error("Field 'nextUpdateTime' of the current obyavleniye is null!");
         }
         return nextUpdateTime;
     }
 
     public Integer getUpdateAttempt() {
         if (updateAttempt == null) {
-            LOGGER.warn("Field 'updateAttempt' of the actual advertisement is null!");
+            LOGGER.error("Field 'updateAttempt' of the current obyavleniye is null!");
         }
         return updateAttempt;
     }
 
-    public ActualAdvertisement setOwnerChatId(Long ownerChatId) {
-        this.ownerChatId = ownerChatId;
-        return this;
+    public List<String> getPhotos() {
+        return photos;
     }
 
-    public ActualAdvertisement setDescription(String description) {
-        this.description = description;
-        return this;
-    }
-
-    public ActualAdvertisement setPrice(Long price) {
-        this.price = price;
-        return this;
-    }
-
-    public ActualAdvertisement setPhone(String phone) {
-        this.phone = phone;
-        return this;
-    }
-
-    public ActualAdvertisement addSocial(String social) {
-        this.contacts.add(social);
-        return this;
-    }
-
-    public ActualAdvertisement setSocials(List<String> socials) {
-        this.contacts = socials;
-        return this;
-    }
-
-    public ActualAdvertisement addPhotos(String photo) {
-        this.photos.add(photo);
-        return this;
-    }
-
-    public ActualAdvertisement setPhotos(List<String> photos) {
-        this.photos = photos;
-        return this;
-    }
-
-    public ActualAdvertisement addTags(List<String> tags) {
-        this.tags.addAll(tags);
-        return this;
-    }
-
-    public ActualAdvertisement addTag(String tag) {
-        tags.add(tag);
-        return this;
-    }
-
-    public ActualAdvertisement setMessageId(Long messageId) {
+    public CurrentObyavleniye setMessageId(Long messageId) {
         this.messageId = messageId;
         return this;
     }
 
-    public ActualAdvertisement setCreationTime(Long creationTime) {
+    public CurrentObyavleniye setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public CurrentObyavleniye setPrice(Long price) {
+        this.price = price;
+        return this;
+    }
+
+    public CurrentObyavleniye setTags(List<String> tags) {
+        this.tags = tags;
+        return this;
+    }
+
+    public CurrentObyavleniye setPhone(String phone) {
+        this.phone = phone;
+        return this;
+    }
+
+    public CurrentObyavleniye addSocial(String social) {
+        this.contacts.add(social);
+        return this;
+    }
+
+    public CurrentObyavleniye setSocials(List<String> socials) {
+        this.contacts = socials;
+        return this;
+    }
+
+    public CurrentObyavleniye addPhoto(String photo) {
+        this.photos.add(photo);
+        return this;
+    }
+
+    public CurrentObyavleniye setPhotos(List<String> photos) {
+        this.photos = photos;
+        return this;
+    }
+
+    public CurrentObyavleniye addTags(List<String> tags) {
+        this.tags.addAll(tags);
+        return this;
+    }
+
+    public CurrentObyavleniye addTag(String tag) {
+        tags.add(tag);
+        return this;
+    }
+
+    public CurrentObyavleniye setCreationTime(Long creationTime) {
         this.creationTime = creationTime;
         return this;
     }
 
-    public ActualAdvertisement setNextUpdateTime(Long nextUpdateTime) {
+    public CurrentObyavleniye setNextUpdateTime(Long nextUpdateTime) {
         this.nextUpdateTime = nextUpdateTime;
         return this;
     }
 
-    public ActualAdvertisement setUpdateAttempt(Integer updateAttempt) {
+    public CurrentObyavleniye setUpdateAttempt(Integer updateAttempt) {
         this.updateAttempt = updateAttempt;
         return this;
     }
 
-    @JsonIgnore
-    public String getAdvertisementText() {
+    public String getObyavleniyeText() {
         List<String> tags = this.getTags();
         StringBuilder tagsString = new StringBuilder();
         for (String tag : tags) {

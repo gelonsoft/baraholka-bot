@@ -1,8 +1,8 @@
 package baraholkateam.rest.controller;
 
-import baraholkateam.rest.model.ActualAdvertisement;
-import baraholkateam.rest.model.CurrentAdvertisement;
-import baraholkateam.rest.service.ActualAdvertisementService;
+import baraholkateam.rest.model.ActualObyavleniye;
+import baraholkateam.rest.model.CurrentObyavleniye;
+import baraholkateam.rest.service.ActualObyavleniyeService;
 import baraholkateam.util.AllTags;
 import baraholkateam.util.TelegramUserInfo;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -30,11 +30,11 @@ public class BaraholkaBotRestController {
     private BaraholkaBotRestControllerHelper controllerHelper;
 
     @Autowired
-    private ActualAdvertisementService actualAdvertisementService;
+    private ActualObyavleniyeService actualObyavleniyeService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "/my_advertisements",
+    @RequestMapping(method = RequestMethod.POST, value = "/my_obyavleniyes",
             headers = {"content-type=application/json"})
-    public ResponseEntity<List<ActualAdvertisement>> getUserAdvertisements(@RequestBody TelegramUserInfo userInfo) {
+    public ResponseEntity<List<ActualObyavleniye>> getUserObyavleniyes(@RequestBody TelegramUserInfo userInfo) {
         Long userId = userInfo.getId();
 
         if (userId == null) {
@@ -46,20 +46,20 @@ public class BaraholkaBotRestController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        List<ActualAdvertisement> advertisements = actualAdvertisementService.getByChatId(userId);
+        List<ActualObyavleniye> obyavleniyes = actualObyavleniyeService.getByChatId(userId);
 
-        return new ResponseEntity<>(advertisements, HttpStatus.OK);
+        return new ResponseEntity<>(obyavleniyes, HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/add_advertisement",
+    @RequestMapping(method = RequestMethod.POST, value = "/add_obyavleniye",
             headers = {"content-type=application/json"})
-    public ResponseEntity<HttpStatus> addNewAdvertisement(@RequestBody JsonNode json) {
+    public ResponseEntity<HttpStatus> addNewObyavleniye(@RequestBody JsonNode json) {
         TelegramUserInfo userInfo;
-        CurrentAdvertisement currentAdvertisement;
+        CurrentObyavleniye currentObyavleniye;
 
         try {
             userInfo = controllerHelper.getUserInfo(json);
-            currentAdvertisement = controllerHelper.getCurrentAdvertisement(json);
+            currentObyavleniye = controllerHelper.getCurrentObyavleniye(json);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -69,16 +69,16 @@ public class BaraholkaBotRestController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        if (!controllerHelper.addNewAdvertisement(currentAdvertisement, json)) {
+        if (!controllerHelper.addNewObyavleniye(currentObyavleniye, json)) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/delete_advertisement/{message_id}",
+    @RequestMapping(method = RequestMethod.POST, value = "/delete_obyavleniye/{message_id}",
             headers = {"content-type=application/json"})
-    public ResponseEntity<HttpStatus> deleteAdvertisement(@RequestBody TelegramUserInfo userInfo,
+    public ResponseEntity<HttpStatus> deleteObyavleniye(@RequestBody TelegramUserInfo userInfo,
                                                           @PathVariable("message_id") Long messageId) {
         Long userId = userInfo.getId();
 
@@ -98,14 +98,14 @@ public class BaraholkaBotRestController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        actualAdvertisementService.removeAdvertisement(messageId);
+        actualObyavleniyeService.removeObyavleniye(messageId);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/search_advertisements",
+    @RequestMapping(method = RequestMethod.POST, value = "/search_obyavleniyes",
             headers = {"content-type=application/json"})
-    public ResponseEntity<List<ActualAdvertisement>> searchAdvertisements(@RequestBody JsonNode json) {
+    public ResponseEntity<List<ActualObyavleniye>> searchObyavleniyes(@RequestBody JsonNode json) {
         TelegramUserInfo userInfo;
         List<String> tagsList;
 
@@ -129,9 +129,9 @@ public class BaraholkaBotRestController {
 
         String[] allTags = tagsList.toArray(String[]::new);
 
-        List<ActualAdvertisement> advertisements = actualAdvertisementService.tagsSearch(allTags);
+        List<ActualObyavleniye> obyavleniyes = actualObyavleniyeService.tagsSearch(allTags);
 
-        return new ResponseEntity<>(advertisements, HttpStatus.OK);
+        return new ResponseEntity<>(obyavleniyes, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/all_tags",

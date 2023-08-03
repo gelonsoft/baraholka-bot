@@ -1,7 +1,7 @@
 package baraholkateam.command;
 
-import baraholkateam.rest.model.CurrentAdvertisement;
-import baraholkateam.rest.service.CurrentAdvertisementService;
+import baraholkateam.rest.model.CurrentObyavleniye;
+import baraholkateam.rest.service.CurrentObyavleniyeService;
 import baraholkateam.rest.service.PreviousStateService;
 import baraholkateam.util.State;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,29 +18,29 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class NewAdvertisementConfirmPhone extends Command {
+public class NewObyavleniyeConfirmPhone extends Command {
     private static final String PHONE_TEXT = "Ваш номер телефона: %s";
     private static final String SOCIAL_TEXT = "Добавлена социальная сеть: %s";
     private static final String CONFIRM_PHONE_TEXT = "Желаете добавить ссылку на вашу социальную сеть?";
     public static final String DELETE_ALL_SOCIALS = "Удалить все социальные сети";
 
     @Autowired
-    private CurrentAdvertisementService currentAdvertisementService;
+    private CurrentObyavleniyeService currentObyavleniyeService;
 
     @Autowired
     private PreviousStateService previousStateService;
 
-    public NewAdvertisementConfirmPhone() {
-        super(State.NewAdvertisement_ConfirmPhone.getIdentifier(),
-                State.NewAdvertisement_ConfirmPhone.getDescription());
+    public NewObyavleniyeConfirmPhone() {
+        super(State.NewObyavleniye_ConfirmPhone.getIdentifier(),
+                State.NewObyavleniye_ConfirmPhone.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        CurrentAdvertisement currentAdvertisement = currentAdvertisementService.get(chat.getId());
-        String phone = currentAdvertisement.getPhone();
-        List<String> socials = currentAdvertisement.getContacts();
-        if (phone != null && previousStateService.get(chat.getId()) != State.NewAdvertisement_AddSocial) {
+        CurrentObyavleniye currentObyavleniye = currentObyavleniyeService.get(chat.getId());
+        String phone = currentObyavleniye.getPhone();
+        List<String> socials = currentObyavleniye.getContacts();
+        if (phone != null && previousStateService.get(chat.getId()) != State.NewObyavleniye_AddSocial) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
                     String.format(PHONE_TEXT, phone), getReplyKeyboard(Collections.emptyList(), true));
         } else if (!socials.isEmpty()) {

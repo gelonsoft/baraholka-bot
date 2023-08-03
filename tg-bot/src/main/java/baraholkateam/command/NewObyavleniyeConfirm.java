@@ -1,7 +1,7 @@
 package baraholkateam.command;
 
-import baraholkateam.rest.model.CurrentAdvertisement;
-import baraholkateam.rest.service.CurrentAdvertisementService;
+import baraholkateam.rest.model.CurrentObyavleniye;
+import baraholkateam.rest.service.CurrentObyavleniyeService;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
 import baraholkateam.util.Converter;
 import baraholkateam.util.State;
@@ -29,32 +29,32 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Component
-public class NewAdvertisementConfirm extends Command {
+public class NewObyavleniyeConfirm extends Command {
     private static final String CONTACTS_LIST_TEXT = """
             Добавлены ссылки на следующие социальные сети:
             %s""";
-    private static final String FORMED_ADVERTISEMENT = """
+    private static final String FORMED_OBYAVLENIYE = """
             Сформировано следующее объявление:""";
     private static final String CONFIRM_AD_TEXT = """
             Желаете опубликовать ваше объявление в канале?""";
-    private static final Logger LOGGER = LoggerFactory.getLogger(NewAdvertisementConfirm.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewObyavleniyeConfirm.class);
 
     @Autowired
-    private CurrentAdvertisementService currentAdvertisementService;
+    private CurrentObyavleniyeService currentObyavleniyeService;
 
     @Autowired
     private TelegramAPIRequests telegramAPIRequests;
 
     @Autowired
-    public NewAdvertisementConfirm() {
-        super(State.NewAdvertisement_Confirm.getIdentifier(), State.NewAdvertisement_Confirm.getDescription());
+    public NewObyavleniyeConfirm() {
+        super(State.NewObyavleniye_Confirm.getIdentifier(), State.NewObyavleniye_Confirm.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        CurrentAdvertisement ad = currentAdvertisementService.get(chat.getId());
+        CurrentObyavleniye ad = currentObyavleniyeService.get(chat.getId());
 
-        String text = ad.getAdvertisementText();
+        String text = ad.getObyavleniyeText();
 
         List<String> photos = ad.getPhotos();
 
@@ -64,7 +64,7 @@ public class NewAdvertisementConfirm extends Command {
         }
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                FORMED_ADVERTISEMENT, getReplyKeyboard(Collections.emptyList(), true));
+                FORMED_OBYAVLENIYE, getReplyKeyboard(Collections.emptyList(), true));
 
         if (photos.size() == 1) {
             sendPhotoMessage(absSender, chat.getId(), Converter.convertBase64StringToPhoto(photos.get(0)), text);
@@ -77,7 +77,7 @@ public class NewAdvertisementConfirm extends Command {
         }
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                CONFIRM_AD_TEXT, getConfirmAdvertisement(photos));
+                CONFIRM_AD_TEXT, getConfirmObyavleniye(photos));
     }
 
     public Message sendPhotoMessage(AbsSender absSender, long chatId, File photoFile, String text) {
@@ -145,7 +145,7 @@ public class NewAdvertisementConfirm extends Command {
         }
     }
 
-    private InlineKeyboardMarkup getConfirmAdvertisement(List<String> photos) {
+    private InlineKeyboardMarkup getConfirmObyavleniye(List<String> photos) {
         InlineKeyboardButton yesButton = new InlineKeyboardButton();
         yesButton.setText("Да");
         String yesCallbackData = String.format("%s %s %d", CONFIRM_AD_CALLBACK_DATA, "yes",

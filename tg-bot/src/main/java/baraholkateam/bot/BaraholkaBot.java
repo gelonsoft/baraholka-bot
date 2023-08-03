@@ -1,34 +1,34 @@
 package baraholkateam.bot;
 
-import baraholkateam.command.DeleteAdvertisement;
+import baraholkateam.command.DeleteObyavleniye;
 import baraholkateam.command.HelpCommand;
 import baraholkateam.command.MainMenuCommand;
-import baraholkateam.command.NewAdvertisementAddAdvertisementTypes;
-import baraholkateam.command.NewAdvertisementAddCategories;
-import baraholkateam.command.NewAdvertisementAddCity;
-import baraholkateam.command.NewAdvertisementAddContacts;
-import baraholkateam.command.NewAdvertisementAddDescription;
-import baraholkateam.command.NewAdvertisementAddPhone;
-import baraholkateam.command.NewAdvertisementAddPhotos;
-import baraholkateam.command.NewAdvertisementAddPrice;
-import baraholkateam.command.NewAdvertisementAddSocial;
-import baraholkateam.command.NewAdvertisementCommand;
-import baraholkateam.command.NewAdvertisementConfirm;
-import baraholkateam.command.NewAdvertisementConfirmPhone;
-import baraholkateam.command.NewAdvertisementConfirmPhoto;
-import baraholkateam.command.NewAdvertisementConfirmPrice;
+import baraholkateam.command.NewObyavleniyeAddObyavleniyeTypes;
+import baraholkateam.command.NewObyavleniyeAddCategories;
+import baraholkateam.command.NewObyavleniyeAddCity;
+import baraholkateam.command.NewObyavleniyeAddContacts;
+import baraholkateam.command.NewObyavleniyeAddDescription;
+import baraholkateam.command.NewObyavleniyeAddPhone;
+import baraholkateam.command.NewObyavleniyeAddPhotos;
+import baraholkateam.command.NewObyavleniyeAddPrice;
+import baraholkateam.command.NewObyavleniyeAddSocial;
+import baraholkateam.command.NewObyavleniyeCommand;
+import baraholkateam.command.NewObyavleniyeConfirm;
+import baraholkateam.command.NewObyavleniyeConfirmPhone;
+import baraholkateam.command.NewObyavleniyeConfirmPhoto;
+import baraholkateam.command.NewObyavleniyeConfirmPrice;
 import baraholkateam.command.NonCommand;
-import baraholkateam.command.SearchAdvertisements;
-import baraholkateam.command.SearchAdvertisementsAddAdvertisementTypes;
-import baraholkateam.command.SearchAdvertisementsAddProductCategories;
-import baraholkateam.command.SearchAdvertisementsShowFoundAdvertisements;
+import baraholkateam.command.SearchObyavleniyes;
+import baraholkateam.command.SearchObyavleniyesAddObyavleniyeTypes;
+import baraholkateam.command.SearchObyavleniyesAddProductCategories;
+import baraholkateam.command.SearchObyavleniyesShowFoundObyavleniyes;
 import baraholkateam.command.StartCommand;
-import baraholkateam.command.UserAdvertisements;
+import baraholkateam.command.UserObyavleniyes;
 import baraholkateam.notification.NotificationExecutor;
-import baraholkateam.rest.model.CurrentAdvertisement;
-import baraholkateam.rest.service.ActualAdvertisementService;
+import baraholkateam.rest.model.CurrentObyavleniye;
+import baraholkateam.rest.service.ActualObyavleniyeService;
 import baraholkateam.rest.service.ChosenTagsService;
-import baraholkateam.rest.service.CurrentAdvertisementService;
+import baraholkateam.rest.service.CurrentObyavleniyeService;
 import baraholkateam.rest.service.CurrentStateService;
 import baraholkateam.rest.service.LastSentMessageService;
 import baraholkateam.rest.service.PreviousStateService;
@@ -70,9 +70,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static baraholkateam.command.Command.ADVERTISEMENT_CANCELLED_TEXT;
-import static baraholkateam.command.Command.ADVERTISEMENT_SUCCESSFUL_DELETE;
-import static baraholkateam.command.Command.ADVERTISEMENT_SUCCESSFUL_UPDATE;
+import static baraholkateam.command.Command.OBYAVLENIYE_CANCELLED_TEXT;
+import static baraholkateam.command.Command.OBYAVLENIYE_SUCCESSFUL_DELETE;
+import static baraholkateam.command.Command.OBYAVLENIYE_SUCCESSFUL_UPDATE;
 import static baraholkateam.command.Command.AD_SWEAR_WORD_DETECTED;
 import static baraholkateam.command.Command.BACK_BUTTON;
 import static baraholkateam.command.Command.CHOSEN_HASHTAGS;
@@ -95,10 +95,10 @@ import static baraholkateam.command.Command.TAGS_CALLBACK_DATA;
 import static baraholkateam.command.Command.TAG_CALLBACK_DATA;
 import static baraholkateam.command.Command.UNSUCCESS_DELETE_AD_TEXT;
 import static baraholkateam.command.Command.UNSUCCESS_TEXT;
-import static baraholkateam.command.DeleteAdvertisement.DELETE_AD;
-import static baraholkateam.command.DeleteAdvertisement.NOT_ACTUAL_TEXT;
-import static baraholkateam.command.NewAdvertisementConfirmPhone.DELETE_ALL_SOCIALS;
-import static baraholkateam.command.NewAdvertisementConfirmPhoto.DELETE_ALL_PHOTOS;
+import static baraholkateam.command.DeleteObyavleniye.DELETE_AD;
+import static baraholkateam.command.DeleteObyavleniye.NOT_ACTUAL_TEXT;
+import static baraholkateam.command.NewObyavleniyeConfirmPhone.DELETE_ALL_SOCIALS;
+import static baraholkateam.command.NewObyavleniyeConfirmPhoto.DELETE_ALL_PHOTOS;
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_PERIOD;
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_TIME_UNIT;
 
@@ -107,16 +107,16 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
     /**
      * Лимит выдачи объявлений в функции поиска объявлений по тегам.
      */
-    public static final Integer SEARCH_ADVERTISEMENTS_LIMIT = 10;
+    public static final Integer SEARCH_OBYAVLENIYES_LIMIT = 10;
     private final String botName;
     private final String botToken;
     private static final Logger LOGGER = LoggerFactory.getLogger(BaraholkaBot.class);
 
     @Autowired
-    private ActualAdvertisementService actualAdvertisementService;
+    private ActualObyavleniyeService actualObyavleniyeService;
 
     @Autowired
-    private CurrentAdvertisementService currentAdvertisementService;
+    private CurrentObyavleniyeService currentObyavleniyeService;
 
     @Autowired
     private CurrentStateService currentStateService;
@@ -149,64 +149,64 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
     private MainMenuCommand mainMenuCommand;
 
     @Autowired
-    private UserAdvertisements userAdvertisements;
+    private UserObyavleniyes userObyavleniyes;
 
     @Autowired
-    private DeleteAdvertisement deleteAdvertisement;
+    private DeleteObyavleniye deleteObyavleniye;
 
     @Autowired
-    private NewAdvertisementAddPhotos newAdvertisementAddPhotos;
+    private NewObyavleniyeAddPhotos newObyavleniyeAddPhotos;
 
     @Autowired
-    private NewAdvertisementConfirmPhoto newAdvertisementConfirmPhoto;
+    private NewObyavleniyeConfirmPhoto newObyavleniyeConfirmPhoto;
 
     @Autowired
-    private NewAdvertisementAddDescription newAdvertisementAddDescription;
+    private NewObyavleniyeAddDescription newObyavleniyeAddDescription;
 
     @Autowired
-    private NewAdvertisementAddCity newAdvertisementAddCity;
+    private NewObyavleniyeAddCity newObyavleniyeAddCity;
 
     @Autowired
-    private NewAdvertisementAddAdvertisementTypes newAdvertisementAddAdvertisementTypes;
+    private NewObyavleniyeAddObyavleniyeTypes newObyavleniyeAddObyavleniyeTypes;
 
     @Autowired
-    private NewAdvertisementAddCategories newAdvertisementAddCategories;
+    private NewObyavleniyeAddCategories newObyavleniyeAddCategories;
 
     @Autowired
-    private NewAdvertisementAddPrice newAdvertisementAddPrice;
+    private NewObyavleniyeAddPrice newObyavleniyeAddPrice;
 
     @Autowired
-    private NewAdvertisementConfirmPrice newAdvertisementConfirmPrice;
+    private NewObyavleniyeConfirmPrice newObyavleniyeConfirmPrice;
 
     @Autowired
-    private NewAdvertisementCommand newAdvertisementCommand;
+    private NewObyavleniyeCommand newObyavleniyeCommand;
 
     @Autowired
-    private NewAdvertisementAddContacts newAdvertisementAddContacts;
+    private NewObyavleniyeAddContacts newObyavleniyeAddContacts;
 
     @Autowired
-    private NewAdvertisementAddPhone newAdvertisementAddPhone;
+    private NewObyavleniyeAddPhone newObyavleniyeAddPhone;
 
     @Autowired
-    private NewAdvertisementConfirmPhone newAdvertisementConfirmPhone;
+    private NewObyavleniyeConfirmPhone newObyavleniyeConfirmPhone;
 
     @Autowired
-    private NewAdvertisementAddSocial newAdvertisementAddSocial;
+    private NewObyavleniyeAddSocial newObyavleniyeAddSocial;
 
     @Autowired
-    private NewAdvertisementConfirm newAdvertisementConfirm;
+    private NewObyavleniyeConfirm newObyavleniyeConfirm;
 
     @Autowired
-    private SearchAdvertisements searchAdvertisements;
+    private SearchObyavleniyes searchObyavleniyes;
 
     @Autowired
-    private SearchAdvertisementsAddAdvertisementTypes searchAdvertisementsAddAdvertisementTypes;
+    private SearchObyavleniyesAddObyavleniyeTypes searchObyavleniyesAddObyavleniyeTypes;
 
     @Autowired
-    private SearchAdvertisementsAddProductCategories searchAdvertisementsAddProductCategories;
+    private SearchObyavleniyesAddProductCategories searchObyavleniyesAddProductCategories;
 
     @Autowired
-    private SearchAdvertisementsShowFoundAdvertisements searchAdvertisementsShowFoundAdvertisements;
+    private SearchObyavleniyesShowFoundObyavleniyes searchObyavleniyesShowFoundObyavleniyes;
 
     @Value("${channel.chat_id}")
     private String channelChatId;
@@ -255,10 +255,10 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         }
 
         // Случай пропуска этапа добавления цены, если не были добавлены соответствующие теги
-        if (currentStateService.get(message.getChatId()) == State.NewAdvertisement_AddPrice) {
-            List<String> tags = currentAdvertisementService.getTags(message.getChatId());
+        if (currentStateService.get(message.getChatId()) == State.NewObyavleniye_AddPrice) {
+            List<String> tags = currentObyavleniyeService.getTags(message.getChatId());
             if (!tags.contains(Tag.Sale.getName()) && !tags.contains(Tag.Bargaining.getName())) {
-                currentStateService.put(message.getChatId(), State.NewAdvertisement_AddContacts);
+                currentStateService.put(message.getChatId(), State.NewObyavleniye_AddContacts);
             }
         }
         return false;
@@ -271,26 +271,26 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         register(startCommand);
         register(helpCommand);
         register(mainMenuCommand);
-        register(userAdvertisements);
-        register(deleteAdvertisement);
-        register(newAdvertisementCommand);
-        register(newAdvertisementAddPhotos);
-        register(newAdvertisementConfirmPhoto);
-        register(newAdvertisementAddDescription);
-        register(newAdvertisementAddCity);
-        register(newAdvertisementAddAdvertisementTypes);
-        register(newAdvertisementAddCategories);
-        register(newAdvertisementAddPrice);
-        register(newAdvertisementConfirmPrice);
-        register(newAdvertisementAddContacts);
-        register(newAdvertisementAddPhone);
-        register(newAdvertisementConfirmPhone);
-        register(newAdvertisementAddSocial);
-        register(newAdvertisementConfirm);
-        register(searchAdvertisements);
-        register(searchAdvertisementsAddAdvertisementTypes);
-        register(searchAdvertisementsAddProductCategories);
-        register(searchAdvertisementsShowFoundAdvertisements);
+        register(userObyavleniyes);
+        register(deleteObyavleniye);
+        register(newObyavleniyeCommand);
+        register(newObyavleniyeAddPhotos);
+        register(newObyavleniyeConfirmPhoto);
+        register(newObyavleniyeAddDescription);
+        register(newObyavleniyeAddCity);
+        register(newObyavleniyeAddObyavleniyeTypes);
+        register(newObyavleniyeAddCategories);
+        register(newObyavleniyeAddPrice);
+        register(newObyavleniyeConfirmPrice);
+        register(newObyavleniyeAddContacts);
+        register(newObyavleniyeAddPhone);
+        register(newObyavleniyeConfirmPhone);
+        register(newObyavleniyeAddSocial);
+        register(newObyavleniyeConfirm);
+        register(searchObyavleniyes);
+        register(searchObyavleniyesAddObyavleniyeTypes);
+        register(searchObyavleniyesAddProductCategories);
+        register(searchObyavleniyesShowFoundObyavleniyes);
     }
 
     @Override
@@ -322,12 +322,12 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                 if (lastSentMessageService.get(chatId).hasReplyMarkup()) {
                     deleteLastMessage(chatId);
                 }
-                if (currentState == State.NewAdvertisement_AddSocial) {
-                    currentAdvertisementService.setSocials(chatId, new ArrayList<>());
+                if (currentState == State.NewObyavleniye_AddSocial) {
+                    currentObyavleniyeService.setSocials(chatId, new ArrayList<>());
                 }
                 currentStateService.put(chatId, backState);
-                if (backState == State.NewAdvertisement_AddContacts) {
-                    currentAdvertisementService.setSocials(chatId, new ArrayList<>());
+                if (backState == State.NewObyavleniye_AddContacts) {
+                    currentObyavleniyeService.setSocials(chatId, new ArrayList<>());
                 }
                 getRegisteredCommand(backState.getIdentifier()).processMessage(this, msg, null);
                 return;
@@ -335,12 +335,12 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         }
 
         // Случай обновления данных во время создания объявления
-        if (msg.hasText() && newAdvertisementUpdateData(msg)) {
+        if (msg.hasText() && newObyavleniyeUpdateData(msg)) {
             return;
         }
 
         // Случай добавления новых фотографий во время создания объявления
-        if (msg.hasPhoto() && addAdvertisementPhotos(msg)) {
+        if (msg.hasPhoto() && addObyavleniyePhotos(msg)) {
             return;
         }
 
@@ -354,21 +354,21 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
 
         // Случай удаления всех фотографий по кнопке
         if (msg.hasText() && Objects.equals(msg.getText(), DELETE_ALL_PHOTOS)
-                && currentStateService.get(chatId) == State.NewAdvertisement_ConfirmPhoto) {
-            currentAdvertisementService.setPhotos(msg.getChatId(), new ArrayList<>());
+                && currentStateService.get(chatId) == State.NewObyavleniye_ConfirmPhoto) {
+            currentObyavleniyeService.setPhotos(msg.getChatId(), new ArrayList<>());
             sendAnswer(chatId, PHOTOS_DELETE, null);
-            currentStateService.put(chatId, State.NewAdvertisement_AddPhotos);
-            getRegisteredCommand(State.NewAdvertisement_AddPhotos.getIdentifier()).processMessage(this, msg, null);
+            currentStateService.put(chatId, State.NewObyavleniye_AddPhotos);
+            getRegisteredCommand(State.NewObyavleniye_AddPhotos.getIdentifier()).processMessage(this, msg, null);
             return;
         }
 
         // Случай удаления всех социальных сетей по кнопке
         if (msg.hasText() && Objects.equals(msg.getText(), DELETE_ALL_SOCIALS)
-                && currentStateService.get(chatId) == State.NewAdvertisement_ConfirmPhone) {
-            currentAdvertisementService.setSocials(msg.getChatId(), new ArrayList<>());
+                && currentStateService.get(chatId) == State.NewObyavleniye_ConfirmPhone) {
+            currentObyavleniyeService.setSocials(msg.getChatId(), new ArrayList<>());
             sendAnswer(chatId, SOCIALS_DELETE, null);
-            currentStateService.put(chatId, State.NewAdvertisement_ConfirmPhone);
-            getRegisteredCommand(State.NewAdvertisement_ConfirmPhone.getIdentifier()).processMessage(this, msg, null);
+            currentStateService.put(chatId, State.NewObyavleniye_ConfirmPhone);
+            getRegisteredCommand(State.NewObyavleniye_ConfirmPhone.getIdentifier()).processMessage(this, msg, null);
             return;
         }
 
@@ -377,37 +377,37 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
             addChosenTags(lastSentMessageService.get(chatId));
 
             if (chosenTagsService.get(chatId) != null
-                    && State.nextState(currentStateService.get(msg.getChatId())) == State.NewAdvertisement_AddPrice) {
-                List<String> addedTags = currentAdvertisementService.getTags(chatId);
+                    && State.nextState(currentStateService.get(msg.getChatId())) == State.NewObyavleniye_AddPrice) {
+                List<String> addedTags = currentObyavleniyeService.getTags(chatId);
                 // Если нужно пропустить добавление цены товара
                 if (!addedTags.contains(Tag.Sale.getName()) && !addedTags.contains(Tag.Bargaining.getName())) {
                     List<String> tags = chosenTagsService.get(chatId).stream()
                             .map(Tag::getName)
                             .toList();
                     previousStateService.put(chatId, currentStateService.get(msg.getChatId()));
-                    currentAdvertisementService.addTags(chatId, tags);
-                    currentStateService.put(msg.getChatId(), State.NewAdvertisement_AddContacts);
+                    currentObyavleniyeService.addTags(chatId, tags);
+                    currentStateService.put(msg.getChatId(), State.NewObyavleniye_AddContacts);
                     deleteLastMessage(msg.getChatId());
                     sendAnswer(
                             chatId,
                             String.format(
                                     CHOSEN_HASHTAGS,
-                                    String.join(" ", currentAdvertisementService.getTags(chatId))
+                                    String.join(" ", currentObyavleniyeService.getTags(chatId))
                             ),
                             null);
-                    getRegisteredCommand(State.NewAdvertisement_AddContacts.getIdentifier())
+                    getRegisteredCommand(State.NewObyavleniye_AddContacts.getIdentifier())
                             .processMessage(this, msg, null);
                     return;
                 }
             }
 
             if (chosenTagsService.get(chatId) != null
-                    && (currentStateService.get(msg.getChatId()) == State.NewAdvertisement_AddAdvertisementTypes
-                    || currentStateService.get(msg.getChatId()) == State.NewAdvertisement_AddCategories)) {
+                    && (currentStateService.get(msg.getChatId()) == State.NewObyavleniye_AddObyavleniyeTypes
+                    || currentStateService.get(msg.getChatId()) == State.NewObyavleniye_AddCategories)) {
                 List<String> tags = chosenTagsService.get(chatId).stream()
                         .map(Tag::getName)
                         .toList();
-                currentAdvertisementService.addTags(chatId, tags);
+                currentObyavleniyeService.addTags(chatId, tags);
                 chosenTagsService.delete(chatId);
             }
 
@@ -426,10 +426,10 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         }
     }
 
-    private boolean newAdvertisementUpdateData(Message msg) {
+    private boolean newObyavleniyeUpdateData(Message msg) {
         State state = currentStateService.get(msg.getChatId());
         String text = msg.getText();
-        if (state == State.NewAdvertisement_AddDescription) {
+        if (state == State.NewObyavleniye_AddDescription) {
             if (text == null || text.length() > 800) {
                 return false;
             }
@@ -439,17 +439,17 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                 sendAnswer(msg.getChatId(), AD_SWEAR_WORD_DETECTED, null);
                 return true;
             }
-            currentAdvertisementService.setDescription(msg.getChatId(), text);
+            currentObyavleniyeService.setDescription(msg.getChatId(), text);
             updateStateOnTextData(msg);
             return true;
         }
 
-        if (state == State.NewAdvertisement_AddPrice) {
+        if (state == State.NewObyavleniye_AddPrice) {
             if (!text.matches("\\d{1,18}")) {
                 return false;
             }
             try {
-                currentAdvertisementService.setPrice(msg.getChatId(), Long.parseLong(text));
+                currentObyavleniyeService.setPrice(msg.getChatId(), Long.parseLong(text));
             } catch (Exception e) {
                 LOGGER.error("Invalid input from user");
             }
@@ -457,35 +457,35 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
             return true;
         }
 
-        if (state == State.NewAdvertisement_AddPhone) {
+        if (state == State.NewObyavleniye_AddPhone) {
             if (!text.matches("\\+7-\\d{3}-\\d{3}-\\d{2}-\\d{2}")) {
                 return false;
             }
-            currentAdvertisementService.setPhone(msg.getChatId(), text);
+            currentObyavleniyeService.setPhone(msg.getChatId(), text);
             updateStateOnTextData(msg);
             return true;
         }
 
-        if (state == State.NewAdvertisement_AddSocial) {
+        if (state == State.NewObyavleniye_AddSocial) {
             if (!text.matches("https://.+/.+")) {
                 return false;
             }
-            currentAdvertisementService.addSocial(msg.getChatId(), text);
-            previousStateService.put(msg.getChatId(), State.NewAdvertisement_AddSocial);
-            currentStateService.put(msg.getChatId(), State.NewAdvertisement_ConfirmPhone);
-            getRegisteredCommand(State.NewAdvertisement_ConfirmPhone.getIdentifier())
+            currentObyavleniyeService.addSocial(msg.getChatId(), text);
+            previousStateService.put(msg.getChatId(), State.NewObyavleniye_AddSocial);
+            currentStateService.put(msg.getChatId(), State.NewObyavleniye_ConfirmPhone);
+            getRegisteredCommand(State.NewObyavleniye_ConfirmPhone.getIdentifier())
                     .processMessage(this, msg, null);
             return true;
         }
         return false;
     }
 
-    private boolean addAdvertisementPhotos(Message msg) {
+    private boolean addObyavleniyePhotos(Message msg) {
         State currentState = currentStateService.get(msg.getChatId());
-        if (currentState == State.NewAdvertisement_AddPhotos || currentState == State.NewAdvertisement_ConfirmPhoto) {
+        if (currentState == State.NewObyavleniye_AddPhotos || currentState == State.NewObyavleniye_ConfirmPhoto) {
 
             AtomicInteger canAddPhotosCount =
-                    new AtomicInteger(10 - currentAdvertisementService.getPhotos(msg.getChatId()).size());
+                    new AtomicInteger(10 - currentObyavleniyeService.getPhotos(msg.getChatId()).size());
             AtomicBoolean isCanAdd = new AtomicBoolean(true);
 
             Map<String, TreeSet<PhotoSize>> photos = msg.getPhoto().stream()
@@ -511,7 +511,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                     sendAnswer(msg.getChatId(), NO_MORE_PHOTOS_ADD, null);
                     return;
                 }
-                currentAdvertisementService.addPhoto(
+                currentObyavleniyeService.addPhoto(
                         msg.getChatId(),
                         Converter.convertPhotoToBase64String(
                                 downloadFileByFilePath(telegramAPIRequests.getFilePath(photo.last().getFileId()))
@@ -520,9 +520,9 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
             });
 
             if (isCanAdd.get()) {
-                getRegisteredCommand(State.NewAdvertisement_ConfirmPhoto.getIdentifier())
+                getRegisteredCommand(State.NewObyavleniye_ConfirmPhoto.getIdentifier())
                         .processMessage(this, msg, null);
-                currentStateService.put(msg.getChatId(), State.NewAdvertisement_ConfirmPhoto);
+                currentStateService.put(msg.getChatId(), State.NewObyavleniye_ConfirmPhoto);
             }
             return true;
         }
@@ -620,8 +620,8 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         String[] dataParts = callbackQuery.split(" ");
         switch (dataParts[0]) {
             case TAG_CALLBACK_DATA -> {
-                if (currentStateService.get(msg.getChatId()) == State.NewAdvertisement_AddCity) {
-                    currentAdvertisementService.addTag(msg.getChatId(), dataParts[1]);
+                if (currentStateService.get(msg.getChatId()) == State.NewObyavleniye_AddCity) {
+                    currentObyavleniyeService.addTag(msg.getChatId(), dataParts[1]);
                 } else {
                     List<Tag> tags = chosenTagsService.get(msg.getChatId());
                     if (tags == null || tags.isEmpty()) {
@@ -675,59 +675,59 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
             case PHONE_CALLBACK_DATA -> {
                 deleteLastMessage(msg.getChatId());
                 if (Objects.equals(dataParts[1], "yes")) {
-                    currentStateService.put(msg.getChatId(), State.NewAdvertisement_AddPhone);
-                    getRegisteredCommand(State.NewAdvertisement_AddPhone.getIdentifier())
+                    currentStateService.put(msg.getChatId(), State.NewObyavleniye_AddPhone);
+                    getRegisteredCommand(State.NewObyavleniye_AddPhone.getIdentifier())
                             .processMessage(this, msg, null);
                 } else if (Objects.equals(dataParts[1], "no")) {
-                    currentStateService.put(msg.getChatId(), State.NewAdvertisement_ConfirmPhone);
-                    getRegisteredCommand(State.NewAdvertisement_ConfirmPhone.getIdentifier())
+                    currentStateService.put(msg.getChatId(), State.NewObyavleniye_ConfirmPhone);
+                    getRegisteredCommand(State.NewObyavleniye_ConfirmPhone.getIdentifier())
                             .processMessage(this, msg, null);
                 }
             }
             case SOCIAL_CALLBACK_DATA -> {
                 deleteLastMessage(msg.getChatId());
                 if (Objects.equals(dataParts[1], "yes")) {
-                    currentStateService.put(msg.getChatId(), State.NewAdvertisement_AddSocial);
-                    getRegisteredCommand(State.NewAdvertisement_AddSocial.getIdentifier())
+                    currentStateService.put(msg.getChatId(), State.NewObyavleniye_AddSocial);
+                    getRegisteredCommand(State.NewObyavleniye_AddSocial.getIdentifier())
                             .processMessage(this, msg, null);
                 } else if (Objects.equals(dataParts[1], "no")) {
-                    currentStateService.put(msg.getChatId(), State.NewAdvertisement_Confirm);
-                    getRegisteredCommand(State.NewAdvertisement_Confirm.getIdentifier())
+                    currentStateService.put(msg.getChatId(), State.NewObyavleniye_Confirm);
+                    getRegisteredCommand(State.NewObyavleniye_Confirm.getIdentifier())
                             .processMessage(this, msg, null);
                 }
             }
             case CONFIRM_AD_CALLBACK_DATA -> {
                 deleteLastMessage(msg.getChatId());
                 if (Objects.equals(dataParts[1], "yes")) {
-                    if (currentAdvertisementService.getContacts(msg.getChatId()).size() == 0
-                            && currentAdvertisementService.getPhone(msg.getChatId()) == null) {
-                        currentAdvertisementService.setSocials(msg.getChatId(),
+                    if (currentObyavleniyeService.getContacts(msg.getChatId()).size() == 0
+                            && currentObyavleniyeService.getPhone(msg.getChatId()) == null) {
+                        currentObyavleniyeService.setSocials(msg.getChatId(),
                                 List.of("@" + telegramAPIRequests.getUser(msg.getChatId()).username()));
                     }
 
                     Message sentAd;
                     if (Objects.equals(dataParts[2], "0")) {
-                        sentAd = newAdvertisementConfirm.sendPhotoMessage(
+                        sentAd = newObyavleniyeConfirm.sendPhotoMessage(
                                 this,
                                 Long.parseLong(channelChatId),
                                 Converter.convertBase64StringToPhoto(
-                                        currentAdvertisementService.getPhotos(msg.getChatId()).get(0)
+                                        currentObyavleniyeService.getPhotos(msg.getChatId()).get(0)
                                 ),
-                                currentAdvertisementService.getAdvertisementText(msg.getChatId())
+                                currentObyavleniyeService.getObyavleniyeText(msg.getChatId())
                         );
                     } else {
                         List<File> photoFiles = new ArrayList<>();
-                        for (String photo : currentAdvertisementService.getPhotos(msg.getChatId())) {
+                        for (String photo : currentObyavleniyeService.getPhotos(msg.getChatId())) {
                             photoFiles.add(Objects.requireNonNull(Converter.convertBase64StringToPhoto(photo)));
                         }
-                        sentAd = newAdvertisementConfirm.sendPhotoMediaGroup(this,
+                        sentAd = newObyavleniyeConfirm.sendPhotoMediaGroup(this,
                                 Long.parseLong(channelChatId),
                                 photoFiles,
-                                currentAdvertisementService.getAdvertisementText(msg.getChatId())).get(0);
+                                currentObyavleniyeService.getObyavleniyeText(msg.getChatId())).get(0);
                     }
                     if (sentAd != null) {
-                        CurrentAdvertisement currentAdvertisement = currentAdvertisementService.get(msg.getChatId());
-                        currentAdvertisement
+                        CurrentObyavleniye currentObyavleniye = currentObyavleniyeService.get(msg.getChatId());
+                        currentObyavleniye
                                 .setMessageId(Long.parseLong(String.valueOf(sentAd.getMessageId())))
                                 .setCreationTime(System.currentTimeMillis())
                                 .setNextUpdateTime(
@@ -736,15 +736,15 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                                                 .toMillis(FIRST_REPEAT_NOTIFICATION_PERIOD)
                                 )
                                 .setUpdateAttempt(0);
-                        currentAdvertisementService.put(currentAdvertisement);
-                        actualAdvertisementService.insertNewAdvertisement(currentAdvertisement);
+                        currentObyavleniyeService.put(currentObyavleniye);
+                        actualObyavleniyeService.insertNewObyavleniye(currentObyavleniye);
                         sendAnswer(msg.getChatId(), SUCCESS_TEXT, null);
                     } else {
                         sendAnswer(msg.getChatId(), UNSUCCESS_TEXT, null);
-                        LOGGER.error("Error while sending advertisement to channel.");
+                        LOGGER.error("Error while sending obyavleniye to channel.");
                     }
                 } else if (Objects.equals(dataParts[1], "no")) {
-                    sendAnswer(msg.getChatId(), ADVERTISEMENT_CANCELLED_TEXT, null);
+                    sendAnswer(msg.getChatId(), OBYAVLENIYE_CANCELLED_TEXT, null);
                 }
                 currentStateService.put(msg.getChatId(), State.MainMenu);
                 getRegisteredCommand(State.MainMenu.getIdentifier())
@@ -756,13 +756,13 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
 
                 if (Objects.equals(dataParts[4], "0")) {
                     editAdText(dataParts[2]);
-                    actualAdvertisementService.removeAdvertisement(messageId);
-                    sendAnswer(chatId, ADVERTISEMENT_SUCCESSFUL_DELETE, null);
+                    actualObyavleniyeService.removeObyavleniye(messageId);
+                    sendAnswer(chatId, OBYAVLENIYE_SUCCESSFUL_DELETE, null);
                 } else {
-                    actualAdvertisementService.setNextUpdateTime(messageId,
+                    actualObyavleniyeService.setNextUpdateTime(messageId,
                             System.currentTimeMillis() + Long.parseLong(dataParts[3]));
-                    actualAdvertisementService.setUpdateAttempt(messageId, 0);
-                    sendAnswer(chatId, ADVERTISEMENT_SUCCESSFUL_UPDATE, null);
+                    actualObyavleniyeService.setUpdateAttempt(messageId, 0);
+                    sendAnswer(chatId, OBYAVLENIYE_SUCCESSFUL_UPDATE, null);
                 }
                 notificationExecutor.deleteMessages(this, chatId, messageId);
             }
@@ -777,12 +777,12 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                 deleteLastMessage(msg.getChatId());
                 if (Objects.equals(dataParts[1], "1")) {
                     editAdText(dataParts[2]);
-                    actualAdvertisementService.removeAdvertisement(Long.parseLong(dataParts[2]));
+                    actualObyavleniyeService.removeObyavleniye(Long.parseLong(dataParts[2]));
                     sendAnswer(msg.getChatId(), SUCCESS_DELETE_AD_TEXT, null);
                 } else {
                     sendAnswer(msg.getChatId(), UNSUCCESS_DELETE_AD_TEXT, null);
-                    currentStateService.put(msg.getChatId(), State.DeleteAdvertisement);
-                    getRegisteredCommand(State.DeleteAdvertisement.getIdentifier())
+                    currentStateService.put(msg.getChatId(), State.DeleteObyavleniye);
+                    getRegisteredCommand(State.DeleteObyavleniye.getIdentifier())
                             .processMessage(this, msg, null);
                 }
             }
@@ -792,7 +792,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
 
     public void editAdText(String messageId) {
         EditMessageCaption editMessage = new EditMessageCaption();
-        String adText = actualAdvertisementService.adText(Long.parseLong(messageId))
+        String adText = actualObyavleniyeService.adText(Long.parseLong(messageId))
                 .substring(Tag.Actual.getName().length() + 1);
         String editedText = String.format("%s\n\n%s", NOT_ACTUAL_TEXT, adText);
         editMessage.setChatId(channelChatId);

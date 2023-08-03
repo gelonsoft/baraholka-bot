@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class SearchAdvertisementsAddProductCategories extends Command {
+public class SearchObyavleniyesAddProductCategories extends Command {
     private static final String CHOOSE_PRODUCT_CATEGORY = """
             Выберите категории товаров.
             Вы можете выбрать несколько хэштегов, нажав на них, либо не выбрать ни один.
@@ -27,16 +27,16 @@ public class SearchAdvertisementsAddProductCategories extends Command {
     @Autowired
     private PreviousStateService previousStateService;
 
-    public SearchAdvertisementsAddProductCategories() {
-        super(State.SearchAdvertisements_AddProductCategories.getIdentifier(),
-                State.SearchAdvertisements_AddProductCategories.getDescription());
+    public SearchObyavleniyesAddProductCategories() {
+        super(State.SearchObyavleniyes_AddProductCategories.getIdentifier(),
+                State.SearchObyavleniyes_AddProductCategories.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         List<Tag> tags = chosenTagsService.get(chat.getId());
 
-        if (previousStateService.get(chat.getId()) == State.SearchAdvertisements_AddAdvertisementTypes) {
+        if (previousStateService.get(chat.getId()) == State.SearchObyavleniyes_AddObyavleniyeTypes) {
             String hashtags = NO_HASHTAGS;
             if (tags != null && !tags.isEmpty()) {
                 hashtags = tags.stream()

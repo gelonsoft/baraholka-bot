@@ -17,7 +17,7 @@ public class NonCommand {
             Пожалуйста, вернитесь в /%s и следуйте инструкциям.""";
     private static final String UNKNOWN_COMMAND = "Введеное сообщение не понятно боту.";
     private static final String CHOOSE_CITY = "Пожалуйста, выберите город для поиска.";
-    private static final String CHOOSE_ADVERTISEMENT_TYPES = "Пожалуйста, выберите типы объявления.";
+    private static final String CHOOSE_OBYAVLENIYE_TYPES = "Пожалуйста, выберите типы объявления.";
     private static final String CHOOSE_PRODUCT_CATEGORIES = "Пожалуйста, выберите категории объявлений.";
     private static final String EMPTY_DESCRIPTION = """
             Длина описания превышает допустимый предел в 800 символов или был произведен ввод в некорректной форме.
@@ -40,24 +40,24 @@ public class NonCommand {
         }
 
         if (currentState.equals(State.Start) || currentState.equals(State.Help) || currentState.equals(State.MainMenu)
-                || currentState.equals(State.NewAdvertisement)) {
+                || currentState.equals(State.NewObyavleniye)) {
             return List.of(new AnswerPair(String.format(COMMAND_ERROR_MESSAGE, currentState.getIdentifier(),
                     State.MainMenu.getIdentifier()), true, null));
-        } else if (currentState.equals(State.NewAdvertisement_AddDescription)) {
+        } else if (currentState.equals(State.NewObyavleniye_AddDescription)) {
             return List.of(new AnswerPair(EMPTY_DESCRIPTION, true, null));
-        } else if (currentState.equals(State.NewAdvertisement_AddPhone)) {
+        } else if (currentState.equals(State.NewObyavleniye_AddPhone)) {
            return List.of(new AnswerPair(INVALID_PHONE_NUMBER, true, null));
-        } else if (currentState.equals(State.NewAdvertisement_AddSocial)) {
+        } else if (currentState.equals(State.NewObyavleniye_AddSocial)) {
             return List.of(new AnswerPair(INVALID_SOCIAL, true, null));
-        } else if (currentState.equals(State.NewAdvertisement_AddPrice)) {
+        } else if (currentState.equals(State.NewObyavleniye_AddPrice)) {
             return List.of(new AnswerPair(INVALID_PRICE, true, null));
-        } else if (currentState.equals(State.SearchAdvertisements)) {
+        } else if (currentState.equals(State.SearchObyavleniyes)) {
             return List.of(new AnswerPair(CHOOSE_CITY, true, null));
-        } else if (currentState.equals(State.SearchAdvertisements_AddAdvertisementTypes)) {
-            return List.of(new AnswerPair(CHOOSE_ADVERTISEMENT_TYPES, true, null));
-        } else if (currentState.equals(State.SearchAdvertisements_AddProductCategories)) {
+        } else if (currentState.equals(State.SearchObyavleniyes_AddObyavleniyeTypes)) {
+            return List.of(new AnswerPair(CHOOSE_OBYAVLENIYE_TYPES, true, null));
+        } else if (currentState.equals(State.SearchObyavleniyes_AddProductCategories)) {
             return List.of(new AnswerPair(CHOOSE_PRODUCT_CATEGORIES, true, null));
-        } else if (currentState.equals(State.SearchAdvertisements_ShowFoundAdvertisements)) {
+        } else if (currentState.equals(State.SearchObyavleniyes_ShowFoundObyavleniyes)) {
             return List.of(new AnswerPair(UNKNOWN_COMMAND, true, null));
         }
         return List.of(new AnswerPair(UNKNOWN_COMMAND, true, null));

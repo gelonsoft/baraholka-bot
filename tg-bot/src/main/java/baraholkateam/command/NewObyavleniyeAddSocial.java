@@ -9,7 +9,7 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import java.util.Collections;
 
 @Component
-public class NewAdvertisementAddSocial extends Command {
+public class NewObyavleniyeAddSocial extends Command {
     private static final String ADD_SOCIAL_TEXT = """
             Добавьте ссылку на вашу социальную сеть.
             Примеры таких ссылок:
@@ -18,8 +18,8 @@ public class NewAdvertisementAddSocial extends Command {
             3. https://ok.ru/profile/12345678900
             4. https://wa.me/89000000000""";
 
-    public NewAdvertisementAddSocial() {
-        super(State.NewAdvertisement_AddSocial.getIdentifier(), State.NewAdvertisement_AddSocial.getDescription());
+    public NewObyavleniyeAddSocial() {
+        super(State.NewObyavleniye_AddSocial.getIdentifier(), State.NewObyavleniye_AddSocial.getDescription());
     }
 
     @Override

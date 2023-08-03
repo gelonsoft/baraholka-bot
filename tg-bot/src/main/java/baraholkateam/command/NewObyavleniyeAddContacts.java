@@ -13,14 +13,14 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class NewAdvertisementAddContacts extends Command {
+public class NewObyavleniyeAddContacts extends Command {
     private static final String ADD_CONTACTS_TEXT = """
             Вы можете указать свои контактные данные.""";
     private static final String ADD_CONTACTS_QUESTION = """
             Желаете указать ваш номер телефона?""";
 
-    public NewAdvertisementAddContacts() {
-        super(State.NewAdvertisement_AddContacts.getIdentifier(), State.NewAdvertisement_AddContacts.getDescription());
+    public NewObyavleniyeAddContacts() {
+        super(State.NewObyavleniye_AddContacts.getIdentifier(), State.NewObyavleniye_AddContacts.getDescription());
     }
 
     @Override

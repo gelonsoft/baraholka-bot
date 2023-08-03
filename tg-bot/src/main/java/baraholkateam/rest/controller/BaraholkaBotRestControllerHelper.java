@@ -1,11 +1,11 @@
 package baraholkateam.rest.controller;
 
 import baraholkateam.bot.BaraholkaBot;
-import baraholkateam.command.NewAdvertisementConfirm;
-import baraholkateam.rest.model.ActualAdvertisement;
-import baraholkateam.rest.model.CurrentAdvertisement;
-import baraholkateam.rest.service.ActualAdvertisementService;
-import baraholkateam.rest.service.CurrentAdvertisementService;
+import baraholkateam.command.NewObyavleniyeConfirm;
+import baraholkateam.rest.model.ActualObyavleniye;
+import baraholkateam.rest.model.CurrentObyavleniye;
+import baraholkateam.rest.service.ActualObyavleniyeService;
+import baraholkateam.rest.service.CurrentObyavleniyeService;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
 import baraholkateam.util.Tag;
 import baraholkateam.util.TelegramUserInfo;
@@ -37,7 +37,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import static baraholkateam.command.DeleteAdvertisement.NOT_ACTUAL_TEXT;
+import static baraholkateam.command.DeleteObyavleniye.NOT_ACTUAL_TEXT;
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_PERIOD;
 import static baraholkateam.notification.NotificationExecutor.FIRST_REPEAT_NOTIFICATION_TIME_UNIT;
 
@@ -48,13 +48,13 @@ public class BaraholkaBotRestControllerHelper {
     private TelegramAPIRequests telegramAPIRequests;
 
     @Autowired
-    private CurrentAdvertisementService currentAdvertisementService;
+    private CurrentObyavleniyeService currentObyavleniyeService;
 
     @Autowired
-    private ActualAdvertisementService actualAdvertisementService;
+    private ActualObyavleniyeService actualObyavleniyeService;
 
     @Autowired
-    private NewAdvertisementConfirm newAdvertisementConfirm;
+    private NewObyavleniyeConfirm newObyavleniyeConfirm;
 
     @Autowired
     private BaraholkaBot baraholkaBot;
@@ -119,7 +119,7 @@ public class BaraholkaBotRestControllerHelper {
                 authDate, hash);
     }
 
-    CurrentAdvertisement getCurrentAdvertisement(JsonNode json) {
+    CurrentObyavleniye getCurrentObyavleniye(JsonNode json) {
         Iterator<JsonNode> tagNodeIterator = json.withArray("tags").elements();
         List<Tag> tags = new ArrayList<>();
         while (tagNodeIterator.hasNext()) {
@@ -142,7 +142,7 @@ public class BaraholkaBotRestControllerHelper {
             price = Long.parseLong(priceString);
         }
 
-        return new CurrentAdvertisement(userId, description, tags, price, phone, contacts);
+        return new CurrentObyavleniye(userId, description, tags, price, phone, contacts);
     }
 
     List<String> getTagsList(JsonNode json) {
@@ -154,13 +154,13 @@ public class BaraholkaBotRestControllerHelper {
         return tagsList;
     }
 
-    boolean addNewAdvertisement(CurrentAdvertisement currentAdvertisement, JsonNode json) {
-        if (currentAdvertisement.getContacts().size() == 0 && currentAdvertisement.getPhone() == null) {
-            currentAdvertisement.setSocials(List.of("@"
-                    + telegramAPIRequests.getUser(currentAdvertisement.getChatId()).username()));
+    boolean addNewObyavleniye(CurrentObyavleniye currentObyavleniye, JsonNode json) {
+        if (currentObyavleniye.getContacts().size() == 0 && currentObyavleniye.getPhone() == null) {
+            currentObyavleniye.setSocials(List.of("@"
+                    + telegramAPIRequests.getUser(currentObyavleniye.getChatId()).username()));
         }
 
-        currentAdvertisementService.put(currentAdvertisement);
+        currentObyavleniyeService.put(currentObyavleniye);
 
         Iterator<JsonNode> photosNodeIterator = json.withArray("photos").elements();
         List<String> photos = new ArrayList<>();
@@ -173,12 +173,12 @@ public class BaraholkaBotRestControllerHelper {
             try {
                 File photoFile = File.createTempFile("photo", "temp");
                 Files.write(Path.of(photoFile.getPath()), Base64.getDecoder().decode(photos.get(0)));
-                sentAd = newAdvertisementConfirm.sendPhotoMessage(
+                sentAd = newObyavleniyeConfirm.sendPhotoMessage(
                         baraholkaBot,
                         channelUsername,
                         //Long.parseLong(channelChatId),
                         photoFile,
-                        currentAdvertisementService.getAdvertisementText(currentAdvertisement.getChatId())
+                        currentObyavleniyeService.getObyavleniyeText(currentObyavleniye.getChatId())
                 );
             } catch (IOException e) {
                 LOGGER.error("Cannot send photo", e);
@@ -198,15 +198,15 @@ public class BaraholkaBotRestControllerHelper {
                 }
             }
 
-            List<Message> messages = newAdvertisementConfirm.sendPhotoMediaGroup(baraholkaBot,
+            List<Message> messages = newObyavleniyeConfirm.sendPhotoMediaGroup(baraholkaBot,
                     Long.parseLong(channelChatId),
                     photoFiles,
-                    currentAdvertisementService.getAdvertisementText(currentAdvertisement.getChatId()));
+                    currentObyavleniyeService.getObyavleniyeText(currentObyavleniye.getChatId()));
             sentAd = messages.get(0);
         }
 
         if (sentAd != null) {
-            currentAdvertisement
+            currentObyavleniye
                     .setMessageId(Long.parseLong(String.valueOf(sentAd.getMessageId())))
                     .setPhotos(photos)
                     .setCreationTime(System.currentTimeMillis())
@@ -216,18 +216,18 @@ public class BaraholkaBotRestControllerHelper {
                                     .toMillis(FIRST_REPEAT_NOTIFICATION_PERIOD)
                     )
                     .setUpdateAttempt(0);
-            currentAdvertisementService.put(currentAdvertisement);
-            actualAdvertisementService.insertNewAdvertisement(currentAdvertisement);
+            currentObyavleniyeService.put(currentObyavleniye);
+            actualObyavleniyeService.insertNewObyavleniye(currentObyavleniye);
 
             return true;
         }
-        LOGGER.error("Cannot send advertisement to channel.");
+        LOGGER.error("Cannot send obyavleniye to channel.");
         return false;
     }
 
     void deleteMessage(Long messageId) throws TelegramApiException {
         EditMessageCaption editMessage = new EditMessageCaption();
-        String adText = actualAdvertisementService.adText(messageId)
+        String adText = actualObyavleniyeService.adText(messageId)
                 .substring(Tag.Actual.getName().length() + 1);
         String editedText = String.format("%s\n\n%s", NOT_ACTUAL_TEXT, adText);
         editMessage.setChatId(channelChatId);
@@ -239,7 +239,7 @@ public class BaraholkaBotRestControllerHelper {
     }
 
     boolean isUserMessageOwner(Long userId, Long messageId) {
-        ActualAdvertisement advertisement = actualAdvertisementService.get(messageId);
-        return advertisement != null && Objects.equals(advertisement.getOwnerChatId(), userId);
+        ActualObyavleniye obyavleniye = actualObyavleniyeService.get(messageId);
+        return obyavleniye != null && Objects.equals(obyavleniye.getOwnerChatId(), userId);
     }
 }

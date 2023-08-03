@@ -1,6 +1,6 @@
 package baraholkateam.command;
 
-import baraholkateam.rest.service.CurrentAdvertisementService;
+import baraholkateam.rest.service.CurrentObyavleniyeService;
 import baraholkateam.rest.service.LastSentMessageService;
 import baraholkateam.util.State;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.util.List;
 
 @Component
-public class NewAdvertisementConfirmPhoto extends Command {
+public class NewObyavleniyeConfirmPhoto extends Command {
     public static final String DELETE_ALL_PHOTOS = "Удалить все фотографии";
     private static final String CONFIRM_PHOTOS_TEXT = """
             Общее количество добавленных фотографий: %s.
@@ -27,22 +27,22 @@ public class NewAdvertisementConfirmPhoto extends Command {
     private static final String NO_MORE_CONFIRM_PHOTOS_TEXT = """
             Общее количество добавленных фотографий: %s.
             Пожалуйста, перейдите к описанию.""";
-    private static final Logger LOGGER = LoggerFactory.getLogger(NewAdvertisementConfirmPhoto.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewObyavleniyeConfirmPhoto.class);
 
     @Autowired
     private LastSentMessageService lastSentMessageService;
 
     @Autowired
-    private CurrentAdvertisementService currentAdvertisementService;
+    private CurrentObyavleniyeService currentObyavleniyeService;
 
-    public NewAdvertisementConfirmPhoto() {
-        super(State.NewAdvertisement_ConfirmPhoto.getIdentifier(),
-                State.NewAdvertisement_ConfirmPhoto.getDescription());
+    public NewObyavleniyeConfirmPhoto() {
+        super(State.NewObyavleniye_ConfirmPhoto.getIdentifier(),
+                State.NewObyavleniye_ConfirmPhoto.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        int addedPhotosCount = currentAdvertisementService.getPhotos(chat.getId()).size();
+        int addedPhotosCount = currentObyavleniyeService.getPhotos(chat.getId()).size();
 
         Message lastSentMessage = lastSentMessageService.get(chat.getId());
         if (lastSentMessage.getText().substring(0, 20).equals(CONFIRM_PHOTOS_TEXT.substring(0, 20))) {
@@ -68,14 +68,14 @@ public class NewAdvertisementConfirmPhoto extends Command {
     private ReplyKeyboardMarkup getAddReplyKeyboard(boolean ifAddPhotos) {
         if (ifAddPhotos) {
             return getReplyKeyboard(List.of(
-                    State.NewAdvertisement_AddPhotos.getDescription(),
-                    State.NewAdvertisement_AddDescription.getDescription(),
+                    State.NewObyavleniye_AddPhotos.getDescription(),
+                    State.NewObyavleniye_AddDescription.getDescription(),
                     DELETE_ALL_PHOTOS
             ), true);
         }
 
         return getReplyKeyboard(List.of(
-                State.NewAdvertisement_AddDescription.getDescription(),
+                State.NewObyavleniye_AddDescription.getDescription(),
                 DELETE_ALL_PHOTOS
         ), true);
     }

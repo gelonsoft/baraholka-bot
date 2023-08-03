@@ -1,7 +1,7 @@
 package baraholkateam.command;
 
-import baraholkateam.rest.model.ActualAdvertisement;
-import baraholkateam.rest.service.ActualAdvertisementService;
+import baraholkateam.rest.model.ActualObyavleniye;
+import baraholkateam.rest.service.ActualObyavleniyeService;
 import baraholkateam.util.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,10 +14,10 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import java.util.ArrayList;
 import java.util.List;
 
-import static baraholkateam.rest.model.ActualAdvertisement.DESCRIPTION_TEXT;
+import static baraholkateam.rest.model.ActualObyavleniye.DESCRIPTION_TEXT;
 
 @Component
-public class DeleteAdvertisement extends Command {
+public class DeleteObyavleniye extends Command {
     public static final String NOT_ACTUAL_TEXT = "<b>НЕАКТУАЛЬНО</b>";
     public static final String USER_ACTUAL_ADS_TEXT = """
             Здесь представлены краткие описания Ваших актуальных объявлений.
@@ -28,16 +28,16 @@ public class DeleteAdvertisement extends Command {
             У вас нет актуальных объявлений.""";
 
     @Autowired
-    private ActualAdvertisementService actualAdvertisementService;
+    private ActualObyavleniyeService actualObyavleniyeService;
 
-    public DeleteAdvertisement() {
-        super(State.DeleteAdvertisement.getIdentifier(), State.DeleteAdvertisement.getDescription());
+    public DeleteObyavleniye() {
+        super(State.DeleteObyavleniye.getIdentifier(), State.DeleteObyavleniye.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         long chatId = chat.getId();
-        List<ActualAdvertisement> ads = actualAdvertisementService.getByChatId(chatId);
+        List<ActualObyavleniye> ads = actualObyavleniyeService.getByChatId(chatId);
 
         if (ads == null || ads.isEmpty()) {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(), NO_ADS_TO_DELETE,
@@ -48,13 +48,13 @@ public class DeleteAdvertisement extends Command {
         }
     }
 
-    public InlineKeyboardMarkup sendInlineKeyBoardMessage(List<ActualAdvertisement> ads) {
+    public InlineKeyboardMarkup sendInlineKeyBoardMessage(List<ActualObyavleniye> ads) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
 
         ads.forEach(ad -> {
             InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-            String description = ad.getAdvertisementText();
+            String description = ad.getObyavleniyeText();
             int descIndex = description.indexOf(DESCRIPTION_TEXT);
             inlineKeyboardButton.setText(
                     description

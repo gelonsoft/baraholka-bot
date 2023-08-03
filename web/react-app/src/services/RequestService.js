@@ -2,10 +2,10 @@ import axios from "axios";
 
 const API_URL='https://baraholka.sighold.com/api'
 const GET_TAGS_URL = API_URL+"/all_tags";
-const GET_SEARCH_ADS_URL = API_URL+"/search_advertisements";
-const GET_MY_ADS_URL = API_URL+"/my_advertisements";
-const POST_DEL_AD_URL = API_URL+"/delete_advertisement/";
-const NEW_AD_URL = API_URL+"/add_advertisement";
+const GET_SEARCH_ADS_URL = API_URL+"/search_obyavleniyes";
+const GET_MY_ADS_URL = API_URL+"/my_obyavleniyes";
+const POST_DEL_AD_URL = API_URL+"/delete_obyavleniye/";
+const NEW_AD_URL = API_URL+"/add_obyavleniye";
 
 class RequestService {
     getTags(userData) {

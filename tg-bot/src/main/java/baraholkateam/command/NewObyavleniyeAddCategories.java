@@ -1,6 +1,6 @@
 package baraholkateam.command;
 
-import baraholkateam.rest.service.CurrentAdvertisementService;
+import baraholkateam.rest.service.CurrentObyavleniyeService;
 import baraholkateam.util.State;
 import baraholkateam.util.TagType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,26 +12,26 @@ import org.telegram.telegrambots.meta.bots.AbsSender;
 import java.util.Objects;
 
 @Component
-public class NewAdvertisementAddCategories extends Command {
-    private static final String CHOSEN_ADVERTISEMENT_TYPES = """
+public class NewObyavleniyeAddCategories extends Command {
+    private static final String CHOSEN_OBYAVLENIYE_TYPES = """
             Выбраны категории объявлений: %s""";
     private static final String ADD_CATEGORIES_TEXT = """
             Теперь выберите категории, наиболее подходящие для описания вашего товара.""";
 
     @Autowired
-    private CurrentAdvertisementService currentAdvertisementService;
+    private CurrentObyavleniyeService currentObyavleniyeService;
 
-    public NewAdvertisementAddCategories() {
-        super(State.NewAdvertisement_AddCategories.getIdentifier(),
-                State.NewAdvertisement_AddCategories.getDescription());
+    public NewObyavleniyeAddCategories() {
+        super(State.NewObyavleniye_AddCategories.getIdentifier(),
+                State.NewObyavleniye_AddCategories.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-        String chosenAdvertisementTypeTags = currentAdvertisementService.get(chat.getId())
-                .getTagsOfType(TagType.AdvertisementType);
-        if (Objects.equals(chosenAdvertisementTypeTags, "")) {
-            chosenAdvertisementTypeTags = NO_HASHTAGS;
+        String chosenObyavleniyeTypeTags = currentObyavleniyeService.get(chat.getId())
+                .getTagsOfType(TagType.ObyavleniyeType);
+        if (Objects.equals(chosenObyavleniyeTypeTags, "")) {
+            chosenObyavleniyeTypeTags = NO_HASHTAGS;
         }
         sendAnswer(
                 absSender,
@@ -39,8 +39,8 @@ public class NewAdvertisementAddCategories extends Command {
                 this.getCommandIdentifier(),
                 user.getUserName(),
                 String.format(
-                        CHOSEN_ADVERTISEMENT_TYPES,
-                        chosenAdvertisementTypeTags
+                        CHOSEN_OBYAVLENIYE_TYPES,
+                        chosenObyavleniyeTypeTags
                 ),
                 showNextButton()
         );

@@ -44,10 +44,10 @@ public abstract class Command extends BotCommand {
             Объявление успешно удалено.
             Текущий статус объявления: неактуальное.""";
     public static final String UNSUCCESS_DELETE_AD_TEXT = "Удаление объявление было отменено.";
-    public static final String ADVERTISEMENT_CANCELLED_TEXT = "Формирование объявления было отменено.";
-    public static final String ADVERTISEMENT_SUCCESSFUL_UPDATE = "Актуальность объявления была продлена.";
-    public static final String ADVERTISEMENT_SUCCESSFUL_DELETE = "Объявление было удалено.";
-    public static final String ADVERTISEMENT_DELETE =
+    public static final String OBYAVLENIYE_CANCELLED_TEXT = "Формирование объявления было отменено.";
+    public static final String OBYAVLENIYE_SUCCESSFUL_UPDATE = "Актуальность объявления была продлена.";
+    public static final String OBYAVLENIYE_SUCCESSFUL_DELETE = "Объявление было удалено.";
+    public static final String OBYAVLENIYE_DELETE =
             "Объявление было автоматически удалено после 3 попыток уточнения его актуальности.";
     public static final String PHOTOS_DELETE = "Фотографии в создаваемом объявлении были успешно удалены.";
     public static final String SOCIALS_DELETE = "Социальные сети в создаваемом объявлении были успешно удалены.";

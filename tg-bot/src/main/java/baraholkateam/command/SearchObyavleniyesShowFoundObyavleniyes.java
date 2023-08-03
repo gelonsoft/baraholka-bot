@@ -1,7 +1,7 @@
 package baraholkateam.command;
 
-import baraholkateam.rest.model.ActualAdvertisement;
-import baraholkateam.rest.service.ActualAdvertisementService;
+import baraholkateam.rest.model.ActualObyavleniye;
+import baraholkateam.rest.service.ActualObyavleniyeService;
 import baraholkateam.rest.service.ChosenTagsService;
 import baraholkateam.rest.service.PreviousStateService;
 import baraholkateam.telegram_api_requests.TelegramAPIRequests;
@@ -21,14 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static baraholkateam.bot.BaraholkaBot.SEARCH_ADVERTISEMENTS_LIMIT;
+import static baraholkateam.bot.BaraholkaBot.SEARCH_OBYAVLENIYES_LIMIT;
 
 @Component
-public class SearchAdvertisementsShowFoundAdvertisements extends Command {
-    private static final String CANNOT_FIND_ADVERTISEMENTS = """
+public class SearchObyavleniyesShowFoundObyavleniyes extends Command {
+    private static final String CANNOT_FIND_OBYAVLENIYES = """
             По Вашему запросу ничего не нашлось.
             Вы можете вернуться в главное меню /%s или найти объявления по другим хэштегам /%s.""";
-    private static final String FOUND_ADVERTISEMENTS = """
+    private static final String FOUND_OBYAVLENIYES = """
             По Вашему запросу нашлось объявлений: %d.
             Показывается не более %s самых актуальных объявлений.
             Вы можете вернуться в главное меню /%s или найти объявления по другим хэштегам /%s.""";
@@ -40,7 +40,7 @@ public class SearchAdvertisementsShowFoundAdvertisements extends Command {
     private TelegramAPIRequests telegramAPIRequests;
 
     @Autowired
-    private ActualAdvertisementService actualAdvertisementService;
+    private ActualObyavleniyeService actualObyavleniyeService;
 
     @Autowired
     private PreviousStateService previousStateService;
@@ -48,16 +48,16 @@ public class SearchAdvertisementsShowFoundAdvertisements extends Command {
     @Value("${channel.username}")
     private String channelUsername;
 
-    public SearchAdvertisementsShowFoundAdvertisements() {
-        super(State.SearchAdvertisements_ShowFoundAdvertisements.getIdentifier(),
-                State.SearchAdvertisements_ShowFoundAdvertisements.getDescription());
+    public SearchObyavleniyesShowFoundObyavleniyes() {
+        super(State.SearchObyavleniyes_ShowFoundObyavleniyes.getIdentifier(),
+                State.SearchObyavleniyes_ShowFoundObyavleniyes.getDescription());
     }
 
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] arguments) {
         List<Tag> tags = chosenTagsService.get(chat.getId());
 
-        if (previousStateService.get(chat.getId()) == State.SearchAdvertisements_AddProductCategories) {
+        if (previousStateService.get(chat.getId()) == State.SearchObyavleniyes_AddProductCategories) {
             String hashtags = NO_HASHTAGS;
             if (tags != null && !tags.isEmpty()) {
                 hashtags = tags.stream()
@@ -71,20 +71,20 @@ public class SearchAdvertisementsShowFoundAdvertisements extends Command {
 
             if (count == 0) {
                 sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                        String.format(CANNOT_FIND_ADVERTISEMENTS,
+                        String.format(CANNOT_FIND_OBYAVLENIYES,
                                 State.MainMenu.getIdentifier(),
-                                State.SearchAdvertisements.getIdentifier()),
+                                State.SearchObyavleniyes.getIdentifier()),
                         showCommandButtons(List.of(State.MainMenu.getDescription(),
-                                State.SearchAdvertisements.getDescription())));
+                                State.SearchObyavleniyes.getDescription())));
             } else {
                 sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
-                        String.format(FOUND_ADVERTISEMENTS,
+                        String.format(FOUND_OBYAVLENIYES,
                                 count,
-                                SEARCH_ADVERTISEMENTS_LIMIT,
+                                SEARCH_OBYAVLENIYES_LIMIT,
                                 State.MainMenu.getIdentifier(),
-                                State.SearchAdvertisements.getIdentifier()),
+                                State.SearchObyavleniyes.getIdentifier()),
                         showCommandButtons(List.of(State.MainMenu.getDescription(),
-                                State.SearchAdvertisements.getDescription())));
+                                State.SearchObyavleniyes.getDescription())));
             }
         } else {
             sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
@@ -97,11 +97,11 @@ public class SearchAdvertisementsShowFoundAdvertisements extends Command {
         if (tags == null || tags.isEmpty()) {
             return 0;
         }
-        List<ActualAdvertisement> sortedAds = actualAdvertisementService.tagsSearch(tags.stream()
+        List<ActualObyavleniye> sortedAds = actualObyavleniyeService.tagsSearch(tags.stream()
                 .map(Tag::getName)
                 .toArray(String[]::new));
         int count = 0;
-        for (ActualAdvertisement sortedAd : sortedAds) {
+        for (ActualObyavleniye sortedAd : sortedAds) {
             telegramAPIRequests.forwardMessage(channelUsername, String.valueOf(chatId),
                     sortedAd.getMessageId());
             count++;
