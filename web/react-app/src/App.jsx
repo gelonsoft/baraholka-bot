@@ -6,10 +6,11 @@ import Baraholka from "./components/Baraholka";
 import React from 'react';
 import Profile from "./components/Profile";
 import MyObjav from "./components/MyObjav";
-import NewObjav from "./components/NewObjav";
 import SearchAds from "./components/SearchAds";
 import DeletedAds from "./components/DeletedAds";
 import Help from "./components/Help";
+import NewObjav from "./components/NewObjav";
+
 
 function App() {
   return (
