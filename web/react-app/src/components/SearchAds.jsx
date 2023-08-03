@@ -5,7 +5,7 @@ import '../style/alice-carousel.css';
 import ReactLoading from 'react-loading';
 import Objav from "../services/Objav";
 
-class SearchAds extends React.Component {
+class SearchObyavs extends React.Component {
     constructor(props) {
         super(props);
         this.handleStartClick = this.handleStartClick.bind(this);
@@ -13,7 +13,7 @@ class SearchAds extends React.Component {
         this.state = {
             isStarted: false,
             choosenTags: [],
-            ads: [],
+            obyavs: [],
             currentCity: 'Не выбран',
             msg: "Поиск объявлений",
             cityTags: ['#Москва', '#СПб', '#Екатеринбург', '#Челябинск', '#Ульяновск', '#Омск', '#Белгород', '#Петропавловск', '#Пермь', '#Волгоград', '#Киров', '#Хабаровск'],
@@ -58,10 +58,10 @@ class SearchAds extends React.Component {
 
     handleStartClick() {
         let userData = JSON.parse(localStorage.getItem('userData'));
-        RequestService.getSearchAds(userData, this.state.choosenTags).then((response) => {
+        RequestService.getSearchObyavs(userData, this.state.choosenTags).then((response) => {
             if (response.data) {
                 this.setState({
-                    ads: response.data,
+                    obyavs: response.data,
                     msg: response.data.length === 0 ? "По вашему запросу ничего не нашлось" : "Найденные объявления"
                 });
             }
@@ -75,13 +75,13 @@ class SearchAds extends React.Component {
     }
 
     handleNewClick() {
-        this.setState({isStarted: false, choosenTags: [], ads: [], msg: "Поиск объявлений"});
+        this.setState({isStarted: false, choosenTags: [], obyavs: [], msg: "Поиск объявлений"});
     }
 
     render() {
         const isStarted = this.state.isStarted;
         if (isStarted) {
-            return <StartNewSearch ads={this.state.ads} msg={this.state.msg} choosenTags={this.state.choosenTags}
+            return <StartNewSearch obyavs={this.state.obyavs} msg={this.state.msg} choosenTags={this.state.choosenTags}
                                    new={this.handleNewClick}/>;
         }
         return <ChooseSearchTags cities={this.state.cityTags} types={this.state.obyavleniyeTypeTags}
@@ -133,7 +133,7 @@ function ChooseSearchTags(props) {
 }
 
 function StartNewSearch(props) {
-    const listOfAds = props.ads?.map((ad) => <FoundAds key={ad.id} username={ad.username} photos={ad.photos}
+    const listOfObyavs = props.obyavs?.map((ad) => <FoundObyavs key={ad.id} username={ad.username} photos={ad.photos}
                                                        tags={ad.tags.toString().replaceAll(",", " ")}
                                                        price={ad.price}
                                                        description={ad.description} phone={ad.phone}
@@ -144,13 +144,13 @@ function StartNewSearch(props) {
         <div className="custom-text">{props.choosenTags?.toString().replaceAll(",", " ")}</div>
         <input type="button" className="btn btn-dark ad__form" value="Выполнить новый поиск" onClick={props.new}/>
         <div className="grid">
-            {listOfAds}
+            {listOfObyavs}
         </div>
     </form>)
 }
 
 
-class FoundAds extends React.Component {
+class FoundObyavs extends React.Component {
     render() {
         return (<div className="ad__form">
             <div className="text__padding"></div>
@@ -169,4 +169,4 @@ const Example = () => (
     <ReactLoading className="ad__form" type="spin" color="#419FD9" height={40} width={40}/>
 );
 
-export default SearchAds;
+export default SearchObyavs;

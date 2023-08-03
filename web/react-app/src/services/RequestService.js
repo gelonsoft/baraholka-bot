@@ -2,10 +2,10 @@ import axios from "axios";
 
 const API_URL='https://baraholka.sighold.com/api'
 const GET_TAGS_URL = API_URL+"/all_tags";
-const GET_SEARCH_ADS_URL = API_URL+"/search_obyavleniyes";
-const GET_MY_ADS_URL = API_URL+"/my_obyavleniyes";
-const POST_DEL_AD_URL = API_URL+"/udalit/";
-const NEW_AD_URL = API_URL+"/add_obyavleniye";
+const GET_SEARCH_OBYAV_URL = API_URL+"/search_obyavleniyes";
+const GET_MY_OBYAV_URL = API_URL+"/my_obyavleniyes";
+const POST_DEL_OBYAV_URL = API_URL+"/save/";
+const NEW_OBYAV_URL = API_URL+"/add_obyavleniye";
 
 class RequestService {
     getTags(userData) {
@@ -25,7 +25,7 @@ class RequestService {
         try {
             return axios({
                 method: "post",
-                url: NEW_AD_URL,
+                url: NEW_OBYAV_URL,
                 data: body,
                 headers: { "Content-Type": "application/json" },
             });
@@ -34,7 +34,7 @@ class RequestService {
         }
     }
 
-    getSearchAds(userData, tags) {
+    getSearchObyavs(userData, tags) {
         const bodyFormData = new FormData();
         bodyFormData.append('id', userData.id);
         bodyFormData.append('first_name', userData.first_name);
@@ -48,7 +48,7 @@ class RequestService {
         try {
             return axios({
                 method: "post",
-                url: GET_SEARCH_ADS_URL,
+                url: GET_SEARCH_OBYAV_URL,
                 data: bodyFormData,
                 headers: {"Content-Type": "application/json"},
             });
@@ -57,7 +57,7 @@ class RequestService {
         }
     }
 
-    getMyAds(userData) {
+    getMyObyavs(userData) {
         const bodyFormData = new FormData();
         bodyFormData.append('id', userData.id);
         bodyFormData.append('first_name', userData.first_name);
@@ -69,7 +69,7 @@ class RequestService {
         try {
             return axios({
                 method: "post",
-                url: GET_MY_ADS_URL,
+                url: GET_MY_OBYAV_URL,
                 data: bodyFormData,
                 headers: {"Content-Type": "application/json"},
             });
@@ -90,7 +90,7 @@ class RequestService {
         try {
             return axios({
                 method: "post",
-                url: POST_DEL_AD_URL + mess_id,
+                url: POST_DEL_OBYAV_URL + mess_id,
                 data: bodyFormData,
                 headers: {"Content-Type": "application/json"},
             });

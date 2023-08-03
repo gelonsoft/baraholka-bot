@@ -19,7 +19,7 @@ class MyObjav extends React.Component {
 
     componentDidMount() {
         let userData = JSON.parse(localStorage.getItem('userData'));
-        RequestService.getMyAds(userData).then((response) => {
+        RequestService.getMyObyavs(userData).then((response) => {
             if (response.data) {
                 this.setState({
                     ads: response.data,
