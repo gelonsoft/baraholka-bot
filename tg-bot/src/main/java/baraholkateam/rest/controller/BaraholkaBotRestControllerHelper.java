@@ -65,6 +65,9 @@ public class BaraholkaBotRestControllerHelper {
     @Value("${channel.chat_id}")
     private String channelChatId;
 
+    @Value("${channel.username}")
+    private String channelUsername;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BaraholkaBotRestControllerHelper.class);
 
     @Autowired
@@ -172,7 +175,8 @@ public class BaraholkaBotRestControllerHelper {
                 Files.write(Path.of(photoFile.getPath()), Base64.getDecoder().decode(photos.get(0)));
                 sentAd = newAdvertisementConfirm.sendPhotoMessage(
                         baraholkaBot,
-                        Long.parseLong(channelChatId),
+                        channelUsername,
+                        //Long.parseLong(channelChatId),
                         photoFile,
                         currentAdvertisementService.getAdvertisementText(currentAdvertisement.getChatId())
                 );

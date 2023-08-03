@@ -96,6 +96,22 @@ public class NewAdvertisementConfirm extends Command {
         }
     }
 
+    public Message sendPhotoMessage(AbsSender absSender, String chatId, File photoFile, String text) {
+        SendPhoto sendPhoto = SendPhoto.builder()
+                .chatId(chatId)
+                .photo(new InputFile(Objects.requireNonNull(photoFile)))
+                .caption(text)
+                .parseMode(ParseMode.HTML)
+                .build();
+
+        try {
+            return absSender.execute(sendPhoto);
+        } catch (TelegramApiException e) {
+            LOGGER.error("Can't send photo message to chatId="+chatId, e);
+            return null;
+        }
+    }
+
     public List<Message> sendPhotoMediaGroup(AbsSender absSender, long chatId, List<File> photoFiles, String text) {
         AtomicInteger count = new AtomicInteger();
         List<InputMedia> medias = photoFiles.stream()
