@@ -78,7 +78,7 @@ class RequestService {
         }
     }
 
-    postDeleteAd(userData, mess_id) {
+    postDeleteObyav(userData, mess_id) {
         const bodyFormData = new FormData();
         bodyFormData.append('id', userData.id);
         bodyFormData.append('first_name', userData.first_name);

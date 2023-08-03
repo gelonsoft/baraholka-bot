@@ -37,7 +37,7 @@ class MyObjav extends React.Component {
 
     handleDeleteClick(val) {
         let userData = JSON.parse(localStorage.getItem('userData'));
-        RequestService.postDeleteAd(userData, val).then((response) => {
+        RequestService.postDeleteObyav(userData, val).then((response) => {
             if (response.status === 200) {
                 let deleteAds = this.state.ads.find(ad => ad.message_id === val);
                 let adsSize = this.state.ads.length - 1;
