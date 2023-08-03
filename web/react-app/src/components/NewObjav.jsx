@@ -1,7 +1,7 @@
 import React from 'react';
 import '../style/style.css';
 import RequestService from '../services/RequestService';
-import deleteBtn from '../img/delete-btn.svg'
+import deleteBtn from '../../public/img/delete-btn.svg'
 
 class NewObjav extends React.Component {
     constructor(props) {

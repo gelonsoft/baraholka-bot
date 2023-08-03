@@ -18,10 +18,10 @@ function App() {
               <Route path="/" element={<Login />} />
               <Route path="/baraholka" element={<Baraholka />}>
                   <Route path="/baraholka/profile" element={<Profile />} />
-                  <Route path="/baraholka/my_ads" element={<MyObjav />} />
-                  <Route path="/baraholka/new_ad" element={<NewObjav />} />
-                  <Route path="/baraholka/search_ads" element={<SearchAds />} />
-                  <Route path="/baraholka/deleted_ads" element={<DeletedAds />} />
+                  <Route path="/baraholka/my_obyavleniye" element={<MyObjav />} />
+                  <Route path="/baraholka/new_obyavleniye" element={<NewObjav />} />
+                  <Route path="/baraholka/search_obyavleniye" element={<SearchAds />} />
+                  <Route path="/baraholka/deleted_obyavleniye" element={<DeletedAds />} />
                   <Route path="/baraholka/help" element={<Help />} />
               </Route>
           </Routes>

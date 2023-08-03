@@ -31,7 +31,7 @@ header {
 .header__logo-icon {
     width: 80px;
     height: 80px;
-    background-image: url("../img/icon.png");
+    background-image: url("../../public/img/icon.png");
     background-position: center;
     background-size: cover;
     margin-right: 10px;
@@ -356,7 +356,7 @@ select {
 .profile-photo-container {
     width: 200px;
     height: 200px;
-    background-image: url("../img/avatar.svg");
+    background-image: url("../../public/img/avatar.svg");
     background-size: cover;
     background-position: center;
 }

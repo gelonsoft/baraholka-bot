@@ -111,7 +111,7 @@ class Dialog extends React.Component {
         return (
             <div>
                 <button type="button" className="del-btn" onClick={this.show.bind(this)}>
-                    <img src={require('../img/del_ad.png')} height="20"/>
+                    <img src={require('../../public/img/del_obyavleniye.png')} height="20"/>
                 </button>
                 <Rodal visible={this.state.visible} animation="fade" height="100" onClose={this.hide.bind(this)}>
                     <div className="main__form-title">Удалить объявление</div>
