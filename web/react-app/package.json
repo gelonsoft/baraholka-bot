@@ -14,13 +14,13 @@
     "react-telegram-login": "^1.1.2",
     "read-more-react": "^1.0.10",
     "rodal": "^2.0.1",
+    "vite": "^4.4.8",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "eslintConfig": {
     "extends": [
@@ -44,7 +44,11 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "react-scripts": "5.0.1",
-    "postcss": "^8.4.27"
+    "@vitejs/plugin-react": "^4.0.1",
+    "postcss": "^8.4.27",
+    "vite": "^4.3.9",
+    "vite-plugin-svgr": "^3.2.0",
+    "vite-tsconfig-paths": "^4.2.0",
+    "postcss-nested": "^6.0.1"
   }
 }

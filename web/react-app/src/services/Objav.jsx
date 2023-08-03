@@ -20,7 +20,7 @@ const ReadMore = ({children}) => {
         </p>
     );
 };
-export default class Ad extends React.Component {
+export default class Objav extends React.Component {
     constructor(props) {
         super(props);
         this.handleBlurClick = this.handleBlurClick.bind(this);
@@ -39,13 +39,13 @@ export default class Ad extends React.Component {
     render() {
         return (
             <div className="add__content">
-                <div className="ad__photo">
+                <div className="objav__photo">
                     <Carousel photos={this.listOfPhotos}/>
                 </div>
                 <div className="text__padding">
-                    <div className="ad-tags">{this.props.tags}</div>
+                    <div className="objav-tags">{this.props.tags}</div>
                     <span style={{display: this.checkPrice}}
-                          className="ad-bottom-padding">Цена: {this.props.price} руб.</span>
+                          className="objav-bottom-padding">Цена: {this.props.price} руб.</span>
                     <ReadMore children={`Описание: ${this.props.description.trim()}`}/>
                     <div>--------------------------------------------------------</div>
                     <ReactSpoiler blur={10} hoverBlur={8} onClick={this.handleBlurClick}>
