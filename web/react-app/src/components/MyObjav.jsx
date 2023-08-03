@@ -12,7 +12,7 @@ class MyObjav extends React.Component {
         super(props);
         this.handleDeleteClick = this.handleDeleteClick.bind(this);
         this.state = {
-            ads: [],
+            obyavs: [],
             msg: "Загрузка данных"
         };
     }
@@ -22,10 +22,10 @@ class MyObjav extends React.Component {
         RequestService.getMyObyavs(userData).then((response) => {
             if (response.data) {
                 this.setState({
-                    ads: response.data,
+                    obyavs: response.data,
                     msg: response.data.length === 0 ? "У вас нет новых объявлений" : "Ваши актуальные объявления"
                 });
-                console.log("My ads", response.data);
+                console.log("My obyavs", response.data);
             }
         }).catch(err => {
             console.log(err);
@@ -39,11 +39,11 @@ class MyObjav extends React.Component {
         let userData = JSON.parse(localStorage.getItem('userData'));
         RequestService.postDeleteObyav(userData, val).then((response) => {
             if (response.status === 200) {
-                let deleteAds = this.state.ads.find(ad => ad.message_id === val);
-                let adsSize = this.state.ads.length - 1;
+                let deleteobyavs = this.state.obyavs.find(ad => ad.message_id === val);
+                let obyavsSize = this.state.obyavs.length - 1;
                 this.setState({
-                    ads: this.state.ads.filter(ad => ad !== deleteAds),
-                    msg: adsSize === 0 ? "У вас нет новых объявлений" : "Ваши актуальные объявления"
+                    obyavs: this.state.obyavs.filter(ad => ad !== deleteobyavs),
+                    msg: obyavsSize === 0 ? "У вас нет новых объявлений" : "Ваши актуальные объявления"
                 });
             }
         }).catch(err => {
@@ -52,7 +52,7 @@ class MyObjav extends React.Component {
     }
 
     render() {
-        const listOfAds = this.state.ads?.map((ad) => <FoundAds key={ad.message_id} id={ad.message_id}
+        const listOfobyavs = this.state.obyavs?.map((ad) => <Foundobyavs key={ad.message_id} id={ad.message_id}
                                                                 photos={ad.photos}
                                                                 tags={ad.tags.toString().replaceAll(",", " ")}
                                                                 price={ad.price}
@@ -64,13 +64,13 @@ class MyObjav extends React.Component {
             <div className="main__form-title">{this.state.msg}</div>
             {showLoad ? <Example/> : null}
             <div className="grid">
-                {listOfAds}
+                {listOfobyavs}
             </div>
         </form>)
     }
 }
 
-class FoundAds extends React.Component {
+class Foundobyavs extends React.Component {
     render() {
         return (<div className="ad__form">
             <div className="main__form-row">
