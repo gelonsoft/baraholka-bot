@@ -91,7 +91,7 @@ public class NewAdvertisementConfirm extends Command {
         try {
             return absSender.execute(sendPhoto);
         } catch (TelegramApiException e) {
-            LOGGER.error("Can't send photo message", e);
+            LOGGER.error("Can't send photo message to chatId="+chatId, e);
             return null;
         }
     }
