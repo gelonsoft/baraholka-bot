@@ -1,8 +1,9 @@
 .idea
 target
-tg-bot/src/main/resources/
+tg-bot/src/main/resources/application.properties
 /node_modules/
 /web/react-app/build/
 /web/react-app/node_modules/
 /web/react-app/react-app.iml
 /install.txt
+/init/createUser.sql

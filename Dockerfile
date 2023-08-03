@@ -16,4 +16,4 @@ WORKDIR /baraholka-app
 
 COPY --from=maven ./tg-bot/target/tg-bot-*.jar ./tg-bot/baraholka-bot.jar
 
-CMD ["java", "-jar", "./tg-bot/baraholka-bot.jar"]
+CMD ["java","-Xmx512m", "-jar", "./tg-bot/baraholka-bot.jar"]
