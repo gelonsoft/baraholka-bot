@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
     "axios": "^1.4.0",
     "react": "^18.2.0",
     "react-alice-carousel": "^2.7.1",
@@ -13,7 +10,6 @@
     "react-flickity-component": "^4.0.5",
     "react-loading": "^2.0.3",
     "react-router-dom": "^6.11.1",
-    "react-scripts": "5.0.1",
     "react-spoiler": "^0.4.3",
     "react-telegram-login": "^1.1.2",
     "read-more-react": "^1.0.10",
@@ -43,5 +39,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "react-scripts": "5.0.1",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0"
   }
 }
