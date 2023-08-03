@@ -128,7 +128,7 @@ function ChooseSearchTags(props) {
                 )
             })}
         </div>
-        <input type="button" className="btn btn-dark ad__form" value="Искать" onClick={props.start}/>
+        <input type="button" className="btn btn-dark obyav__form" value="Искать" onClick={props.start}/>
     </form>)
 }
 
@@ -142,7 +142,7 @@ function StartNewSearch(props) {
         <div className="main__form-title">Хэштеги</div>
         <div>Вы выбрали следующие хэштеги для выполнения поиска.</div>
         <div className="custom-text">{props.choosenTags?.toString().replaceAll(",", " ")}</div>
-        <input type="button" className="btn btn-dark ad__form" value="Выполнить новый поиск" onClick={props.new}/>
+        <input type="button" className="btn btn-dark obyav__form" value="Выполнить новый поиск" onClick={props.new}/>
         <div className="grid">
             {listOfObyavs}
         </div>
@@ -152,7 +152,7 @@ function StartNewSearch(props) {
 
 class FoundObyavs extends React.Component {
     render() {
-        return (<div className="ad__form">
+        return (<div className="obyav__form">
             <div className="text__padding"></div>
             <Objav key={this.props.key} id={this.props.id}
                    photos={this.props.photos}
@@ -166,7 +166,7 @@ class FoundObyavs extends React.Component {
 }
 
 const Example = () => (
-    <ReactLoading className="ad__form" type="spin" color="#419FD9" height={40} width={40}/>
+    <ReactLoading className="obyav__form" type="spin" color="#419FD9" height={40} width={40}/>
 );
 
 export default SearchObyavs;

@@ -72,7 +72,7 @@ class MyObjav extends React.Component {
 
 class Foundobyavs extends React.Component {
     render() {
-        return (<div className="ad__form">
+        return (<div className="obyav__form">
             <div className="main__form-row">
                 <div className="text__padding"></div>
                 <Dialog id={this.props.id} delete={(id) => this.props.delete(id)}></Dialog>
@@ -90,7 +90,7 @@ class Foundobyavs extends React.Component {
 }
 
 const Example = () => (
-    <ReactLoading className="ad__form" type="spin" color="#419FD9" height={40} width={40}/>
+    <ReactLoading className="obyav__form" type="spin" color="#419FD9" height={40} width={40}/>
 );
 
 class Dialog extends React.Component {
@@ -114,9 +114,9 @@ class Dialog extends React.Component {
                     <img src={'/img/del_obyavleniye.png'} height="20"/>
                 </button>
                 <Rodal visible={this.state.visible} animation="fade" height="100" onClose={this.hide.bind(this)}>
-                    <div className="main__form-title">Удалить объявление</div>
-                    <div>Вы желаете удалить выбранное объявление?</div>
-                    <div className="main__form-row ad__form">
+                    <div className="main__form-title">Удалить</div>
+                    <div>Вы уверены?</div>
+                    <div className="main__form-row obyav__form">
                         <input type="button" className="btn btn-dialog btn-light-color" value="Да" onClick={() => {
                             this.props.delete(this.props.id);
                             this.setState({visible: false});
