@@ -1,11 +1,14 @@
 package baraholkateam.rest.controller;
 
+import baraholkateam.command.NewObyavleniyeConfirm;
 import baraholkateam.rest.model.ActualObyavleniye;
 import baraholkateam.rest.model.CurrentObyavleniye;
 import baraholkateam.rest.service.ActualObyavleniyeService;
 import baraholkateam.util.AllTags;
 import baraholkateam.util.TelegramUserInfo;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import java.util.List;
 
@@ -26,6 +30,7 @@ import java.util.List;
 @RequestMapping("/api")
 public class BaraholkaBotRestController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaraholkaBotRestController.class);
     @Autowired
     private BaraholkaBotRestControllerHelper controllerHelper;
 
@@ -94,7 +99,16 @@ public class BaraholkaBotRestController {
 
         try {
             controllerHelper.deleteMessage(messageId);
-        } catch (Exception e) {
+        } catch (TelegramApiRequestException e1) {
+            if (e1.getApiResponse().equals("Bad Request: message to edit not found")) {
+                LOGGER.info("Info in deleteObyavleniye on deleteMessage "+messageId,e1);
+            } else {
+                LOGGER.error("Error in deleteObyavleniye on deleteMessage "+messageId,e1);
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+        catch (Exception e) {
+            LOGGER.error("Error in deleteObyavleniye on deleteMessage "+messageId,e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 

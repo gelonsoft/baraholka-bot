@@ -230,7 +230,8 @@ public class BaraholkaBotRestControllerHelper {
         String adText = actualObyavleniyeService.adText(messageId)
                 .substring(Tag.Actual.getName().length() + 1);
         String editedText = String.format("%s\n\n%s", NOT_ACTUAL_TEXT, adText);
-        editMessage.setChatId(channelChatId);
+        //editMessage.setChatId(channelChatId);
+        editMessage.setChatId(channelUsername);
         editMessage.setMessageId(Integer.parseInt(String.valueOf(messageId)));
         editMessage.setParseMode(ParseMode.HTML);
         editMessage.setCaption(editedText);
