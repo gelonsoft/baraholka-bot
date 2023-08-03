@@ -4,11 +4,9 @@ COPY ./pom.xml ./pom.xml
 
 COPY ./tg-bot/pom.xml ./tg-bot/pom.xml
 
+COPY ./tg-bot/src ./tg-bot/src
+
 WORKDIR /tg-bot
-
-RUN mvn dependency:resolve
-
-COPY ./tg-bot/src ./src
 
 RUN mvn clean compile assembly:single
 
