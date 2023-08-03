@@ -36,7 +36,7 @@ class Login extends React.Component {
             <div className="login-container">
                 <div className="login">
                     <p>Функции веб-сервиса:<br/>1. Добавление объявлений<br/>2. Удаление объявлений<br/>3. Поиск по акутальным объявлениям<br/>4. Все актуальные объявления пользователя</p>
-                    <TelegramLoginButton dataOnauth={this.handleTelegramResponse} botName="BaraholkaAdBot" />
+                    <TelegramLoginButton dataOnauth={this.handleTelegramResponse} botName="BaraholkaSigmaBot" />
                 </div>
             </div>
         )
