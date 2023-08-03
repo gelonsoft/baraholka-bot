@@ -1,10 +1,11 @@
 import axios from "axios";
 
-const GET_TAGS_URL = "http://localhost:8080/api/all_tags";
-const GET_SEARCH_ADS_URL = "http://localhost:8080/api/search_advertisements";
-const GET_MY_ADS_URL = "http://localhost:8080/api/my_advertisements";
-const POST_DEL_AD_URL = "http://localhost:8080/api/delete_advertisement/";
-const NEW_AD_URL = "http://localhost:8080/api/add_advertisement";
+const API_URL='https://baraholka.sighold.com/api'
+const GET_TAGS_URL = API_URL+"/all_tags";
+const GET_SEARCH_ADS_URL = API_URL+"/search_advertisements";
+const GET_MY_ADS_URL = API_URL+"/my_advertisements";
+const POST_DEL_AD_URL = API_URL+"/delete_advertisement/";
+const NEW_AD_URL = API_URL+"/add_advertisement";
 
 class RequestService {
     getTags(userData) {
