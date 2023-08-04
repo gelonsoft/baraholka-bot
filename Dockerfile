@@ -6,8 +6,8 @@ COPY ./tg-bot/pom.xml ./tg-bot/pom.xml
 
 WORKDIR /tg-bot
 
-#RUN mvn dependency:resolve
-RUN mvn clean package -Dmaven.main.skip -Dmaven.test.skip && rm -r target
+RUN mvn dependency:resolve
+#RUN mvn clean package -Dmaven.main.skip -Dmaven.test.skip && rm -r target
 
 COPY ./tg-bot/src ./src
 
