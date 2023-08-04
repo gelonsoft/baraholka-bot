@@ -155,7 +155,7 @@ public class NewObyavleniyeConfirm extends Command {
         try {
             return absSender.execute(sendMediaGroup);
         } catch (TelegramApiException e) {
-            LOGGER.error("Can't send photos with media group", e);
+            LOGGER.error("Can't send photos with media group to chat="+chatId, e);
             return null;
         }
     }
@@ -188,7 +188,7 @@ public class NewObyavleniyeConfirm extends Command {
         try {
             return absSender.execute(sendMediaGroup);
         } catch (TelegramApiException e) {
-            LOGGER.error("Can't send photos with media group", e);
+            LOGGER.error("Can't send photos with media group to chat="+chatId, e);
             return null;
         }
     }
