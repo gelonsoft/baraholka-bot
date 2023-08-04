@@ -74,21 +74,17 @@ public class NewObyavleniyeConfirm extends Command {
                 FORMED_OBYAVLENIYE, getReplyKeyboard(Collections.emptyList(), true));
 
         if (photos.size() == 1) {
-            if (chat.getId()==Long.parseLong(channelChatId)) {
-                sendPhotoMessage(absSender, channelUsername, Converter.convertBase64StringToPhoto(photos.get(0)), text);
-            } else {
-                sendPhotoMessage(absSender, chat.getId(), Converter.convertBase64StringToPhoto(photos.get(0)), text);
-            }
+
+            sendPhotoMessage(absSender, chat.getId(), Converter.convertBase64StringToPhoto(photos.get(0)), text);
+
         } else if (photos.size() > 1) {
             List<File> photoFiles = new ArrayList<>();
             for (String photo : photos) {
                 photoFiles.add(Objects.requireNonNull(Converter.convertBase64StringToPhoto(photo)));
             }
-            if (chat.getId()==Long.parseLong(channelChatId)) {
-                sendPhotoMediaGroup(absSender, channelUsername, photoFiles, text);
-            } else {
-                sendPhotoMediaGroup(absSender, chat.getId(), photoFiles, text);
-            }
+
+            sendPhotoMediaGroup(absSender, chat.getId(), photoFiles, text);
+
         }
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
@@ -96,6 +92,9 @@ public class NewObyavleniyeConfirm extends Command {
     }
 
     public Message sendPhotoMessage(AbsSender absSender, long chatId, File photoFile, String text) {
+        if (chatId == Long.parseLong(channelChatId)) {
+            return this.sendPhotoMessage(absSender, channelUsername, photoFile, text);
+        }
         SendPhoto sendPhoto = SendPhoto.builder()
                 .chatId(chatId)
                 .photo(new InputFile(Objects.requireNonNull(photoFile)))
@@ -106,7 +105,7 @@ public class NewObyavleniyeConfirm extends Command {
         try {
             return absSender.execute(sendPhoto);
         } catch (TelegramApiException e) {
-            LOGGER.error("Can't send photo message to chatId="+chatId, e);
+            LOGGER.error("Can't send photo message to chatId=" + chatId, e);
             return null;
         }
     }
@@ -122,23 +121,26 @@ public class NewObyavleniyeConfirm extends Command {
         try {
             return absSender.execute(sendPhoto);
         } catch (TelegramApiException e) {
-            LOGGER.error("Can't send photo message to chatId="+chatId, e);
+            LOGGER.error("Can't send photo message to chatId=" + chatId, e);
             return null;
         }
     }
 
     public List<Message> sendPhotoMediaGroup(AbsSender absSender, long chatId, List<File> photoFiles, String text) {
+        if (chatId == Long.parseLong(channelChatId)) {
+            return this.sendPhotoMediaGroup(absSender, channelUsername, photoFiles, text);
+        }
         AtomicInteger count = new AtomicInteger();
         List<InputMedia> medias = photoFiles.stream()
                 .map(photoFile -> {
                     String mediaName = UUID.randomUUID().toString();
 
                     InputMediaPhoto.InputMediaPhotoBuilder inputMediaPhotoBuilder = InputMediaPhoto.builder()
-                                .media("attach://" + mediaName)
-                                .mediaName(mediaName)
-                                .isNewMedia(true)
-                                .newMediaFile(Objects.requireNonNull(photoFile))
-                                .parseMode(ParseMode.HTML);
+                            .media("attach://" + mediaName)
+                            .mediaName(mediaName)
+                            .isNewMedia(true)
+                            .newMediaFile(Objects.requireNonNull(photoFile))
+                            .parseMode(ParseMode.HTML);
 
                     if (count.getAndIncrement() == 0) {
                         inputMediaPhotoBuilder.caption(text);
@@ -155,7 +157,7 @@ public class NewObyavleniyeConfirm extends Command {
         try {
             return absSender.execute(sendMediaGroup);
         } catch (TelegramApiException e) {
-            LOGGER.error("Can't send photos with media group to chat="+chatId, e);
+            LOGGER.error("Can't send photos with media group to chat=" + chatId, e);
             return null;
         }
     }
@@ -188,7 +190,7 @@ public class NewObyavleniyeConfirm extends Command {
         try {
             return absSender.execute(sendMediaGroup);
         } catch (TelegramApiException e) {
-            LOGGER.error("Can't send photos with media group to chat="+chatId, e);
+            LOGGER.error("Can't send photos with media group to chat=" + chatId, e);
             return null;
         }
     }
