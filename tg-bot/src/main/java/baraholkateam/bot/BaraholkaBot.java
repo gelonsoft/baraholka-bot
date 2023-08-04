@@ -796,7 +796,7 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
         String adText = actualObyavleniyeService.adText(Long.parseLong(messageId))
                 .substring(Tag.Actual.getName().length() + 1);
         String editedText = String.format("%s\n\n%s", NOT_ACTUAL_TEXT, adText);
-        editMessage.setChatId(channelChatId);
+        editMessage.setChatId(channelUsername);
         editMessage.setMessageId(Integer.parseInt(messageId));
         editMessage.setParseMode(ParseMode.HTML);
         editMessage.setCaption(editedText);

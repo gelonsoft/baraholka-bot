@@ -239,7 +239,7 @@ public class NotificationExecutor {
         String editedText = String.format("%s\n\n%s", NOT_ACTUAL_TEXT,
                 actualObyavleniyeService.adText(Long.parseLong(messageId))
                 .substring(Tag.Actual.getName().length() + 1));
-        editMessage.setChatId(channelChatId);
+        editMessage.setChatId(channelUsername);
         editMessage.setMessageId(Integer.parseInt(messageId));
         editMessage.setParseMode(ParseMode.HTML);
         editMessage.setCaption(editedText);

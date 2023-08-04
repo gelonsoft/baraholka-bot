@@ -31,6 +31,9 @@ public class UserObyavleniyes extends Command {
     @Value("${channel.chat_id}")
     private String channelChatId;
 
+    @Value("${channel.username}")
+    private String channelUsername;
+
     public UserObyavleniyes() {
         super(State.UserObyavleniyes.getIdentifier(), State.UserObyavleniyes.getDescription());
     }
@@ -45,7 +48,7 @@ public class UserObyavleniyes extends Command {
                     USER_OBYAVLENIYES, null);
             for (ActualObyavleniye actualObyavleniye : actualObyavleniyes) {
                 telegramAPIRequests.forwardMessage(
-                        channelChatId,
+                        channelUsername,
                         String.valueOf(actualObyavleniye.getOwnerChatId()),
                         actualObyavleniye.getMessageId()
                 );
