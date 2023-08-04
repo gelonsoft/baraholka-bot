@@ -11,9 +11,9 @@ RUN mvn clean package -Dmaven.main.skip -Dmaven.test.skip && rm -r target
 
 COPY ./tg-bot/src ./src
 
-RUN mvn clean package -Dmaven.test.skip
+#RUN mvn clean package -Dmaven.test.skip
 
-#RUN mvn clean compile assembly:single -o
+RUN mvn clean compile assembly:single -o
 
 FROM openjdk:17-alpine
 
