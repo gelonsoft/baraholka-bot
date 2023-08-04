@@ -67,7 +67,7 @@ public class NewObyavleniyeConfirm extends Command {
                 FORMED_OBYAVLENIYE, getReplyKeyboard(Collections.emptyList(), true));
 
         if (photos.size() == 1) {
-            sendPhotoMessage(absSender, chat.getId(), Converter.convertBase64StringToPhoto(photos.get(0)), text);
+            sendPhotoMessage(absSender, chat.getUserName(), Converter.convertBase64StringToPhoto(photos.get(0)), text);
         } else if (photos.size() > 1) {
             List<File> photoFiles = new ArrayList<>();
             for (String photo : photos) {
