@@ -6,14 +6,14 @@ COPY ./tg-bot/pom.xml ./tg-bot/pom.xml
 
 WORKDIR /tg-bot
 
-RUN mvn dependency:resolve
+RUN mvn clean dependency:resolve
 #RUN mvn clean package -Dmaven.main.skip -Dmaven.test.skip && rm -r target
 
 COPY ./tg-bot/src ./src
 
 #RUN mvn clean package -Dmaven.test.skip
 
-RUN mvn clean compile assembly:single -o
+RUN mvn compile assembly:single
 
 FROM openjdk:17-alpine
 
