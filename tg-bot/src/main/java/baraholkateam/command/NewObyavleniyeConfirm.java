@@ -8,6 +8,7 @@ import baraholkateam.util.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.methods.send.SendMediaGroup;
@@ -50,6 +51,12 @@ public class NewObyavleniyeConfirm extends Command {
         super(State.NewObyavleniye_Confirm.getIdentifier(), State.NewObyavleniye_Confirm.getDescription());
     }
 
+    @Value("${channel.chat_id}")
+    private String channelChatId;
+
+    @Value("${channel.username}")
+    private String channelUsername;
+
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
         CurrentObyavleniye ad = currentObyavleniyeService.get(chat.getId());
@@ -67,13 +74,21 @@ public class NewObyavleniyeConfirm extends Command {
                 FORMED_OBYAVLENIYE, getReplyKeyboard(Collections.emptyList(), true));
 
         if (photos.size() == 1) {
-            sendPhotoMessage(absSender, chat.getUserName(), Converter.convertBase64StringToPhoto(photos.get(0)), text);
+            if (chat.getId()==Long.parseLong(channelChatId)) {
+                sendPhotoMessage(absSender, channelUsername, Converter.convertBase64StringToPhoto(photos.get(0)), text);
+            } else {
+                sendPhotoMessage(absSender, chat.getId(), Converter.convertBase64StringToPhoto(photos.get(0)), text);
+            }
         } else if (photos.size() > 1) {
             List<File> photoFiles = new ArrayList<>();
             for (String photo : photos) {
                 photoFiles.add(Objects.requireNonNull(Converter.convertBase64StringToPhoto(photo)));
             }
-            sendPhotoMediaGroup(absSender, chat.getId(), photoFiles, text);
+            if (chat.getId()==Long.parseLong(channelChatId)) {
+                sendPhotoMediaGroup(absSender, channelUsername, photoFiles, text);
+            } else {
+                sendPhotoMediaGroup(absSender, chat.getId(), photoFiles, text);
+            }
         }
 
         sendAnswer(absSender, chat.getId(), this.getCommandIdentifier(), user.getUserName(),
@@ -124,6 +139,39 @@ public class NewObyavleniyeConfirm extends Command {
                                 .isNewMedia(true)
                                 .newMediaFile(Objects.requireNonNull(photoFile))
                                 .parseMode(ParseMode.HTML);
+
+                    if (count.getAndIncrement() == 0) {
+                        inputMediaPhotoBuilder.caption(text);
+                    }
+
+                    return inputMediaPhotoBuilder.build();
+                }).collect(Collectors.toList());
+
+        SendMediaGroup sendMediaGroup = SendMediaGroup.builder()
+                .chatId(chatId)
+                .medias(medias)
+                .build();
+
+        try {
+            return absSender.execute(sendMediaGroup);
+        } catch (TelegramApiException e) {
+            LOGGER.error("Can't send photos with media group", e);
+            return null;
+        }
+    }
+
+    public List<Message> sendPhotoMediaGroup(AbsSender absSender, String chatId, List<File> photoFiles, String text) {
+        AtomicInteger count = new AtomicInteger();
+        List<InputMedia> medias = photoFiles.stream()
+                .map(photoFile -> {
+                    String mediaName = UUID.randomUUID().toString();
+
+                    InputMediaPhoto.InputMediaPhotoBuilder inputMediaPhotoBuilder = InputMediaPhoto.builder()
+                            .media("attach://" + mediaName)
+                            .mediaName(mediaName)
+                            .isNewMedia(true)
+                            .newMediaFile(Objects.requireNonNull(photoFile))
+                            .parseMode(ParseMode.HTML);
 
                     if (count.getAndIncrement() == 0) {
                         inputMediaPhotoBuilder.caption(text);
