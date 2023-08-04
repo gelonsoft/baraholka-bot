@@ -709,7 +709,8 @@ public class BaraholkaBot extends TelegramLongPollingCommandBot implements TgFil
                     if (Objects.equals(dataParts[2], "0")) {
                         sentAd = newObyavleniyeConfirm.sendPhotoMessage(
                                 this,
-                                Long.parseLong(channelChatId),
+                                //Long.parseLong(channelChatId),
+                                channelUsername,
                                 Converter.convertBase64StringToPhoto(
                                         currentObyavleniyeService.getPhotos(msg.getChatId()).get(0)
                                 ),
