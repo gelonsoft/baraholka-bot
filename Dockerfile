@@ -13,7 +13,7 @@ COPY ./tg-bot/src ./src
 
 #RUN mvn clean package -Dmaven.test.skip
 
-RUN mvn compile assembly:single
+RUN mvn compile assembly:single --no-snapshot-updates
 
 FROM openjdk:17-alpine
 
